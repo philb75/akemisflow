@@ -1,0 +1,488 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// PHASE 1: CORE ENTITIES (Week 1-2)
+// =============================================================================
+
+enum ContactType {
+  CLIENT_COMPANY
+  CLIENT_CONTACT
+  CONSULTANT
+  PARTNER
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model Contact {
+  id                    String        @id @default(uuid()) @db.Uuid
+  contactType           ContactType   @map("contact_type")
+  name                  String        @db.VarChar(255)
+  email                 String?       @db.VarChar(255)
+  phone                 String?       @db.VarChar(50)
+  status                ContactStatus @default(ACTIVE)
+  
+  // Address fields
+  addressLine1          String?       @map("address_line1") @db.VarChar(255)
+  addressLine2          String?       @map("address_line2") @db.VarChar(255)
+  city                  String?       @db.VarChar(100)
+  state                 String?       @db.VarChar(100)
+  postalCode            String?       @map("postal_code") @db.VarChar(20)
+  country               String?       @db.VarChar(2) // ISO 2-letter country code
+  
+  // Business information
+  taxId                 String?       @map("tax_id") @db.VarChar(100)
+  currencyPreference    String?       @map("currency_preference") @db.VarChar(3) @default("EUR")
+  
+  // Company relationship
+  parentCompanyId       String?       @map("parent_company_id") @db.Uuid
+  parentCompany         Contact?      @relation("CompanyHierarchy", fields: [parentCompanyId], references: [id])
+  subContacts           Contact[]     @relation("CompanyHierarchy")
+  
+  // Profit sharing (for partners)
+  profitSharePercentage Decimal?      @map("profit_share_percentage") @db.Decimal(5,2)
+  
+  // Metadata
+  notes                 String?       @db.Text
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  bankAccounts          BankAccount[]
+  clientInvoices        Invoice[]     @relation("ClientInvoices")
+  consultantPayments    ConsultantPayment[]
+  partnerProfitShares   PartnerProfitShare[]
+  
+  @@map("contacts")
+}
+
+enum BankAccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum BankAccountType {
+  BUSINESS
+  PERSONAL
+  SAVINGS
+  CHECKING
+}
+
+model BankAccount {
+  id              String            @id @default(uuid()) @db.Uuid
+  accountName     String            @map("account_name") @db.VarChar(255)
+  bankName        String            @map("bank_name") @db.VarChar(255)
+  accountNumber   String?           @map("account_number") @db.VarChar(100)
+  currency        String            @db.VarChar(3)
+  
+  // Account details
+  iban            String?           @db.VarChar(34)
+  swiftBic        String?           @map("swift_bic") @db.VarChar(11)
+  routingNumber   String?           @map("routing_number") @db.VarChar(20)
+  sortCode        String?           @map("sort_code") @db.VarChar(10)
+  
+  // Account classification
+  accountType     BankAccountType   @map("account_type") @default(BUSINESS)
+  status          BankAccountStatus @default(ACTIVE)
+  
+  // Limits and controls
+  dailyLimit      Decimal?          @map("daily_limit") @db.Decimal(15,2)
+  monthlyLimit    Decimal?          @map("monthly_limit") @db.Decimal(15,2)
+  
+  // External integrations
+  airwallexAccountId String?        @unique @map("airwallex_account_id") @db.VarChar(255)
+  
+  // Ownership
+  contactId       String?           @map("contact_id") @db.Uuid
+  contact         Contact?          @relation(fields: [contactId], references: [id])
+  
+  // Metadata
+  metadata        Json?
+  
+  // Timestamps
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  transactions    Transaction[]
+  invoices        Invoice[]
+  
+  @@map("bank_accounts")
+}
+
+// =============================================================================
+// PHASE 2: TRANSACTION MANAGEMENT (Week 3-4)
+// =============================================================================
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum TransactionCategory {
+  INVOICE_PAYMENT
+  CONSULTANT_PAYMENT
+  EXPENSE
+  TRANSFER
+  FEE
+  INTEREST
+  REFUND
+  OTHER
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum TransactionSource {
+  AIRWALLEX
+  HSBC_IMPORT
+  MANUAL_UPLOAD
+  MANUAL
+}
+
+model Transaction {
+  id                    String              @id @default(uuid()) @db.Uuid
+  
+  // Core transaction data
+  bankAccountId         String              @map("bank_account_id") @db.Uuid
+  bankAccount           BankAccount         @relation(fields: [bankAccountId], references: [id])
+  
+  transactionType       TransactionType     @map("transaction_type")
+  amount                Decimal             @db.Decimal(15,2)
+  currency              String              @db.VarChar(3)
+  
+  // Transaction details
+  description           String?             @db.Text
+  referenceNumber       String?             @map("reference_number") @db.VarChar(255)
+  category              TransactionCategory @default(OTHER)
+  status                TransactionStatus   @default(COMPLETED)
+  
+  // Fee tracking
+  feeAmount             Decimal?            @map("fee_amount") @db.Decimal(15,2)
+  feeCurrency           String?             @map("fee_currency") @db.VarChar(3)
+  
+  // Multi-currency support
+  originalAmount        Decimal?            @map("original_amount") @db.Decimal(15,2)
+  originalCurrency      String?             @map("original_currency") @db.VarChar(3)
+  exchangeRate          Decimal?            @map("exchange_rate") @db.Decimal(10,6)
+  
+  // Counterparty
+  counterpartyContactId String?             @map("counterparty_contact_id") @db.Uuid
+  counterpartyContact   Contact?            @relation(fields: [counterpartyContactId], references: [id])
+  
+  // External system integration
+  airwallexTransactionId String?            @unique @map("airwallex_transaction_id") @db.VarChar(255)
+  source                TransactionSource   @default(MANUAL)
+  rawData               Json?               @map("raw_data")
+  
+  // Dates
+  transactionDate       DateTime            @map("transaction_date") @db.Date
+  valueDate             DateTime?           @map("value_date") @db.Date
+  
+  // Reconciliation
+  batchId               String?             @map("batch_id") @db.Uuid
+  reconciliationStatus  String?             @map("reconciliation_status") @db.VarChar(20)
+  
+  // Compliance
+  transactionPurpose    String?             @map("transaction_purpose") @db.VarChar(255)
+  complianceNotes       String?             @map("compliance_notes") @db.Text
+  
+  // Timestamps
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  invoicePayments       Invoice[]           @relation("InvoicePayments")
+  consultantPayments    ConsultantPayment[] @relation("ConsultantPaymentTransactions")
+  
+  @@map("transactions")
+}
+
+// =============================================================================
+// PHASE 3: INVOICE MANAGEMENT (Week 5-6)
+// =============================================================================
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  VIEWED
+  PAID
+  PARTIAL_PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+  DISPUTED
+}
+
+model Invoice {
+  id                  String               @id @default(uuid()) @db.Uuid
+  invoiceNumber       String               @unique @map("invoice_number") @db.VarChar(100)
+  displayNumber       String?              @map("display_number") @db.VarChar(50) // Custom format like "2025043045"
+  
+  // Client information
+  clientContactId     String               @map("client_contact_id") @db.Uuid
+  clientContact       Contact              @relation("ClientInvoices", fields: [clientContactId], references: [id])
+  
+  // Financial details
+  amount              Decimal              @db.Decimal(15,2)
+  currency            String               @db.VarChar(3)
+  subtotal            Decimal?             @db.Decimal(15,2)
+  totalTax            Decimal?             @map("total_tax") @db.Decimal(15,2) @default(0)
+  totalAmount         Decimal?             @map("total_amount") @db.Decimal(15,2)
+  
+  // Status and dates
+  status              InvoiceStatus        @default(DRAFT)
+  issueDate           DateTime             @map("issue_date") @db.Date
+  dueDate             DateTime             @map("due_date") @db.Date
+  sentDate            DateTime?            @map("sent_date") @db.Date
+  viewedDate          DateTime?            @map("viewed_date") @db.Date
+  paidDate            DateTime?            @map("paid_date") @db.Date
+  
+  // Payment information
+  paymentTransactionId String?             @map("payment_transaction_id") @db.Uuid
+  paymentTransaction   Transaction?        @relation("InvoicePayments", fields: [paymentTransactionId], references: [id])
+  bankAccountId        String?             @map("bank_account_id") @db.Uuid
+  bankAccount          BankAccount?        @relation(fields: [bankAccountId], references: [id])
+  
+  // Terms and conditions
+  paymentTermsDays     Int?                @map("payment_terms_days")
+  paymentTermsText     String?             @map("payment_terms_text") @db.VarChar(255)
+  paymentInstructions  String?             @map("payment_instructions") @db.Text
+  
+  // Project information
+  referenceNumber      String?             @map("reference_number") @db.VarChar(255)
+  projectName          String?             @map("project_name") @db.VarChar(255)
+  
+  // Invoice tracking
+  reminderCount        Int                 @default(0) @map("reminder_count")
+  
+  // Template and branding
+  templateId           String?             @map("template_id") @db.Uuid
+  logoUrl              String?             @map("logo_url") @db.VarChar(500)
+  
+  // Fees and discounts
+  lateFeeRate          Decimal?            @map("late_fee_rate") @db.Decimal(5,2)
+  discountRate         Decimal?            @map("discount_rate") @db.Decimal(5,2)
+  discountAmount       Decimal?            @map("discount_amount") @db.Decimal(15,2)
+  
+  // Recurring invoices
+  isRecurring          Boolean             @default(false) @map("is_recurring")
+  recurringInterval    String?             @map("recurring_interval") @db.VarChar(20) // monthly, quarterly, yearly
+  nextInvoiceDate      DateTime?           @map("next_invoice_date") @db.Date
+  
+  // Content
+  lineItems            Json?               @map("line_items") // JSON array of line items
+  notes                String?             @db.Text
+  
+  // Timestamps
+  createdAt            DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  consultantPayments   ConsultantPayment[] @relation("InvoiceConsultantPayments")
+  
+  @@map("invoices")
+}
+
+// =============================================================================
+// PHASE 4: CONSULTANT PAYMENTS (Week 7)
+// =============================================================================
+
+enum ConsultantPaymentStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  WIRE_TRANSFER
+  CHECK
+  CASH
+  DIGITAL_WALLET
+  OTHER
+}
+
+model ConsultantPayment {
+  id                    String                  @id @default(uuid()) @db.Uuid
+  
+  // Consultant information
+  consultantContactId   String                  @map("consultant_contact_id") @db.Uuid
+  consultantContact     Contact                 @relation(fields: [consultantContactId], references: [id])
+  
+  // Related invoice
+  relatedInvoiceId      String?                 @map("related_invoice_id") @db.Uuid
+  relatedInvoice        Invoice?                @relation("InvoiceConsultantPayments", fields: [relatedInvoiceId], references: [id])
+  
+  // Payment details
+  amount                Decimal                 @db.Decimal(15,2)
+  currency              String                  @db.VarChar(3)
+  netAmount             Decimal?                @map("net_amount") @db.Decimal(15,2)
+  
+  // Tax withholding
+  taxWithheld           Decimal?                @map("tax_withheld") @db.Decimal(15,2) @default(0)
+  taxRate               Decimal?                @map("tax_rate") @db.Decimal(5,2) @default(0)
+  
+  // Commission tracking
+  commissionRate        Decimal?                @map("commission_rate") @db.Decimal(5,2)
+  
+  // Status and workflow
+  status                ConsultantPaymentStatus @default(PENDING)
+  approvalStatus        String?                 @map("approval_status") @db.VarChar(20)
+  approvedBy            String?                 @map("approved_by") @db.Uuid
+  approvedDate          DateTime?               @map("approved_date") @db.Date
+  
+  // Payment execution
+  paymentMethod         PaymentMethod?          @map("payment_method")
+  paymentDate           DateTime?               @map("payment_date") @db.Date
+  paymentTransactionId  String?                 @map("payment_transaction_id") @db.Uuid
+  paymentTransaction    Transaction?            @relation("ConsultantPaymentTransactions", fields: [paymentTransactionId], references: [id])
+  paymentReference      String?                 @map("payment_reference") @db.VarChar(255)
+  
+  // Additional information
+  description           String?                 @db.Text
+  paymentDetails        Json?                   @map("payment_details")
+  
+  // Timestamps
+  createdAt             DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  @@map("consultant_payments")
+}
+
+// =============================================================================
+// PHASE 5: PROFIT DISTRIBUTION (Week 8)
+// =============================================================================
+
+enum ProfitDistributionStatus {
+  CALCULATED
+  DISTRIBUTED
+  FINALIZED
+}
+
+model ProfitDistribution {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  period              String                   @db.VarChar(7) // Format: YYYY-MM
+  totalProfit         Decimal                  @map("total_profit") @db.Decimal(15,2)
+  baseCurrency        String                   @map("base_currency") @db.VarChar(3)
+  status              ProfitDistributionStatus @default(CALCULATED)
+  
+  // Calculation details
+  calculationDetails  Json?                    @map("calculation_details")
+  calculationDate     DateTime                 @map("calculation_date") @db.Date
+  distributionDate    DateTime?                @map("distribution_date") @db.Date
+  distributionMethod  String?                  @map("distribution_method") @db.VarChar(50)
+  
+  // Approval workflow
+  approvedBy          String?                  @map("approved_by") @db.Uuid
+  approvedDate        DateTime?                @map("approved_date") @db.Date
+  
+  // Timestamps
+  createdAt           DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  partnerShares       PartnerProfitShare[]
+  
+  @@unique([period, baseCurrency])
+  @@map("profit_distributions")
+}
+
+enum PartnerProfitShareStatus {
+  PENDING
+  PAID
+}
+
+model PartnerProfitShare {
+  id                    String                    @id @default(uuid()) @db.Uuid
+  
+  // Distribution reference
+  profitDistributionId  String                    @map("profit_distribution_id") @db.Uuid
+  profitDistribution    ProfitDistribution        @relation(fields: [profitDistributionId], references: [id])
+  
+  // Partner information
+  partnerContactId      String                    @map("partner_contact_id") @db.Uuid
+  partnerContact        Contact                   @relation(fields: [partnerContactId], references: [id])
+  
+  // Share details
+  sharePercentage       Decimal                   @map("share_percentage") @db.Decimal(5,2)
+  shareAmount           Decimal                   @map("share_amount") @db.Decimal(15,2)
+  currency              String                    @db.VarChar(3)
+  
+  // Payment status
+  status                PartnerProfitShareStatus  @default(PENDING)
+  paymentTransactionId  String?                   @map("payment_transaction_id") @db.Uuid
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  @@map("partner_profit_shares")
+}
+
+// =============================================================================
+// SUPPORTING TABLES
+// =============================================================================
+
+enum ExchangeRateSource {
+  AIRWALLEX
+  MANUAL
+  API
+}
+
+enum ExchangeRateType {
+  SPOT
+  FORWARD
+  HISTORICAL
+}
+
+model ExchangeRate {
+  id           String             @id @default(uuid()) @db.Uuid
+  fromCurrency String             @map("from_currency") @db.VarChar(3)
+  toCurrency   String             @map("to_currency") @db.VarChar(3)
+  rate         Decimal            @db.Decimal(10,6)
+  
+  // Rate details
+  bidRate      Decimal?           @map("bid_rate") @db.Decimal(10,6)
+  askRate      Decimal?           @map("ask_rate") @db.Decimal(10,6)
+  spread       Decimal?           @db.Decimal(10,6)
+  
+  // Rate metadata
+  rateType     ExchangeRateType   @map("rate_type") @default(SPOT)
+  source       ExchangeRateSource @default(MANUAL)
+  provider     String?            @db.VarChar(50)
+  
+  // Validity
+  rateDate     DateTime           @map("rate_date") @db.Date
+  expiresAt    DateTime?          @map("expires_at") @db.Timestamptz(6)
+  isActive     Boolean            @default(true) @map("is_active")
+  
+  // Timestamps
+  createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  @@unique([fromCurrency, toCurrency, rateDate])
+  @@map("exchange_rates")
+}
