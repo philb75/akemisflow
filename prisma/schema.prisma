@@ -68,6 +68,7 @@ model Contact {
   clientInvoices        Invoice[]     @relation("ClientInvoices")
   consultantPayments    ConsultantPayment[]
   partnerProfitShares   PartnerProfitShare[]
+  transactions          Transaction[] @relation("CounterpartyTransactions")
   
   @@map("contacts")
 }
@@ -190,7 +191,7 @@ model Transaction {
   
   // Counterparty
   counterpartyContactId String?             @map("counterparty_contact_id") @db.Uuid
-  counterpartyContact   Contact?            @relation(fields: [counterpartyContactId], references: [id])
+  counterpartyContact   Contact?            @relation("CounterpartyTransactions", fields: [counterpartyContactId], references: [id])
   
   // External system integration
   airwallexTransactionId String?            @unique @map("airwallex_transaction_id") @db.VarChar(255)
