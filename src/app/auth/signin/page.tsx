@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
-export default function SignIn() {
+function SignInForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -131,11 +131,10 @@ export default function SignIn() {
                 disabled={isLoading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white disabled:opacity-50 transition-colors"
                 style={{
-                  backgroundColor: '#2E3A7C',
-                  '&:hover': { backgroundColor: '#1E2A5C' }
+                  backgroundColor: '#2E3A7C'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#1E2A5C'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#2E3A7C'}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#1E2A5C'}
+                onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = '#2E3A7C'}
               >
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
@@ -175,8 +174,8 @@ export default function SignIn() {
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
               <Link href="/auth/signup" className="font-medium transition-colors" style={{color: '#2E3A7C'}} 
-                    onMouseEnter={(e) => e.target.style.color = '#4A6BA8'}
-                    onMouseLeave={(e) => e.target.style.color = '#2E3A7C'}>
+                    onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#4A6BA8'}
+                    onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#2E3A7C'}>
                 Sign up
               </Link>
             </p>
@@ -184,5 +183,13 @@ export default function SignIn() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   )
 }

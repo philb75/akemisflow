@@ -12,7 +12,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
     error: "/auth/error",
   },
   providers: [
@@ -33,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await db.user.findUnique({
           where: {
-            email: credentials.email
+            email: credentials.email as string
           }
         })
 
@@ -42,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
+          credentials.password as string,
           user.password
         )
 
@@ -77,14 +76,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.sub,
-          role: token.role,
-        }
+      if (session.user) {
+        session.user.id = token.sub as string
+        session.user.role = token.role as string
       }
+      return session
     },
   },
   events: {
