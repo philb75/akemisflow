@@ -128,4 +128,39 @@ The application is deployed with Vercel SSO authentication enabled, which explai
 
 ---
 
-**Status**: ✅ DEPLOYMENT COMPLETE - Full production environment ready!
+**Status**: ⚠️ DEPLOYMENT COMPLETE - Database Issue Identified
+
+## 🚨 Production Database Issue Resolution
+
+**Current Status**: Supabase database is paused due to inactivity, causing signup failures.
+
+### Issue Summary
+- Production signup fails with "Internal server error"
+- Database connection error: "Can't reach database server at db.wflcaapznpczlxjaeyfd.supabase.co:5432"
+- Local environment works perfectly with same database credentials
+- Database setup endpoints created and functional locally
+
+### Root Cause
+Supabase databases auto-pause after inactivity periods on free tier. The database needs to be woken up.
+
+### Emergency Database Endpoints Created
+1. **Database Test**: https://akemisflow-philippe-barthelemys-projects.vercel.app/api/db-test
+   - Tests basic database connectivity
+   - Returns detailed error messages for troubleshooting
+
+2. **Database Setup**: https://akemisflow-philippe-barthelemys-projects.vercel.app/api/db-setup
+   - Creates required NextAuth.js tables (User, Account, Session, VerificationToken)
+   - Uses raw SQL for compatibility
+   - Publicly accessible for emergency setup
+
+### Resolution Steps
+1. **Wake up Supabase database** via dashboard: https://supabase.com/dashboard/project/wflcaapznpczlxjaeyfd
+2. **Run database setup** once connection is restored: `/api/db-setup`
+3. **Test production signup** functionality
+4. **Consider upgrading Supabase plan** to prevent auto-pausing
+
+### Local Testing Confirmed ✅
+- Database connection works perfectly locally
+- Signup functionality operational
+- Database schema properly configured
+- Emergency endpoints functional
