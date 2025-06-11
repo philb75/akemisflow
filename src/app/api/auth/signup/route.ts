@@ -19,6 +19,9 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await db.user.findUnique({
       where: { email }
+    }).catch((error) => {
+      console.error("Database connection error:", error)
+      throw new Error("Database connection failed")
     })
 
     if (existingUser) {
@@ -64,8 +67,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // More specific error for database issues
+    if (error instanceof Error) {
+      if (error.message.includes("Database connection failed")) {
+        return NextResponse.json(
+          { error: "Database unavailable. Please try again later." },
+          { status: 503 }
+        )
+      }
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     )
   }

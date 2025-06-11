@@ -95,8 +95,8 @@ npm run db:studio
 ### 🔗 Important URLs
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/wflcaapznpczlxjaeyfd
 - **Vercel Dashboard**: https://vercel.com/philippe-barthelemys-projects/akemisflow
-- **Production URL**: https://akemisflow-nqtvpcmpd-philippe-barthelemys-projects.vercel.app
-- **Deployment Logs**: https://vercel.com/philippe-barthelemys-projects/akemisflow/4XWHMk1VTTCm5yJBhniaQuEmvPZN
+- **Production URL**: https://akemisflow-g0doyamax-philippe-barthelemys-projects.vercel.app
+- **Latest Deployment**: https://vercel.com/philippe-barthelemys-projects/akemisflow/FGdebfKTsVe7xYRLcWJJczELWsCV
 
 ### 📦 Configured Environment Variables ✅
 - ✅ DATABASE_URL (PostgreSQL connection)
