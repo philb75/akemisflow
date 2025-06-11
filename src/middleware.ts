@@ -11,6 +11,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/db-setup') ||
     pathname.startsWith('/api/db-test') ||
+    pathname.startsWith('/api/wake-db') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon.ico') ||
     pathname.startsWith('/images/') ||
@@ -49,6 +50,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public (public files)
      */
-    "/((?!api/auth|api/db-setup|api/db-test|_next/static|_next/image|favicon.ico|public).*)",
+    "/((?!api/auth|api/db-setup|api/db-test|api/wake-db|_next/static|_next/image|favicon.ico|public).*)",
   ],
 }
