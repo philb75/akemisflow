@@ -1,5 +1,8 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 // Mock data for bank accounts
 const mockBankAccounts = [
@@ -83,7 +86,8 @@ export default function BankAccountsPage() {
   }, 0);
 
   return (
-    <div className="space-y-8">
+    <DashboardLayout>
+      <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -285,6 +289,7 @@ export default function BankAccountsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

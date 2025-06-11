@@ -1,5 +1,8 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 const mockInvoices = [
   {
@@ -58,7 +61,8 @@ function getCurrencySymbol(currency: string) {
 
 export default function InvoicesPage() {
   return (
-    <div className="space-y-8">
+    <DashboardLayout>
+      <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -167,6 +171,7 @@ export default function InvoicesPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

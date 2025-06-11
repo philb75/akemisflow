@@ -2,143 +2,157 @@
 
 A comprehensive financial management system for Akemis operations, built with Next.js, PostgreSQL, and modern web technologies.
 
-## 🏗️ Architecture
-
-- **Frontend**: Next.js 14 with TypeScript
-- **Backend**: Next.js API routes + PostgreSQL
-- **Database**: PostgreSQL with incremental migrations
-- **Development**: Docker Compose with local PostgreSQL
-- **Production**: Vercel + Supabase (or Railway)
-
 ## 🚀 Quick Start
 
-### Development (Local with Docker)
+### Choose Your Development Environment
 
+#### 1. Simple Local Development
 ```bash
-# Clone the repository
-git clone https://github.com/philb75/akemisflow.git
-cd akemisflow
+# Start database services
+pnpm docker:up
 
-# Start development environment
-docker-compose up -d
+# Install dependencies and start development
+pnpm install
+pnpm prisma db push
+pnpm dev
+```
+Access: http://localhost:3000
 
-# Install dependencies
-npm install
+#### 2. Complete Local Stack (Production Mirror)
+```bash
+# Start all services (PostgreSQL, PostgREST, MinIO, Redis)
+pnpm docker:full
 
-# Run database migrations
-npm run db:migrate
+# Switch to Docker environment
+pnpm env:docker
+```
+Access: http://localhost:3000 (full stack running in containers)
 
-# Start development server
-npm run dev
+#### 3. Containerized Development
+```bash
+# Run everything including Next.js in containers
+pnpm docker:full --profile app
 ```
 
-Visit http://localhost:3000
+### 🏗️ Architecture
 
-### Database Management
+#### Local Development Stack
+- **PostgreSQL 15**: Database (mirrors Supabase)
+- **PostgREST**: REST API layer (mirrors Supabase API)  
+- **MinIO**: S3-compatible storage (mirrors Supabase Storage)
+- **Redis**: Caching and sessions
+- **Next.js**: Application server (mirrors Vercel)
+- **pgAdmin**: Database management UI
 
+#### Production Stack  
+- **Vercel**: Application hosting and deployment
+- **Supabase**: Database and API services
+- **Supabase Storage**: File storage
+
+## 🔄 Migration & Deployment
+
+### Local to Production
 ```bash
-# Create new migration
-npm run db:migration:create <name>
+# Automated migration
+pnpm migrate:to-prod
 
-# Run migrations
-npm run db:migrate
+# Manual deployment
+vercel --prod
+```
 
-# Reset database (with seed data)
-npm run db:reset
-
-# Access database
-npm run db:studio
+### Production to Local Sync
+```bash
+# Sync production data/schema to local
+pnpm sync:from-prod
 ```
 
 ## 📋 Key Features
 
-### Phase 1 - Foundation (Week 1-2)
-- ✅ Client & Contact Management
-- ✅ Bank Account Management
-- ✅ Basic Dashboard
+### Phase 1 - Foundation ✅
+- Client & Contact Management
+- Bank Account Management  
+- Basic Dashboard
 
-### Phase 2 - Contract & Invoice Management (Week 3-4)
-- 🔄 Contract Templates & Generation
-- 🔄 Dual Invoice System (Client + Contractor)
-- 🔄 PDF Generation
+### Phase 2 - Contract & Invoice Management 🔄
+- Contract Templates & Generation
+- Dual Invoice System (Client + Contractor)
+- PDF Generation
 
-### Phase 3 - Financial Operations (Week 5-6)
-- ⏳ Payment Processing & Matching
-- ⏳ Bank Charge Calculations
-- ⏳ Profit Distribution Engine
+### Phase 3 - Financial Operations ⏳
+- Payment Processing & Matching
+- Bank Charge Calculations
+- Profit Distribution Engine
 
-### Phase 4 - Integration & Automation (Week 7-8)
-- ⏳ Airwallex API Integration
-- ⏳ HSBC Spreadsheet Import
-- ⏳ Financial Reporting Dashboard
+### Phase 4 - Integration & Automation ⏳  
+- Airwallex API Integration
+- HSBC Spreadsheet Import
+- Financial Reporting Dashboard
 
-## 🛠️ Technology Stack
+## 🛠️ Common Commands
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, PostgreSQL
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js
-- **File Storage**: Local storage (dev) / Vercel Blob (prod)
-- **PDF Generation**: @react-pdf/renderer
-- **UI Components**: Radix UI + Tailwind
-
-## 📁 Project Structure
-
-```
-akemisflow/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── api/               # API routes
-│   │   ├── dashboard/         # Dashboard pages
-│   │   ├── clients/           # Client management
-│   │   ├── contracts/         # Contract management
-│   │   ├── invoices/          # Invoice management
-│   │   └── transactions/      # Transaction management
-│   ├── components/            # React components
-│   │   ├── ui/               # Base UI components
-│   │   ├── forms/            # Form components
-│   │   └── charts/           # Chart components
-│   ├── lib/                   # Utility libraries
-│   │   ├── db.ts             # Database connection
-│   │   ├── auth.ts           # Authentication
-│   │   └── utils.ts          # Utilities
-│   └── types/                # TypeScript definitions
-├── prisma/                   # Database schema & migrations
-├── docker/                   # Docker configuration
-└── docs/                     # Documentation
-```
-
-## 🔒 Environment Variables
-
+### Development
 ```bash
-# Database
-DATABASE_URL="postgresql://akemisflow:password@localhost:5432/akemisflow_dev"
-
-# Authentication
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key"
-
-# External APIs (Production)
-AIRWALLEX_API_KEY="your-airwallex-key"
-AIRWALLEX_CLIENT_ID="your-client-id"
-AIRWALLEX_WEBHOOK_SECRET="your-webhook-secret"
-
-# Google Sheets
-GOOGLE_SHEETS_PRIVATE_KEY="your-private-key"
-GOOGLE_SHEETS_CLIENT_EMAIL="your-client-email"
+pnpm dev                 # Start development server
+pnpm build              # Build for production
+pnpm type-check         # TypeScript checking
+pnpm lint               # Code linting
 ```
+
+### Database
+```bash
+pnpm db:push            # Apply schema changes
+pnpm db:studio          # Open Prisma Studio
+pnpm db:migrate         # Apply migrations
+pnpm db:reset           # Reset database
+```
+
+### Docker
+```bash
+pnpm docker:up          # Start basic services
+pnpm docker:full        # Start complete stack
+pnpm docker:reset       # Reset and restart
+pnpm docker:down        # Stop services
+```
+
+### Environment
+```bash
+pnpm env:docker         # Switch to Docker config
+pnpm env:local          # Switch to local config
+```
+
+## 🔗 Service URLs
+
+### Local Development
+- **App**: http://localhost:3000
+- **API**: http://localhost:3001  
+- **pgAdmin**: http://localhost:8080 (admin@akemisflow.local / admin123)
+- **MinIO**: http://localhost:9001 (akemisflow / dev_password_2024)
+
+### Production
+- **App**: https://akemisflow-[hash].vercel.app
+- **Supabase**: https://supabase.com/dashboard/project/wflcaapznpczlxjaeyfd
+- **Vercel**: https://vercel.com/philippe-barthelemys-projects/akemisflow
+
+## 🔒 Environment Configuration
+
+Three environment setups:
+- `.env.local`: Local development (direct database)
+- `.env.local.docker`: Docker development (containerized)  
+- `.env.production`: Production (Vercel + Supabase)
+
+## 📚 Documentation
+
+- **[DEVELOPMENT_WORKFLOW.md](./DEVELOPMENT_WORKFLOW.md)**: Complete development guide
+- **[DEPLOYMENT_SETUP.md](./DEPLOYMENT_SETUP.md)**: Production deployment details
+- **[supabase_schema.sql](./supabase_schema.sql)**: Database schema
 
 ## 🧪 Testing
 
 ```bash
-# Run tests
-npm test
-
-# Run with coverage
-npm run test:coverage
-
-# E2E tests
-npm run test:e2e
+pnpm test              # Run tests
+pnpm test:watch        # Watch mode
+pnpm test:coverage     # Coverage report  
+pnpm test:e2e          # End-to-end tests
 ```
 
 ## 📊 Business Logic
@@ -153,28 +167,13 @@ npm run test:e2e
 - Configurable per client
 - Multi-currency support with exchange rates
 
-### Transaction Flow
-1. Contract signed → Generate dual invoices
-2. Client payment received → Calculate charges
-3. Pay consultant → Update balances
-4. Monthly profit distribution
+## 🤝 Contributing
 
-## 🚀 Deployment
-
-### Production Deployment (Vercel + Supabase)
-```bash
-# Build for production
-npm run build
-
-# Deploy to Vercel
-vercel --prod
-```
-
-### Alternative: Railway Deployment
-```bash
-# Deploy to Railway
-railway deploy
-```
+1. Choose development environment (local/Docker)
+2. Make changes and test locally
+3. Run linting and type checking
+4. Test migration to production (staging)
+5. Deploy to production
 
 ## 📞 Support
 

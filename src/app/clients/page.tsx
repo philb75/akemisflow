@@ -1,5 +1,8 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 // Mock data for development
 const mockClients = [
@@ -58,7 +61,8 @@ function getCurrencySymbol(currency: string) {
 
 export default function ClientsPage() {
   return (
-    <div className="space-y-8">
+    <DashboardLayout>
+      <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -179,6 +183,7 @@ export default function ClientsPage() {
           </Card>
         ))}
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
