@@ -181,12 +181,21 @@ export class AirwallexAPIClient {
     this.apiKey = process.env.AIRWALLEX_API_KEY || ''
     this.baseUrl = process.env.AIRWALLEX_BASE_URL || 'https://api.airwallex.com'
 
+    // Don't throw during build time - check credentials when actually using the API
+    if (typeof window !== 'undefined' && (!this.clientId || !this.apiKey)) {
+      console.warn('Airwallex API credentials not configured')
+    }
+  }
+
+  private checkCredentials() {
     if (!this.clientId || !this.apiKey) {
-      throw new Error('Airwallex API credentials not configured')
+      throw new Error('Airwallex API credentials not configured - please set AIRWALLEX_CLIENT_ID and AIRWALLEX_API_KEY environment variables')
     }
   }
 
   private async authenticate(): Promise<string> {
+    this.checkCredentials()
+    
     // Check if we have a valid token
     if (this.authToken && this.tokenExpiry && this.tokenExpiry > new Date()) {
       return this.authToken
