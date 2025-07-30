@@ -11,6 +11,15 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
+  webpack: (config, { isServer }) => {
+    // Fix module resolution for UI components
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@/components/ui/button': require.resolve('./src/components/ui/button.tsx'),
+      '@/components/ui/card': require.resolve('./src/components/ui/card.tsx'),
+    };
+    return config;
+  },
   env: {
     DATABASE_URL: process.env.DATABASE_URL,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
