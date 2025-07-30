@@ -24,6 +24,31 @@ Complete Local Development + Production Migration Guide
 - Node.js 18+ and pnpm
 - Git
 
+### Quick Start (Recommended for Development)
+```bash
+# Navigate to project
+cd ${DEV_ROOT}/akemis/akemisflow
+
+# Install dependencies (use pnpm to avoid npm permission issues)
+pnpm install
+
+# Start development server in background
+pnpm dev > server.log 2>&1 &
+
+# Server available at: http://localhost:3000
+# App redirects to /auth/signin for authentication
+
+# Create admin user (if database is fresh)
+DATABASE_URL="postgresql://akemisflow:dev_password_2024@localhost:5432/akemisflow_dev" node create-admin.js
+
+# Admin credentials:
+# Email: philb75@gmail.com
+# Password: Philb123$
+
+# Stop server when done
+pkill -f "next dev"
+```
+
 ### 1. Local Development Setup
 
 #### Option A: Basic Development (Direct Database)

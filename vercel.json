@@ -1,4 +1,22 @@
 {
-  "buildCommand": "pnpm prisma generate && pnpm run build",
-  "installCommand": "pnpm install"
+  "buildCommand": "pnpm run build",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "functions": {
+    "src/app/api/upload/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/suppliers/route.ts": {
+      "maxDuration": 30
+    }
+  }
 }

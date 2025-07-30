@@ -1,0 +1,1254 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.13
+-- Dumped by pg_dump version 15.13
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
+--
+-- Name: BankAccountStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."BankAccountStatus" AS ENUM (
+    'ACTIVE',
+    'INACTIVE',
+    'SUSPENDED',
+    'CLOSED'
+);
+
+
+--
+-- Name: BankAccountType; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."BankAccountType" AS ENUM (
+    'BUSINESS',
+    'PERSONAL',
+    'SAVINGS',
+    'CHECKING'
+);
+
+
+--
+-- Name: ConsultantPaymentStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ConsultantPaymentStatus" AS ENUM (
+    'PENDING',
+    'APPROVED',
+    'PAID',
+    'CANCELLED'
+);
+
+
+--
+-- Name: ContactStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ContactStatus" AS ENUM (
+    'ACTIVE',
+    'INACTIVE',
+    'SUSPENDED'
+);
+
+
+--
+-- Name: ContactType; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ContactType" AS ENUM (
+    'CLIENT_COMPANY',
+    'CLIENT_CONTACT',
+    'CONSULTANT',
+    'PARTNER'
+);
+
+
+--
+-- Name: ExchangeRateSource; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ExchangeRateSource" AS ENUM (
+    'AIRWALLEX',
+    'MANUAL',
+    'API'
+);
+
+
+--
+-- Name: ExchangeRateType; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ExchangeRateType" AS ENUM (
+    'SPOT',
+    'FORWARD',
+    'HISTORICAL'
+);
+
+
+--
+-- Name: InvoiceStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."InvoiceStatus" AS ENUM (
+    'DRAFT',
+    'SENT',
+    'VIEWED',
+    'PAID',
+    'PARTIAL_PAID',
+    'OVERDUE',
+    'CANCELLED',
+    'REFUNDED',
+    'DISPUTED'
+);
+
+
+--
+-- Name: PartnerProfitShareStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."PartnerProfitShareStatus" AS ENUM (
+    'PENDING',
+    'PAID'
+);
+
+
+--
+-- Name: PaymentMethod; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."PaymentMethod" AS ENUM (
+    'BANK_TRANSFER',
+    'WIRE_TRANSFER',
+    'CHECK',
+    'CASH',
+    'DIGITAL_WALLET',
+    'OTHER'
+);
+
+
+--
+-- Name: ProfitDistributionStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."ProfitDistributionStatus" AS ENUM (
+    'CALCULATED',
+    'DISTRIBUTED',
+    'FINALIZED'
+);
+
+
+--
+-- Name: SupplierStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."SupplierStatus" AS ENUM (
+    'ACTIVE',
+    'INACTIVE',
+    'SUSPENDED'
+);
+
+
+--
+-- Name: TransactionCategory; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."TransactionCategory" AS ENUM (
+    'INVOICE_PAYMENT',
+    'CONSULTANT_PAYMENT',
+    'EXPENSE',
+    'TRANSFER',
+    'FEE',
+    'INTEREST',
+    'REFUND',
+    'OTHER'
+);
+
+
+--
+-- Name: TransactionSource; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."TransactionSource" AS ENUM (
+    'AIRWALLEX',
+    'HSBC_IMPORT',
+    'MANUAL_UPLOAD',
+    'MANUAL',
+    'API',
+    'CSV'
+);
+
+
+--
+-- Name: TransactionStatus; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."TransactionStatus" AS ENUM (
+    'PENDING',
+    'COMPLETED',
+    'FAILED',
+    'CANCELLED'
+);
+
+
+--
+-- Name: TransactionType; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."TransactionType" AS ENUM (
+    'CREDIT',
+    'DEBIT'
+);
+
+
+--
+-- Name: UserRole; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public."UserRole" AS ENUM (
+    'UNASSIGNED',
+    'ADMINISTRATOR',
+    'CLIENT',
+    'AUDITOR'
+);
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.accounts (
+    id text NOT NULL,
+    user_id text NOT NULL,
+    type text NOT NULL,
+    provider text NOT NULL,
+    provider_account_id text NOT NULL,
+    refresh_token text,
+    access_token text,
+    expires_at integer,
+    token_type text,
+    scope text,
+    id_token text,
+    session_state text
+);
+
+
+--
+-- Name: bank_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bank_accounts (
+    id uuid NOT NULL,
+    account_name character varying(255) NOT NULL,
+    bank_name character varying(255) NOT NULL,
+    account_number character varying(100),
+    currency character varying(3) NOT NULL,
+    iban character varying(34),
+    swift_bic character varying(11),
+    routing_number character varying(20),
+    sort_code character varying(10),
+    account_type public."BankAccountType" DEFAULT 'BUSINESS'::public."BankAccountType" NOT NULL,
+    status public."BankAccountStatus" DEFAULT 'ACTIVE'::public."BankAccountStatus" NOT NULL,
+    daily_limit numeric(15,2),
+    monthly_limit numeric(15,2),
+    airwallex_account_id character varying(255),
+    contact_id uuid,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL
+);
+
+
+--
+-- Name: consultant_payments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.consultant_payments (
+    id uuid NOT NULL,
+    consultant_contact_id uuid NOT NULL,
+    related_invoice_id uuid,
+    amount numeric(15,2) NOT NULL,
+    currency character varying(3) NOT NULL,
+    net_amount numeric(15,2),
+    tax_withheld numeric(15,2) DEFAULT 0,
+    tax_rate numeric(5,2) DEFAULT 0,
+    commission_rate numeric(5,2),
+    status public."ConsultantPaymentStatus" DEFAULT 'PENDING'::public."ConsultantPaymentStatus" NOT NULL,
+    approval_status character varying(20),
+    approved_by uuid,
+    approved_date date,
+    payment_method public."PaymentMethod",
+    payment_date date,
+    payment_transaction_id uuid,
+    payment_reference character varying(255),
+    description text,
+    payment_details jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL
+);
+
+
+--
+-- Name: contacts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.contacts (
+    id uuid NOT NULL,
+    contact_type public."ContactType" NOT NULL,
+    name character varying(255) NOT NULL,
+    email character varying(255),
+    phone character varying(50),
+    status public."ContactStatus" DEFAULT 'ACTIVE'::public."ContactStatus" NOT NULL,
+    address_line1 character varying(255),
+    address_line2 character varying(255),
+    city character varying(100),
+    state character varying(100),
+    postal_code character varying(20),
+    country character varying(2),
+    tax_id character varying(100),
+    currency_preference character varying(3) DEFAULT 'EUR'::character varying,
+    parent_company_id uuid,
+    profit_share_percentage numeric(5,2),
+    notes text,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL,
+    airwallex_capabilities character varying(500),
+    airwallex_entity_type character varying(20),
+    airwallex_last_sync_at timestamp(6) with time zone,
+    airwallex_payer_account_id character varying(255),
+    airwallex_payment_methods character varying(500),
+    airwallex_raw_data jsonb,
+    airwallex_sync_error text,
+    airwallex_sync_status character varying(20) DEFAULT 'NONE'::character varying,
+    auto_invoice_generation boolean DEFAULT false NOT NULL,
+    client_category character varying(20),
+    client_onboarding_status character varying(20) DEFAULT 'NEW'::character varying,
+    client_risk_rating character varying(10),
+    invoice_delivery_method character varying(20) DEFAULT 'EMAIL'::character varying,
+    preferred_payment_method character varying(50),
+    receiving_account_currency character varying(3),
+    receiving_account_name character varying(255),
+    receiving_account_number character varying(100),
+    receiving_bank_country_code character varying(2),
+    receiving_bank_name character varying(255),
+    receiving_iban character varying(34),
+    receiving_swift_code character varying(20)
+);
+
+
+--
+-- Name: exchange_rates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.exchange_rates (
+    id uuid NOT NULL,
+    from_currency character varying(3) NOT NULL,
+    to_currency character varying(3) NOT NULL,
+    rate numeric(10,6) NOT NULL,
+    bid_rate numeric(10,6),
+    ask_rate numeric(10,6),
+    spread numeric(10,6),
+    rate_type public."ExchangeRateType" DEFAULT 'SPOT'::public."ExchangeRateType" NOT NULL,
+    source public."ExchangeRateSource" DEFAULT 'MANUAL'::public."ExchangeRateSource" NOT NULL,
+    provider character varying(50),
+    rate_date date NOT NULL,
+    expires_at timestamp(6) with time zone,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: invoices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.invoices (
+    id uuid NOT NULL,
+    invoice_number character varying(100) NOT NULL,
+    display_number character varying(50),
+    client_contact_id uuid NOT NULL,
+    amount numeric(15,2) NOT NULL,
+    currency character varying(3) NOT NULL,
+    subtotal numeric(15,2),
+    total_tax numeric(15,2) DEFAULT 0,
+    total_amount numeric(15,2),
+    status public."InvoiceStatus" DEFAULT 'DRAFT'::public."InvoiceStatus" NOT NULL,
+    issue_date date NOT NULL,
+    due_date date NOT NULL,
+    sent_date date,
+    viewed_date date,
+    paid_date date,
+    payment_transaction_id uuid,
+    bank_account_id uuid,
+    payment_terms_days integer,
+    payment_terms_text character varying(255),
+    payment_instructions text,
+    reference_number character varying(255),
+    project_name character varying(255),
+    reminder_count integer DEFAULT 0 NOT NULL,
+    template_id uuid,
+    logo_url character varying(500),
+    late_fee_rate numeric(5,2),
+    discount_rate numeric(5,2),
+    discount_amount numeric(15,2),
+    is_recurring boolean DEFAULT false NOT NULL,
+    recurring_interval character varying(20),
+    next_invoice_date date,
+    line_items jsonb,
+    notes text,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL
+);
+
+
+--
+-- Name: partner_profit_shares; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.partner_profit_shares (
+    id uuid NOT NULL,
+    profit_distribution_id uuid NOT NULL,
+    partner_contact_id uuid NOT NULL,
+    share_percentage numeric(5,2) NOT NULL,
+    share_amount numeric(15,2) NOT NULL,
+    currency character varying(3) NOT NULL,
+    status public."PartnerProfitShareStatus" DEFAULT 'PENDING'::public."PartnerProfitShareStatus" NOT NULL,
+    payment_transaction_id uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL
+);
+
+
+--
+-- Name: profit_distributions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.profit_distributions (
+    id uuid NOT NULL,
+    period character varying(7) NOT NULL,
+    total_profit numeric(15,2) NOT NULL,
+    base_currency character varying(3) NOT NULL,
+    status public."ProfitDistributionStatus" DEFAULT 'CALCULATED'::public."ProfitDistributionStatus" NOT NULL,
+    calculation_details jsonb,
+    calculation_date date NOT NULL,
+    distribution_date date,
+    distribution_method character varying(50),
+    approved_by uuid,
+    approved_date date,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL
+);
+
+
+--
+-- Name: sessions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sessions (
+    id text NOT NULL,
+    session_token text NOT NULL,
+    user_id text NOT NULL,
+    expires timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: suppliers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.suppliers (
+    id uuid NOT NULL,
+    first_name character varying(100) NOT NULL,
+    last_name character varying(100) NOT NULL,
+    email character varying(255) NOT NULL,
+    phone character varying(50),
+    company character varying(255),
+    vat_number character varying(100),
+    address text,
+    city character varying(100),
+    postal_code character varying(20),
+    country character varying(100),
+    proof_of_address_url character varying(500),
+    proof_of_address_name character varying(255),
+    proof_of_address_type character varying(50),
+    proof_of_address_size integer,
+    id_document_url character varying(500),
+    id_document_name character varying(255),
+    id_document_type character varying(50),
+    id_document_size integer,
+    status public."SupplierStatus" DEFAULT 'ACTIVE'::public."SupplierStatus" NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL,
+    address_country_code character varying(2),
+    address_state character varying(100),
+    airwallex_beneficiary_id character varying(255),
+    airwallex_entity_type character varying(20),
+    airwallex_last_sync_at timestamp(6) with time zone,
+    airwallex_payer_entity_type character varying(20),
+    airwallex_payment_methods character varying(500),
+    airwallex_raw_data jsonb,
+    airwallex_sync_error text,
+    airwallex_sync_status character varying(20) DEFAULT 'NONE'::character varying,
+    bank_account_currency character varying(3),
+    bank_account_name character varying(255),
+    bank_account_number character varying(100),
+    bank_country_code character varying(2),
+    bank_name character varying(255),
+    business_registration_number character varying(100),
+    business_registration_type character varying(100),
+    iban character varying(34),
+    legal_rep_address text,
+    legal_rep_city character varying(100),
+    legal_rep_country_code character varying(2),
+    legal_rep_email character varying(255),
+    legal_rep_first_name character varying(100),
+    legal_rep_id_type character varying(50),
+    legal_rep_last_name character varying(100),
+    legal_rep_mobile_number character varying(50),
+    legal_rep_nationality character varying(100),
+    legal_rep_occupation character varying(255),
+    legal_rep_postal_code character varying(20),
+    legal_rep_state character varying(100),
+    local_clearing_system character varying(100),
+    personal_email character varying(255),
+    personal_first_name_chinese character varying(100),
+    personal_id_number character varying(100),
+    personal_last_name_chinese character varying(100),
+    personal_nationality character varying(100),
+    personal_occupation character varying(255),
+    preferred_currency character varying(3) DEFAULT 'EUR'::character varying,
+    swift_code character varying(20)
+);
+
+
+--
+-- Name: transactions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.transactions (
+    id uuid NOT NULL,
+    bank_account_id uuid NOT NULL,
+    transaction_type public."TransactionType" NOT NULL,
+    amount numeric(15,2) NOT NULL,
+    currency character varying(3) NOT NULL,
+    description text,
+    reference_number character varying(255),
+    category public."TransactionCategory" DEFAULT 'OTHER'::public."TransactionCategory" NOT NULL,
+    status public."TransactionStatus" DEFAULT 'COMPLETED'::public."TransactionStatus" NOT NULL,
+    fee_amount numeric(15,2),
+    fee_currency character varying(3),
+    original_amount numeric(15,2),
+    original_currency character varying(3),
+    exchange_rate numeric(10,6),
+    counterparty_contact_id uuid,
+    airwallex_transaction_id character varying(255),
+    source public."TransactionSource" DEFAULT 'MANUAL'::public."TransactionSource" NOT NULL,
+    raw_data jsonb,
+    transaction_date date NOT NULL,
+    value_date date,
+    batch_id uuid,
+    reconciliation_status character varying(20),
+    transaction_purpose character varying(255),
+    compliance_notes text,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone NOT NULL,
+    balance_after_transaction numeric(15,2),
+    original_description text,
+    source_type character varying(50)
+);
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id text NOT NULL,
+    name text,
+    email text NOT NULL,
+    email_verified timestamp(3) without time zone,
+    image text,
+    password text,
+    role public."UserRole" DEFAULT 'UNASSIGNED'::public."UserRole" NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    first_name text,
+    last_name text,
+    phone text,
+    timezone text DEFAULT 'Europe/Paris'::text,
+    language text DEFAULT 'en'::text,
+    company_id uuid,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL,
+    last_login_at timestamp(3) without time zone
+);
+
+
+--
+-- Name: verificationtokens; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.verificationtokens (
+    identifier text NOT NULL,
+    token text NOT NULL,
+    expires timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Data for Name: accounts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.accounts (id, user_id, type, provider, provider_account_id, refresh_token, access_token, expires_at, token_type, scope, id_token, session_state) FROM stdin;
+\.
+
+
+--
+-- Data for Name: bank_accounts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.bank_accounts (id, account_name, bank_name, account_number, currency, iban, swift_bic, routing_number, sort_code, account_type, status, daily_limit, monthly_limit, airwallex_account_id, contact_id, metadata, created_at, updated_at) FROM stdin;
+146fe471-dfd1-4ee8-addf-add4b5879fe4	Airwallex Main Account	Airwallex	\N	EUR	\N	\N	\N	\N	BUSINESS	ACTIVE	\N	\N	\N	\N	\N	2025-06-14 20:52:45.929+00	2025-06-14 20:52:45.929+00
+\.
+
+
+--
+-- Data for Name: consultant_payments; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.consultant_payments (id, consultant_contact_id, related_invoice_id, amount, currency, net_amount, tax_withheld, tax_rate, commission_rate, status, approval_status, approved_by, approved_date, payment_method, payment_date, payment_transaction_id, payment_reference, description, payment_details, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: contacts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.contacts (id, contact_type, name, email, phone, status, address_line1, address_line2, city, state, postal_code, country, tax_id, currency_preference, parent_company_id, profit_share_percentage, notes, metadata, created_at, updated_at, airwallex_capabilities, airwallex_entity_type, airwallex_last_sync_at, airwallex_payer_account_id, airwallex_payment_methods, airwallex_raw_data, airwallex_sync_error, airwallex_sync_status, auto_invoice_generation, client_category, client_onboarding_status, client_risk_rating, invoice_delivery_method, preferred_payment_method, receiving_account_currency, receiving_account_name, receiving_account_number, receiving_bank_country_code, receiving_bank_name, receiving_iban, receiving_swift_code) FROM stdin;
+1ecca44f-faa1-451c-a093-68cc013e7367	CLIENT_CONTACT	Hasni Alaoui Zineb	\N	\N	ACTIVE	17, Cit AL OSRA COPERATIVE SAHAR IMB R apt 04, (736) Centre Ville Hsain	\N	Sala Al Jadida	\N	11100	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "a54eb6fb-f359-4af0-bb05-1217df3c8d0f", "entity_type": "PERSONAL", "bank_details": {"bank_name": "AWB", "account_name": "Hasni Alaoui Zineb", "account_number": "007815000544800030681460", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "007"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.863+00	2025-06-15 16:30:41.863+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+e4db3a87-f085-4a52-a6ac-498a19ee29e5	CLIENT_CONTACT	Ouyang Feiyun	\N	\N	ACTIVE	Building 3, Room 204, Dening Yuan Road	\N	Shanghai	CN-SH	201601	CN	\N	USD	\N	\N	\N	{"airwallex": {"id": "7d5c2f96-1e3b-455d-b06c-5ea571771c41", "entity_type": "PERSONAL", "bank_details": {"bank_name": "The Hongkong and Shanghai Banking Corporation Limited", "swift_code": "HSBCHKHH", "account_name": "Ouyang Feiyun", "account_number": "138856612833", "account_currency": "USD", "bank_country_code": "HK", "local_clearing_system": "RTGS"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.875+00	2025-06-15 16:30:41.875+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+eaf87176-a181-4d57-9e0e-e82d98340c04	CLIENT_COMPANY	COMIN'IT	contact@cominav.com	\N	ACTIVE	101 BOULEVARD ZERKTOUNI	\N	CASABLANCA	\N	20100	MA	\N	EUR	\N	\N	\N	{"airwallex": {"id": "15a81a91-0d20-4d71-a05f-26de554a5f08", "entity_type": "COMPANY", "bank_details": {"bank_name": "BANQUE POPULAIRE AL HOCEIMA", "swift_code": "BCPOMAMC", "account_name": "COMIN'IT", "account_number": "MA64190170212118014763710201", "account_currency": "EUR", "bank_country_code": "MA"}, "additional_info": {"personal_email": "contact@cominav.com"}, "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.88+00	2025-06-15 16:30:41.88+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+70a63c14-cde1-48d6-b38e-e0829cd31667	CLIENT_CONTACT	MOSTAFA EL ALLIOUI	mustaelallioui@gmail.com	\N	ACTIVE	LOT 3, RTE IMMOUZZER AIT SKATTO	\N	FES	\N	30090	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "07bd4c1b-a2c2-4f2f-86c4-d75f4189e371", "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "MOSTAFA EL ALLIOUI", "account_number": "230270896224821100710001", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "mustaelallioui@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.883+00	2025-06-15 16:30:41.883+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+bd875061-0ab6-4d57-abaa-20495d33bbcf	CLIENT_CONTACT	ADIL LOUSKI	alouski@yahoo.fr	\N	ACTIVE	SIDI BELYOUT	\N	CASABLANCA	\N	20000	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "18c85036-e698-49bb-933f-33d76011524a", "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "ADIL LOUSKI", "account_number": "230780312006421100180048", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "alouski@yahoo.fr"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.886+00	2025-06-15 16:30:41.886+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+86a1a89c-5d56-4d86-9ba5-49da43469e3e	CLIENT_CONTACT	Mademoiselle WADE NDEYE FATOU	ndeyefatouwade@hotmail.com	\N	ACTIVE	11 Avenue Allary	\N	Limeil-Brévannes	\N	94450	FR	\N	EUR	\N	\N	\N	{"airwallex": {"id": "a7c3de59-b5d9-4ab7-9ddf-9ded87cb9097", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE DE DAKAR SA", "swift_code": "BDKRSNDA", "account_name": "Mademoiselle WADE NDEYE FATOU", "account_number": "SN1910100300250152580168", "account_currency": "EUR", "bank_country_code": "SN"}, "additional_info": {"personal_email": "ndeyefatouwade@hotmail.com"}, "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.889+00	2025-06-15 16:30:41.889+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+3fb39f53-d352-4242-87b2-8a5f653d3a81	CLIENT_CONTACT	Mehdi Benchekroun	mehdibenchekroun@gmail.com	\N	ACTIVE	13 Sect 6 Bloc J No. 13 Rue Al Kotn Hay Ria Rabat Agdal Ryad	\N	Rabat	\N	10106	MA	\N	EUR	\N	\N	\N	{"airwallex": {"id": "407ad95a-23f4-4a57-94e8-0c8e256477fe", "entity_type": "PERSONAL", "bank_details": {"bank_name": "CREDIT AGRICOLE DU MAROC", "swift_code": "CNCAMAMR", "account_name": "Mehdi Benchekroun", "account_number": "225810079500859635010115", "account_currency": "EUR", "bank_country_code": "MA"}, "additional_info": {"personal_email": "mehdibenchekroun@gmail.com"}, "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.892+00	2025-06-15 16:30:41.892+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+672a2ef8-2ca9-4414-87f9-1d7b1898df3b	CLIENT_CONTACT	Mr BEN AMOR WAEL	wael.benamor@gmail.com	\N	ACTIVE	Angle Avenue Hédi Chaker et Rue 8 Juillet 1884	\N	Le Kef	\N	7100	TN	\N	EUR	\N	\N	\N	{"airwallex": {"id": "07c2c572-9572-4c77-9d9e-87e4f8cecae8", "entity_type": "PERSONAL", "bank_details": {"iban": "TN5908802000325100492648", "bank_name": "Banque Internationale Arabe de Tunisie (BIAT)", "swift_code": "BIATTNTT", "account_name": "Mr BEN AMOR WAEL", "account_currency": "EUR", "bank_country_code": "TN"}, "additional_info": {"personal_email": "wael.benamor@gmail.com"}, "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.896+00	2025-06-15 16:30:41.896+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+b32c332e-e9a3-4d84-a44d-e2739ccb0483	CLIENT_CONTACT	MR DKHISSI KAMAL	dkhissi.kamal@gmail.com	\N	ACTIVE	Boulevard Idriss Al Akbar	\N	Oujda	\N	60000	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "c13a043f-57e8-48f8-9ac5-8c67ce6a2c6e", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE POPULAIRE TANGER TETOUAN", "account_name": "MR DKHISSI KAMAL", "account_number": "164720211113041366000948", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "164"}, "additional_info": {"personal_email": "dkhissi.kamal@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.899+00	2025-06-15 16:30:41.899+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+958fe724-157f-40f3-9f88-a5c4ca865747	CLIENT_CONTACT	Ousmane Mazou	ousmanemazou@gmail.com	\N	ACTIVE	Avenue de la Mairie	\N	Niamey	\N	8001	NE	\N	XOF	\N	\N	\N	{"airwallex": {"id": "fa755914-f46b-4cd5-a4f0-5837ae4524e1", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE INTERNATIONALE POUR L'AFRIQUE AU NIGER", "swift_code": "BIANNENIXXX", "account_name": "Ousmane Mazou", "account_number": "NE0400100906295032000689", "account_currency": "XOF", "bank_country_code": "NE"}, "additional_info": {"personal_email": "ousmanemazou@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.901+00	2025-06-15 16:30:41.901+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+497402be-c084-4b7f-a372-08f233ad0e65	CLIENT_CONTACT	Mme  MOULAGBA JEMAA	khalid.atlassi@gmail.com	\N	ACTIVE	85, Bloc B, Boulevard Hassan II	\N	Beni Mellal	\N	23000	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "73c6395d-215c-48d0-b696-97436f7e7f35", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE POPULAIRE MARRAKESH BENI MELLAL", "account_name": "Mme  MOULAGBA JEMAA", "account_number": "145090211111413027000369", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "145"}, "additional_info": {"personal_email": "khalid.atlassi@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.905+00	2025-06-15 16:30:41.905+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+e88d041f-17ec-4a98-a485-9cca35cfe153	CLIENT_CONTACT	MOHAMED JOUAHER	mohamedjouaher@gmail.com	\N	ACTIVE	94-96 BD MOHAMED V	\N	BENI MELLAL	\N	23020	MA	\N	MAD	\N	\N	\N	{"airwallex": {"id": "73db6ed4-37da-4c63-b206-09847648df29", "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "MOHAMED JOUAHER", "account_number": "230090614760921402200031", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "mohamedjouaher@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.907+00	2025-06-15 16:30:41.907+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+890d0377-ce16-4c8d-83d5-d5a99087f68e	CLIENT_CONTACT	MOUSSA GARBA	moussagarba@gmail.com	\N	ACTIVE	Angle Boulevard de la Liberte et Rue des Batisseurs	\N	NIAMEY	\N	8001	NE	\N	XOF	\N	\N	\N	{"airwallex": {"id": "26ee238c-62df-42eb-a2f7-1946c4ebb989", "entity_type": "PERSONAL", "bank_details": {"bank_name": "ECOBANK NIGER ECN", "swift_code": "ECOCNENIXXX", "account_name": "MOUSSA GARBA", "account_number": "NE0950100111161012280116", "account_currency": "XOF", "bank_country_code": "NE"}, "additional_info": {"personal_email": "moussagarba@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.91+00	2025-06-15 16:30:41.91+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+a5adaa02-3db3-40f2-937b-9af3d886fa3b	CLIENT_CONTACT	Mary Hope E Sarrosa	hopesarrosa@gmail.com	\N	ACTIVE	Town and Country	\N	Talisay	\N	6115	PH	\N	PHP	\N	\N	\N	{"airwallex": {"id": "c30277e0-093d-4f55-bc8c-0f6d63d6a609", "nickname": "HS BPI", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BPI", "swift_code": "BOPIPHMM", "account_name": "Mary Hope E Sarrosa", "account_number": "1770006909", "account_currency": "PHP", "bank_country_code": "PH"}, "additional_info": {"personal_email": "hopesarrosa@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.913+00	2025-06-15 16:30:41.913+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+b3fbbaf8-7163-45ec-88dd-a6acf19413ff	CLIENT_CONTACT	Mary Hope Sarrosa	hopesarrosa@gmail.com	\N	ACTIVE	Calle Real Cia. Guipuzcoana de Caracas	\N	San Sebastian	ES-SS	20011	ES	\N	EUR	\N	\N	\N	{"airwallex": {"id": "1f3415e3-a64f-41cd-8cf0-badbdc1facc3", "nickname": "Revolut", "entity_type": "PERSONAL", "bank_details": {"iban": "ES3415830001159011323959", "bank_name": "REVOLUT BANK UAB, SUCURSAL EN ESPAN", "swift_code": "REVOESM2", "account_name": "Mary Hope Sarrosa", "account_currency": "EUR", "bank_country_code": "ES"}, "additional_info": {"personal_email": "hopesarrosa@gmail.com"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.915+00	2025-06-15 16:30:41.915+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+dc82c355-6ffe-454d-95a3-fa5443e61fdf	CLIENT_CONTACT	Mary Hope Sarrosa Espanola	hopesarrosa@gmail.com	\N	ACTIVE	Calle Real Cia. Guipuzcoana de Caracas	\N	San Sebastian	ES-SS	20011	ES	\N	EUR	\N	\N	\N	{"airwallex": {"id": "d8b15873-9c6a-4ac3-85a1-961ac737158d", "nickname": "HS BBVA", "entity_type": "PERSONAL", "bank_details": {"iban": "ES3401825297230201462651", "bank_name": "BANCO BILBAO VIZCAYA ARGENTARIA, S.A.", "swift_code": "BBVAESMMXXX", "account_name": "Mary Hope Sarrosa Espanola", "account_currency": "EUR", "bank_country_code": "ES"}, "additional_info": {"personal_email": "hopesarrosa@gmail.com", "personal_last_name_in_chinese": "Sarrosa", "personal_first_name_in_chinese": "Mary Hope"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.918+00	2025-06-15 16:30:41.918+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+d75e3452-9ded-4ef1-bb5d-0277338f1b45	CLIENT_CONTACT	Alejandro Goicoechea Bercedo	goikotobal@gmail.com	\N	ACTIVE	Address. Calle Real compañía Guipuzcoana de Caracas n. 2. 3 B	\N	San Sebastian	ES-SS	20011	ES	\N	EUR	\N	\N	\N	{"airwallex": {"id": "c81f704b-774d-4642-b9f5-16801025515a", "entity_type": "PERSONAL", "bank_details": {"iban": "ES1701825297260200386789", "bank_name": "BANCO BILBAO VIZCAYA ARGENTARIA, S.A.", "swift_code": "BBVAESMMXXX", "account_name": "Alejandro Goicoechea Bercedo", "account_currency": "EUR", "bank_country_code": "ES"}, "additional_info": {"personal_email": "goikotobal@gmail.com", "personal_last_name_in_chinese": "Goicoechea Bercedo", "personal_first_name_in_chinese": "Alejandro"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.925+00	2025-06-15 16:30:41.925+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+83501fb0-9dda-4271-aab0-85e01eb4a5a7	CLIENT_COMPANY	Akemis Limited			ACTIVE	Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road	\N	Yau Ma Tei	\N	\N	HK	\N	USD	\N	\N	\N	{"airwallex": {"id": "61921c80-bd7f-4de5-a93e-0254a07c22a4", "entity_type": "COMPANY", "bank_details": {"bank_name": "HONGKONG AND SHANGHAI BANKING CORPORATION LIMITED, THE", "swift_code": "HSBCHKHHHKH", "account_name": "Akemis Limited", "account_number": "004502269855838", "account_currency": "USD", "bank_country_code": "HK", "account_routing_type1": "bank_code", "local_clearing_system": "RTGS", "account_routing_value1": "004"}, "additional_info": {"legal_rep_email": "", "legal_rep_address": {"city": "Yau Ma Tei", "country_code": "HK", "street_address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road"}, "legal_rep_id_type": "", "personal_id_number": "", "personal_occupation": "", "legal_rep_occupation": "", "personal_nationality": "HK", "legal_rep_nationality": "", "legal_rep_mobile_number": "", "business_registration_type": "ENTITY_TAX_ID"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.929+00	2025-06-15 16:30:41.929+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+843ad532-cd7c-46df-b3cf-10cdc500996f	CLIENT_CONTACT	Philippe Barthelemy	philb75@gmail.com		ACTIVE	Town & Country	\N	City Of Talisay	\N	6115	PH	\N	PHP	\N	\N	\N	{"airwallex": {"id": "c8a026ce-fc4b-4aac-9ffc-cb4dd1bf7147", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANK OF THE PHILIPPINE ISLANDS", "swift_code": "BOPIPHMM", "account_name": "Philippe Barthelemy", "account_number": "1040008167", "account_currency": "PHP", "bank_country_code": "PH"}, "additional_info": {"personal_email": "philb75@gmail.com", "legal_rep_email": "", "legal_rep_address": {"city": "City Of Talisay", "postcode": "6115", "country_code": "PH", "street_address": "Town & Country"}, "legal_rep_id_type": "", "legal_rep_last_name": "Barthelemy", "personal_occupation": "", "legal_rep_first_name": "Philippe", "legal_rep_occupation": "", "personal_nationality": "PH", "legal_rep_nationality": "", "legal_rep_mobile_number": "", "business_registration_type": "", "business_registration_number": "", "personal_last_name_in_chinese": "Barthelemy", "personal_first_name_in_chinese": "Philippe"}, "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}}	2025-06-15 16:30:41.933+00	2025-06-15 16:30:41.933+00	\N	\N	\N	\N	\N	\N	\N	NONE	f	\N	NEW	\N	EMAIL	\N	\N	\N	\N	\N	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: exchange_rates; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.exchange_rates (id, from_currency, to_currency, rate, bid_rate, ask_rate, spread, rate_type, source, provider, rate_date, expires_at, is_active, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: invoices; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.invoices (id, invoice_number, display_number, client_contact_id, amount, currency, subtotal, total_tax, total_amount, status, issue_date, due_date, sent_date, viewed_date, paid_date, payment_transaction_id, bank_account_id, payment_terms_days, payment_terms_text, payment_instructions, reference_number, project_name, reminder_count, template_id, logo_url, late_fee_rate, discount_rate, discount_amount, is_recurring, recurring_interval, next_invoice_date, line_items, notes, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: partner_profit_shares; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.partner_profit_shares (id, profit_distribution_id, partner_contact_id, share_percentage, share_amount, currency, status, payment_transaction_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: profit_distributions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.profit_distributions (id, period, total_profit, base_currency, status, calculation_details, calculation_date, distribution_date, distribution_method, approved_by, approved_date, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.sessions (id, session_token, user_id, expires) FROM stdin;
+\.
+
+
+--
+-- Data for Name: suppliers; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.suppliers (id, first_name, last_name, email, phone, company, vat_number, address, city, postal_code, country, proof_of_address_url, proof_of_address_name, proof_of_address_type, proof_of_address_size, id_document_url, id_document_name, id_document_type, id_document_size, status, is_active, created_at, updated_at, address_country_code, address_state, airwallex_beneficiary_id, airwallex_entity_type, airwallex_last_sync_at, airwallex_payer_entity_type, airwallex_payment_methods, airwallex_raw_data, airwallex_sync_error, airwallex_sync_status, bank_account_currency, bank_account_name, bank_account_number, bank_country_code, bank_name, business_registration_number, business_registration_type, iban, legal_rep_address, legal_rep_city, legal_rep_country_code, legal_rep_email, legal_rep_first_name, legal_rep_id_type, legal_rep_last_name, legal_rep_mobile_number, legal_rep_nationality, legal_rep_occupation, legal_rep_postal_code, legal_rep_state, local_clearing_system, personal_email, personal_first_name_chinese, personal_id_number, personal_last_name_chinese, personal_nationality, personal_occupation, preferred_currency, swift_code) FROM stdin;
+2d44fb7d-9976-494c-92c4-fe41034b81bf	KABRAOUI	YOUSSEF	Youcef.kabraoui@gmail.com	\N	\N	\N	HAY OULAD CHRIFA N 3	TIFLET	15400	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.294+00	2025-07-29 19:22:21.294+00	MA	\N	5148a0b7-d67f-4ef5-9dda-f0bf2feffaea	PERSONAL	2025-07-29 19:22:21.293+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "TIFLET", "postcode": "15400", "country_code": "MA", "street_address": "HAY OULAD CHRIFA N 3"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "SGMB", "account_name": "KABRAOUI YOUSSEF", "account_number": "022815000335002780551363", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "022"}, "additional_info": {"personal_email": "Youcef.kabraoui@gmail.com"}}, "beneficiary_id": "5148a0b7-d67f-4ef5-9dda-f0bf2feffaea", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	KABRAOUI YOUSSEF	022815000335002780551363	MA	SGMB	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Youcef.kabraoui@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+9f1e8ce4-e1f5-4211-b258-8efc8661b921	Ouyang	Feiyun	7d5c2f96-1e3b-455d-b06c-5ea571771c41@airwallex.placeholder	\N	\N	\N	Building 3, Room 204, Dening Yuan Road	Shanghai	201601	China	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.517+00	2025-07-29 19:22:21.314+00	CN	CN-SH	7d5c2f96-1e3b-455d-b06c-5ea571771c41	PERSONAL	2025-07-29 19:22:21.314+00	COMPANY	["LOCAL"]	{"nickname": "Denis Parshin", "beneficiary": {"address": {"city": "Shanghai", "state": "CN-SH", "postcode": "201601", "country_code": "CN", "street_address": "Building 3, Room 204, Dening Yuan Road"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "The Hongkong and Shanghai Banking Corporation Limited", "swift_code": "HSBCHKHH", "account_name": "Ouyang Feiyun", "account_number": "138856612833", "account_currency": "USD", "bank_country_code": "HK", "local_clearing_system": "RTGS"}}, "beneficiary_id": "7d5c2f96-1e3b-455d-b06c-5ea571771c41", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	USD	Ouyang Feiyun	138856612833	HK	The Hongkong and Shanghai Banking Corporation Limited	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	RTGS	\N	\N	\N	\N	\N	\N	USD	HSBCHKHH
+48477f19-df22-40b6-a8b2-5742d4f546de	Unknown	COMIN'IT	contact@cominav.com	\N	\N	\N	101 BOULEVARD ZERKTOUNI	CASABLANCA	20100	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.523+00	2025-07-29 19:22:21.322+00	MA	\N	15a81a91-0d20-4d71-a05f-26de554a5f08	COMPANY	2025-07-29 19:22:21.322+00	COMPANY	["SWIFT"]	{"beneficiary": {"address": {"city": "CASABLANCA", "postcode": "20100", "country_code": "MA", "street_address": "101 BOULEVARD ZERKTOUNI"}, "entity_type": "COMPANY", "bank_details": {"bank_name": "BANQUE POPULAIRE AL HOCEIMA", "swift_code": "BCPOMAMC", "account_name": "COMIN'IT", "account_number": "MA64190170212118014763710201", "account_currency": "EUR", "bank_country_code": "MA"}, "additional_info": {"personal_email": "contact@cominav.com"}}, "beneficiary_id": "15a81a91-0d20-4d71-a05f-26de554a5f08", "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}	\N	SYNCED	EUR	COMIN'IT	MA64190170212118014763710201	MA	BANQUE POPULAIRE AL HOCEIMA	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	contact@cominav.com	\N	\N	\N	\N	\N	EUR	BCPOMAMC
+284ef538-5ac6-4685-80b4-0f5f6fe17793	MOSTAFA	EL ALLIOUI	mustaelallioui@gmail.com	\N	\N	\N	LOT 3, RTE IMMOUZZER AIT SKATTO	FES	30090	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.529+00	2025-07-29 19:22:21.328+00	MA	\N	07bd4c1b-a2c2-4f2f-86c4-d75f4189e371	PERSONAL	2025-07-29 19:22:21.328+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "FES", "postcode": "30090", "country_code": "MA", "street_address": "LOT 3, RTE IMMOUZZER AIT SKATTO"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "MOSTAFA EL ALLIOUI", "account_number": "230270896224821100710001", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "mustaelallioui@gmail.com"}}, "beneficiary_id": "07bd4c1b-a2c2-4f2f-86c4-d75f4189e371", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MOSTAFA EL ALLIOUI	230270896224821100710001	MA	CIH BANK	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	mustaelallioui@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+afc9ef4a-9ded-40da-810e-35a06da6628a	ADIL	LOUSKI	alouski@yahoo.fr	\N	\N	\N	SIDI BELYOUT	CASABLANCA	20000	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.534+00	2025-07-29 19:22:21.336+00	MA	\N	18c85036-e698-49bb-933f-33d76011524a	PERSONAL	2025-07-29 19:22:21.336+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "CASABLANCA", "postcode": "20000", "country_code": "MA", "street_address": "SIDI BELYOUT"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "ADIL LOUSKI", "account_number": "230780312006421100180048", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "alouski@yahoo.fr"}}, "beneficiary_id": "18c85036-e698-49bb-933f-33d76011524a", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	ADIL LOUSKI	230780312006421100180048	MA	CIH BANK	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	alouski@yahoo.fr	\N	\N	\N	\N	\N	MAD	\N
+cb340874-6894-476a-bd3b-da865b7a010c	Mademoiselle	WADE NDEYE FATOU	ndeyefatouwade@hotmail.com	\N	\N	\N	11 Avenue Allary	Limeil-Brévannes	94450	France	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.538+00	2025-07-29 19:22:21.342+00	FR	\N	a7c3de59-b5d9-4ab7-9ddf-9ded87cb9097	PERSONAL	2025-07-29 19:22:21.342+00	COMPANY	["SWIFT"]	{"beneficiary": {"address": {"city": "Limeil-Brévannes", "postcode": "94450", "country_code": "FR", "street_address": "11 Avenue Allary"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE DE DAKAR SA", "swift_code": "BDKRSNDA", "account_name": "Mademoiselle WADE NDEYE FATOU", "account_number": "SN1910100300250152580168", "account_currency": "EUR", "bank_country_code": "SN"}, "additional_info": {"personal_email": "ndeyefatouwade@hotmail.com"}}, "beneficiary_id": "a7c3de59-b5d9-4ab7-9ddf-9ded87cb9097", "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}	\N	SYNCED	EUR	Mademoiselle WADE NDEYE FATOU	SN1910100300250152580168	SN	BANQUE DE DAKAR SA	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	ndeyefatouwade@hotmail.com	\N	\N	\N	\N	\N	EUR	BDKRSNDA
+c40633b7-ca16-4ef2-8b8e-87efe42d4ef7	ADNANE	FARHANE	Adnane.frm@gmail.com	\N	\N	\N	50 Al Muqarrab St, Al Reem Island, 47817	ABU DHABI	\N	AE	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.298+00	2025-07-29 19:22:21.298+00	AE	\N	b1458093-ec35-4a50-8371-63fe5af137e8	PERSONAL	2025-07-29 19:22:21.298+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "ABU DHABI", "country_code": "AE", "street_address": "50 Al Muqarrab St, Al Reem Island, 47817"}, "entity_type": "PERSONAL", "bank_details": {"iban": "AE400500000000018857509", "bank_name": "Abu Dhabi Islamic Bank", "swift_code": "ABDIAEAD", "account_name": "ADNANE FARHANE", "account_currency": "AED", "bank_country_code": "AE"}, "additional_info": {"personal_email": "Adnane.frm@gmail.com"}}, "beneficiary_id": "b1458093-ec35-4a50-8371-63fe5af137e8", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	AED	ADNANE FARHANE	\N	AE	Abu Dhabi Islamic Bank	\N	\N	AE400500000000018857509	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Adnane.frm@gmail.com	\N	\N	\N	\N	\N	AED	ABDIAEAD
+40a4cc70-0ce5-4e49-b667-cc51b5a39a56	MR	DKHISSI KAMAL	dkhissi.kamal@gmail.com	\N	\N	\N	Boulevard Idriss Al Akbar	Oujda	60000	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.549+00	2025-07-29 19:22:21.376+00	MA	\N	c13a043f-57e8-48f8-9ac5-8c67ce6a2c6e	PERSONAL	2025-07-29 19:22:21.376+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Oujda", "postcode": "60000", "country_code": "MA", "street_address": "Boulevard Idriss Al Akbar"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE POPULAIRE TANGER TETOUAN", "account_name": "MR DKHISSI KAMAL", "account_number": "164720211113041366000948", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "164"}, "additional_info": {"personal_email": "dkhissi.kamal@gmail.com"}}, "beneficiary_id": "c13a043f-57e8-48f8-9ac5-8c67ce6a2c6e", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MR DKHISSI KAMAL	164720211113041366000948	MA	BANQUE POPULAIRE TANGER TETOUAN	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	dkhissi.kamal@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+c2740099-d3bd-480b-9b88-ee4e9ef33b4c	Ousmane	Mazou	ousmanemazou@gmail.com	\N	\N	\N	Avenue de la Mairie	Niamey	8001	Niger	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.552+00	2025-07-29 19:22:21.38+00	NE	\N	fa755914-f46b-4cd5-a4f0-5837ae4524e1	PERSONAL	2025-07-29 19:22:21.38+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Niamey", "postcode": "8001", "country_code": "NE", "street_address": "Avenue de la Mairie"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE INTERNATIONALE POUR L'AFRIQUE AU NIGER", "swift_code": "BIANNENIXXX", "account_name": "Ousmane Mazou", "account_number": "NE0400100906295032000689", "account_currency": "XOF", "bank_country_code": "NE"}, "additional_info": {"personal_email": "ousmanemazou@gmail.com"}}, "beneficiary_id": "fa755914-f46b-4cd5-a4f0-5837ae4524e1", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	XOF	Ousmane Mazou	NE0400100906295032000689	NE	BANQUE INTERNATIONALE POUR L'AFRIQUE AU NIGER	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	ousmanemazou@gmail.com	\N	\N	\N	\N	\N	XOF	BIANNENIXXX
+82eeda13-4eb3-408d-a0af-fe4fa0128393	Mme	 MOULAGBA JEMAA	khalid.atlassi@gmail.com	\N	\N	\N	85, Bloc B, Boulevard Hassan II	Beni Mellal	23000	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.556+00	2025-07-29 19:22:21.39+00	MA	\N	73c6395d-215c-48d0-b696-97436f7e7f35	PERSONAL	2025-07-29 19:22:21.39+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Beni Mellal", "postcode": "23000", "country_code": "MA", "street_address": "85, Bloc B, Boulevard Hassan II"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE POPULAIRE MARRAKESH BENI MELLAL", "account_name": "Mme  MOULAGBA JEMAA", "account_number": "145090211111413027000369", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "145"}, "additional_info": {"personal_email": "khalid.atlassi@gmail.com"}}, "beneficiary_id": "73c6395d-215c-48d0-b696-97436f7e7f35", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	Mme  MOULAGBA JEMAA	145090211111413027000369	MA	BANQUE POPULAIRE MARRAKESH BENI MELLAL	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	khalid.atlassi@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+98c332ad-c028-4432-965f-138c01d5d4ef	MOHAMED	JOUAHER	mohamedjouaher@gmail.com	\N	\N	\N	94-96 BD MOHAMED V	BENI MELLAL	23020	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.559+00	2025-07-29 19:22:21.393+00	MA	\N	73db6ed4-37da-4c63-b206-09847648df29	PERSONAL	2025-07-29 19:22:21.393+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "BENI MELLAL", "postcode": "23020", "country_code": "MA", "street_address": "94-96 BD MOHAMED V"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "CIH BANK", "account_name": "MOHAMED JOUAHER", "account_number": "230090614760921402200031", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "230"}, "additional_info": {"personal_email": "mohamedjouaher@gmail.com"}}, "beneficiary_id": "73db6ed4-37da-4c63-b206-09847648df29", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MOHAMED JOUAHER	230090614760921402200031	MA	CIH BANK	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	mohamedjouaher@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+c40caff3-6d4f-4a67-b250-650072e3bd75	MOUSSA	GARBA	moussagarba@gmail.com	\N	\N	\N	Angle Boulevard de la Liberte et Rue des Batisseurs	NIAMEY	8001	Niger	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.563+00	2025-07-29 19:22:21.396+00	NE	\N	26ee238c-62df-42eb-a2f7-1946c4ebb989	PERSONAL	2025-07-29 19:22:21.396+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "NIAMEY", "postcode": "8001", "country_code": "NE", "street_address": "Angle Boulevard de la Liberte et Rue des Batisseurs"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "ECOBANK NIGER ECN", "swift_code": "ECOCNENIXXX", "account_name": "MOUSSA GARBA", "account_number": "NE0950100111161012280116", "account_currency": "XOF", "bank_country_code": "NE"}, "additional_info": {"personal_email": "moussagarba@gmail.com"}}, "beneficiary_id": "26ee238c-62df-42eb-a2f7-1946c4ebb989", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	XOF	MOUSSA GARBA	NE0950100111161012280116	NE	ECOBANK NIGER ECN	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	moussagarba@gmail.com	\N	\N	\N	\N	\N	XOF	ECOCNENIXXX
+652af4b3-1fb7-45ae-8877-d0c8ecc830b8	Mary	Hope E Sarrosa	hopesarrosa@gmail.com	\N	\N	\N	Town and Country	Talisay	6115	Philippines	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.566+00	2025-07-29 19:22:21.404+00	PH	\N	c30277e0-093d-4f55-bc8c-0f6d63d6a609	PERSONAL	2025-07-29 19:22:21.404+00	COMPANY	["LOCAL"]	{"nickname": "HS BPI", "beneficiary": {"address": {"city": "Talisay", "postcode": "6115", "country_code": "PH", "street_address": "Town and Country"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BPI", "swift_code": "BOPIPHMM", "account_name": "Mary Hope E Sarrosa", "account_number": "1770006909", "account_currency": "PHP", "bank_country_code": "PH"}, "additional_info": {"personal_email": "hopesarrosa@gmail.com"}}, "beneficiary_id": "c30277e0-093d-4f55-bc8c-0f6d63d6a609", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	PHP	Mary Hope E Sarrosa	1770006909	PH	BPI	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	hopesarrosa@gmail.com	\N	\N	\N	\N	\N	PHP	BOPIPHMM
+cf309ed6-9352-48a3-83c1-a273133a0a48	M	RIFAI ADAM	rifai.adamm@gmail.com	\N	\N	\N	BD ZERKTOUNI IMM 8 APP 5 MOHAMMEDIA	MOHAMMEDIA	28830	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.24+00	2025-07-29 19:22:21.24+00	MA	\N	f66dbebe-e090-4e02-930b-66952207709d	PERSONAL	2025-07-29 19:22:21.239+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "MOHAMMEDIA", "postcode": "28830", "country_code": "MA", "street_address": "BD ZERKTOUNI IMM 8 APP 5 MOHAMMEDIA"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "AWB", "account_name": "M RIFAI ADAM", "account_number": "007787001533504003100155", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "007"}, "additional_info": {"personal_email": "rifai.adamm@gmail.com"}}, "beneficiary_id": "f66dbebe-e090-4e02-930b-66952207709d", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	M RIFAI ADAM	007787001533504003100155	MA	AWB	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	rifai.adamm@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+e899e837-fd7a-452f-b82d-353f030aae12	Company	Akemis Limited	61921c80-bd7f-4de5-a93e-0254a07c22a4@airwallex.placeholder		Akemis Limited	\N	Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road	Yau Ma Tei	\N	Hong Kong	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.586+00	2025-07-29 19:22:21.622+00	HK	\N	61921c80-bd7f-4de5-a93e-0254a07c22a4	COMPANY	2025-07-29 19:22:21.622+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Yau Ma Tei", "country_code": "HK", "street_address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road"}, "entity_type": "COMPANY", "bank_details": {"bank_name": "HONGKONG AND SHANGHAI BANKING CORPORATION LIMITED, THE", "swift_code": "HSBCHKHHHKH", "account_name": "Akemis Limited", "account_number": "004502269855838", "account_currency": "USD", "bank_country_code": "HK", "account_routing_type1": "bank_code", "local_clearing_system": "RTGS", "account_routing_value1": "004"}, "company_name": "Akemis Limited", "additional_info": {"legal_rep_email": "", "legal_rep_address": {"city": "Yau Ma Tei", "country_code": "HK", "street_address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road"}, "legal_rep_id_type": "", "personal_id_number": "", "personal_occupation": "", "legal_rep_occupation": "", "personal_nationality": "HK", "legal_rep_nationality": "", "legal_rep_mobile_number": "", "business_registration_type": "ENTITY_TAX_ID"}}, "beneficiary_id": "61921c80-bd7f-4de5-a93e-0254a07c22a4", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	USD	Akemis Limited	004502269855838	HK	HONGKONG AND SHANGHAI BANKING CORPORATION LIMITED, THE	\N	ENTITY_TAX_ID	\N	Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road	Yau Ma Tei	HK		\N		\N				\N	\N	RTGS	\N	\N		\N	HK		USD	HSBCHKHHHKH
+2a416793-3f4f-4e4a-9e0c-381f7f79d998	Philippe	Barthelemy	philb75@gmail.com		\N	\N	Town & Country	City Of Talisay	6115	Philippines	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.592+00	2025-07-29 19:22:21.627+00	PH	\N	c8a026ce-fc4b-4aac-9ffc-cb4dd1bf7147	PERSONAL	2025-07-29 19:22:21.627+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "City Of Talisay", "postcode": "6115", "country_code": "PH", "street_address": "Town & Country"}, "last_name": "Barthelemy", "first_name": "Philippe", "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANK OF THE PHILIPPINE ISLANDS", "swift_code": "BOPIPHMM", "account_name": "Philippe Barthelemy", "account_number": "1040008167", "account_currency": "PHP", "bank_country_code": "PH"}, "additional_info": {"personal_email": "philb75@gmail.com", "legal_rep_email": "", "legal_rep_address": {"city": "City Of Talisay", "postcode": "6115", "country_code": "PH", "street_address": "Town & Country"}, "legal_rep_id_type": "", "legal_rep_last_name": "Barthelemy", "personal_occupation": "", "legal_rep_first_name": "Philippe", "legal_rep_occupation": "", "personal_nationality": "PH", "legal_rep_nationality": "", "legal_rep_mobile_number": "", "business_registration_type": "", "business_registration_number": "", "personal_last_name_in_chinese": "Barthelemy", "personal_first_name_in_chinese": "Philippe"}}, "beneficiary_id": "c8a026ce-fc4b-4aac-9ffc-cb4dd1bf7147", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	PHP	Philippe Barthelemy	1040008167	PH	BANK OF THE PHILIPPINE ISLANDS			\N	Town & Country	City Of Talisay	PH		Philippe		Barthelemy				6115	\N	\N	philb75@gmail.com	Philippe	\N	Barthelemy	PH		PHP	BOPIPHMM
+73e4052e-8f79-4948-b31c-0e5ec7f8ebcf	Unknown	NVPC CONSULTING FZE	Nouaman.elh@hotmail.fr	\N	\N	\N	Entrance No. 2, Ground Floor, Al Zahia Area - Sheikh Mohammed Bin Zayed Rd	Sharjah	\N	AE	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.251+00	2025-07-29 19:22:21.251+00	AE	\N	0f298331-3fa0-463f-a2fc-4c2f0fc2686a	COMPANY	2025-07-29 19:22:21.25+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Sharjah", "country_code": "AE", "street_address": "Entrance No. 2, Ground Floor, Al Zahia Area - Sheikh Mohammed Bin Zayed Rd"}, "entity_type": "COMPANY", "bank_details": {"iban": "AE980400000253578415002", "bank_name": "National Bank of Ras Al-Khaimah", "swift_code": "NRAKAEAK", "account_name": "NVPC CONSULTING FZE", "account_currency": "AED", "bank_country_code": "AE"}, "additional_info": {"personal_email": "Nouaman.elh@hotmail.fr"}}, "beneficiary_id": "0f298331-3fa0-463f-a2fc-4c2f0fc2686a", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	AED	NVPC CONSULTING FZE	\N	AE	National Bank of Ras Al-Khaimah	\N	\N	AE980400000253578415002	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Nouaman.elh@hotmail.fr	\N	\N	\N	\N	\N	AED	NRAKAEAK
+8f5b0d87-9448-46e4-b106-99b0fc843c4b	Mr	Jendoubi Maher	maher_jendoubi@hotmail.fr	\N	\N	\N	Avenue de Hédi Nouira	TUNIS	2080	Tunisia	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.257+00	2025-07-29 19:22:21.257+00	TN	\N	c9b59cd3-2555-4050-808b-07c49746e35e	PERSONAL	2025-07-29 19:22:21.256+00	COMPANY	["SWIFT"]	{"beneficiary": {"address": {"city": "TUNIS", "postcode": "2080", "country_code": "TN", "street_address": "Avenue de Hédi Nouira"}, "entity_type": "PERSONAL", "bank_details": {"iban": "TN5908102000735100527571", "bank_name": "Banque Internationale Arabe de Tunisie (BIAT)", "swift_code": "BIATTNTT", "account_name": "Mr Jendoubi Maher", "account_currency": "TND", "bank_country_code": "TN", "intermediary_bank_name": "BANQUE INTERNATIONALE ARABE DE TUNISIE", "intermediary_bank_swift_code": "BIATTNTT"}, "additional_info": {"personal_email": "maher_jendoubi@hotmail.fr"}}, "beneficiary_id": "c9b59cd3-2555-4050-808b-07c49746e35e", "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}	\N	SYNCED	TND	Mr Jendoubi Maher	\N	TN	Banque Internationale Arabe de Tunisie (BIAT)	\N	\N	TN5908102000735100527571	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	maher_jendoubi@hotmail.fr	\N	\N	\N	\N	\N	TND	BIATTNTT
+7c38ffbf-de7c-476a-a97e-7886c74b11d0	GAMPENE	PHILIPPE	philippe.Gampene@gmail.com	\N	\N	\N	Rue 16-17, Secteur 17	Bobo-Dioulasso	\N	BF	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.261+00	2025-07-29 19:22:21.261+00	BF	\N	34bc3a72-4809-4582-94f1-d4c5989bf30c	PERSONAL	2025-07-29 19:22:21.26+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Bobo-Dioulasso", "country_code": "BF", "street_address": "Rue 16-17, Secteur 17"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "UBA BURKINA", "swift_code": "BIBUBFBF", "account_name": "GAMPENE PHILIPPE", "account_number": "260220224140501001797580", "account_currency": "XOF", "bank_country_code": "BF"}, "additional_info": {"personal_email": "philippe.Gampene@gmail.com"}}, "beneficiary_id": "34bc3a72-4809-4582-94f1-d4c5989bf30c", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	XOF	GAMPENE PHILIPPE	260220224140501001797580	BF	UBA BURKINA	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	philippe.Gampene@gmail.com	\N	\N	\N	\N	\N	XOF	BIBUBFBF
+b001d031-ade0-4bbe-aeef-326d0ce5b323	NOURA	ESSOUFI	noura.essoufi@gmail.com	\N	\N	\N	6 LT ANNASR ESC OD ETG RC APPT 2 TR11 - RCE4 OULED SALA	CASABLANCA	27182	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.267+00	2025-07-29 19:22:21.267+00	MA	\N	9d1ddc6b-7bfb-4227-8a08-bf651e64a196	PERSONAL	2025-07-29 19:22:21.266+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "CASABLANCA", "postcode": "27182", "country_code": "MA", "street_address": "6 LT ANNASR ESC OD ETG RC APPT 2 TR11 - RCE4 OULED SALA"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BCP", "account_name": "NOURA ESSOUFI", "account_number": "190780211111482207000074", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "190"}, "additional_info": {"personal_email": "noura.essoufi@gmail.com"}}, "beneficiary_id": "9d1ddc6b-7bfb-4227-8a08-bf651e64a196", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	NOURA ESSOUFI	190780211111482207000074	MA	BCP	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	noura.essoufi@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+022982ff-8d17-4cac-9561-53ef9223c268	NGO	YANGA CORRINE	ngo.yanga@gmail.com	\N	\N	\N	Quartier Bastos	Yaoundé	\N	CM	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.272+00	2025-07-29 19:22:21.272+00	CM	\N	a5fe20d4-674d-4e4d-8cc1-41128e2e7144	PERSONAL	2025-07-29 19:22:21.271+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Yaoundé", "country_code": "CM", "street_address": "Quartier Bastos"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "AFRILAND FIRST BANK", "swift_code": "CCEICMCX", "account_name": "NGO YANGA CORRINE", "account_number": "10005000010950757105177", "account_currency": "XAF", "bank_country_code": "CM"}, "additional_info": {"personal_email": "ngo.yanga@gmail.com"}}, "beneficiary_id": "a5fe20d4-674d-4e4d-8cc1-41128e2e7144", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	XAF	NGO YANGA CORRINE	10005000010950757105177	CM	AFRILAND FIRST BANK	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	ngo.yanga@gmail.com	\N	\N	\N	\N	\N	XAF	CCEICMCX
+9d965d31-6e27-4be8-943f-24aca45fd26b	MAMOUH	KARIM	karim.mamouh@gmail.com	\N	\N	\N	Immeuble Amina-B APP 01	AL HOCEIMA	32000	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.278+00	2025-07-29 19:22:21.278+00	MA	\N	ad7ea9d1-6524-4f9d-976a-6f4f2dc6a0c5	PERSONAL	2025-07-29 19:22:21.277+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "AL HOCEIMA", "postcode": "32000", "country_code": "MA", "street_address": "Immeuble Amina-B APP 01"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "AWB", "account_name": "MAMOUH KARIM", "account_number": "007050000067500031012030", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "007"}, "additional_info": {"personal_email": "karim.mamouh@gmail.com"}}, "beneficiary_id": "ad7ea9d1-6524-4f9d-976a-6f4f2dc6a0c5", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MAMOUH KARIM	007050000067500031012030	MA	AWB	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	karim.mamouh@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+e819b5a1-375a-4fe3-acf7-44edd3776360	MR	OULKFIF MOHAMED	mohamedoulkfif@gmail.com	\N	\N	\N	Lycée Lala Amina VN VILLA N8	MEKNES	50000	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.284+00	2025-07-29 19:22:21.284+00	MA	\N	b05d0b94-26e5-4e4e-a2af-8091134d6959	PERSONAL	2025-07-29 19:22:21.283+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "MEKNES", "postcode": "50000", "country_code": "MA", "street_address": "Lycée Lala Amina VN VILLA N8"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BANQUE POPULAIRE FES TAZA", "account_name": "MR OULKFIF MOHAMED", "account_number": "127480211113438127000757", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "127"}, "additional_info": {"personal_email": "mohamedoulkfif@gmail.com"}}, "beneficiary_id": "b05d0b94-26e5-4e4e-a2af-8091134d6959", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MR OULKFIF MOHAMED	127480211113438127000757	MA	BANQUE POPULAIRE FES TAZA	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	mohamedoulkfif@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+24e7d3b0-770f-4aae-b20b-c949fd5d72eb	MLLE	MBAYE NDEYE NGONE	ngome.mbaye@gmail.com	\N	\N	\N	SACRE COEUR 3 DAKAR	DAKAR	11500	Senegal	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.29+00	2025-07-29 19:22:21.29+00	SN	\N	99ad351b-f4ea-43ce-8064-2d9401f9ff94	PERSONAL	2025-07-29 19:22:21.289+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "DAKAR", "postcode": "11500", "country_code": "SN", "street_address": "SACRE COEUR 3 DAKAR"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "CORIS BANK INTERNATIONAL SENEGAL SA", "swift_code": "CORISNDA", "account_name": "MLLE MBAYE NDEYE NGONE", "account_number": "SN2130100100636332400120", "account_currency": "XOF", "bank_country_code": "SN"}, "additional_info": {"personal_email": "ngome.mbaye@gmail.com"}}, "beneficiary_id": "99ad351b-f4ea-43ce-8064-2d9401f9ff94", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	XOF	MLLE MBAYE NDEYE NGONE	SN2130100100636332400120	SN	CORIS BANK INTERNATIONAL SENEGAL SA	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	ngome.mbaye@gmail.com	\N	\N	\N	\N	\N	XOF	CORISNDA
+76e6b9ad-5273-4413-bc07-3cbe50fb3803	MME	SANAA OUHALOU	sa.ouiazzane@gmail.com	\N	\N	\N	Lot n° 64, Quartier Essaad	Berrechid	26300	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-07-29 19:22:21.303+00	2025-07-29 19:22:21.303+00	MA	\N	8a02ca37-4e61-45ba-9d67-4c26a7ddb43b	PERSONAL	2025-07-29 19:22:21.302+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Berrechid", "postcode": "26300", "country_code": "MA", "street_address": "Lot n° 64, Quartier Essaad"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "BMCE", "account_name": "MME SANAA OUHALOU", "account_number": "011793000064200000220532", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "011"}, "additional_info": {"personal_email": "sa.ouiazzane@gmail.com"}}, "beneficiary_id": "8a02ca37-4e61-45ba-9d67-4c26a7ddb43b", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	MME SANAA OUHALOU	011793000064200000220532	MA	BMCE	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	sa.ouiazzane@gmail.com	\N	\N	\N	\N	\N	MAD	\N
+c108d558-6390-47e1-a1b2-84ad3b16624c	Hasni	Alaoui Zineb	a54eb6fb-f359-4af0-bb05-1217df3c8d0f@airwallex.placeholder	\N	\N	\N	17, Cit AL OSRA COPERATIVE SAHAR IMB R apt 04, (736) Centre Ville Hsain	Sala Al Jadida	11100	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.511+00	2025-07-29 19:22:21.307+00	MA	\N	a54eb6fb-f359-4af0-bb05-1217df3c8d0f	PERSONAL	2025-07-29 19:22:21.307+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "Sala Al Jadida", "postcode": "11100", "country_code": "MA", "street_address": "17, Cit AL OSRA COPERATIVE SAHAR IMB R apt 04, (736) Centre Ville Hsain"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "AWB", "account_name": "Hasni Alaoui Zineb", "account_number": "007815000544800030681460", "account_currency": "MAD", "bank_country_code": "MA", "account_routing_type1": "bank_code", "account_routing_value1": "007"}}, "beneficiary_id": "a54eb6fb-f359-4af0-bb05-1217df3c8d0f", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	MAD	Hasni Alaoui Zineb	007815000544800030681460	MA	AWB	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	MAD	\N
+b3965f67-7b77-48a5-b2c3-c1120a92e3d0	Mehdi	Benchekroun	mehdibenchekroun@gmail.com	\N	\N	\N	13 Sect 6 Bloc J No. 13 Rue Al Kotn Hay Ria Rabat Agdal Ryad	Rabat	10106	Morocco	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.542+00	2025-07-29 19:22:21.356+00	MA	\N	407ad95a-23f4-4a57-94e8-0c8e256477fe	PERSONAL	2025-07-29 19:22:21.356+00	COMPANY	["SWIFT"]	{"beneficiary": {"address": {"city": "Rabat", "postcode": "10106", "country_code": "MA", "street_address": "13 Sect 6 Bloc J No. 13 Rue Al Kotn Hay Ria Rabat Agdal Ryad"}, "entity_type": "PERSONAL", "bank_details": {"bank_name": "CREDIT AGRICOLE DU MAROC", "swift_code": "CNCAMAMR", "account_name": "Mehdi Benchekroun", "account_number": "225810079500859635010115", "account_currency": "EUR", "bank_country_code": "MA"}, "additional_info": {"personal_email": "mehdibenchekroun@gmail.com"}}, "beneficiary_id": "407ad95a-23f4-4a57-94e8-0c8e256477fe", "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}	\N	SYNCED	EUR	Mehdi Benchekroun	225810079500859635010115	MA	CREDIT AGRICOLE DU MAROC	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	mehdibenchekroun@gmail.com	\N	\N	\N	\N	\N	EUR	CNCAMAMR
+29ec971d-5d6b-4cba-b92c-d6ea8d508d0e	Mr	BEN AMOR WAEL	wael.benamor@gmail.com	\N	\N	\N	Angle Avenue Hédi Chaker et Rue 8 Juillet 1884	Le Kef	7100	Tunisia	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.546+00	2025-07-29 19:22:21.362+00	TN	\N	07c2c572-9572-4c77-9d9e-87e4f8cecae8	PERSONAL	2025-07-29 19:22:21.362+00	COMPANY	["SWIFT"]	{"beneficiary": {"address": {"city": "Le Kef", "postcode": "7100", "country_code": "TN", "street_address": "Angle Avenue Hédi Chaker et Rue 8 Juillet 1884"}, "entity_type": "PERSONAL", "bank_details": {"iban": "TN5908802000325100492648", "bank_name": "Banque Internationale Arabe de Tunisie (BIAT)", "swift_code": "BIATTNTT", "account_name": "Mr BEN AMOR WAEL", "account_currency": "EUR", "bank_country_code": "TN"}, "additional_info": {"personal_email": "wael.benamor@gmail.com"}}, "beneficiary_id": "07c2c572-9572-4c77-9d9e-87e4f8cecae8", "payment_methods": ["SWIFT"], "payer_entity_type": "COMPANY"}	\N	SYNCED	EUR	Mr BEN AMOR WAEL	\N	TN	Banque Internationale Arabe de Tunisie (BIAT)	\N	\N	TN5908802000325100492648	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	wael.benamor@gmail.com	\N	\N	\N	\N	\N	EUR	BIATTNTT
+4013c58e-14f7-4358-be5a-3179085fbae6	Alejandro	Goicoechea Bercedo	goikotobal@gmail.com	\N	\N	\N	Address. Calle Real compañía Guipuzcoana de Caracas n. 2. 3 B	San Sebastian	20011	Spain	\N	\N	\N	\N	\N	\N	\N	\N	ACTIVE	t	2025-06-15 17:24:31.582+00	2025-07-29 19:22:21.616+00	ES	ES-SS	c81f704b-774d-4642-b9f5-16801025515a	PERSONAL	2025-07-29 19:22:21.616+00	COMPANY	["LOCAL"]	{"beneficiary": {"address": {"city": "San Sebastian", "state": "ES-SS", "postcode": "20011", "country_code": "ES", "street_address": "Address. Calle Real compañía Guipuzcoana de Caracas n. 2. 3 B"}, "last_name": "Goicoechea Bercedo", "first_name": "Alejandro", "entity_type": "PERSONAL", "bank_details": {"iban": "ES1701825297260200386789", "bank_name": "BANCO BILBAO VIZCAYA ARGENTARIA, S.A.", "swift_code": "BBVAESMMXXX", "account_name": "Alejandro Goicoechea Bercedo", "account_currency": "EUR", "bank_country_code": "ES"}, "additional_info": {"personal_email": "goikotobal@gmail.com", "personal_last_name_in_chinese": "Goicoechea Bercedo", "personal_first_name_in_chinese": "Alejandro"}}, "beneficiary_id": "c81f704b-774d-4642-b9f5-16801025515a", "payment_methods": ["LOCAL"], "payer_entity_type": "COMPANY"}	\N	SYNCED	EUR	Alejandro Goicoechea Bercedo	\N	ES	BANCO BILBAO VIZCAYA ARGENTARIA, S.A.	\N	\N	ES1701825297260200386789	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	goikotobal@gmail.com	Alejandro	\N	Goicoechea Bercedo	\N	\N	EUR	BBVAESMMXXX
+\.
+
+
+--
+-- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.transactions (id, bank_account_id, transaction_type, amount, currency, description, reference_number, category, status, fee_amount, fee_currency, original_amount, original_currency, exchange_rate, counterparty_contact_id, airwallex_transaction_id, source, raw_data, transaction_date, value_date, batch_id, reconciliation_status, transaction_purpose, compliance_notes, created_at, updated_at, balance_after_transaction, original_description, source_type) FROM stdin;
+6720ba7a-81a5-4888-a95e-2772a04728f5	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-10905.81	EUR	Pay MAD 112095.79 to  (Hasni Alaoui Zineb)	\N	OTHER	COMPLETED	4.34	EUR	\N	\N	\N	\N	1894ef2f-8863-4326-ba2d-d73f25924286	API	{"bank": "Airwallex", "date": "2025-06-14T08:45:21.000Z", "note": "", "amount": -10905.81, "source": "API", "balance": 6604.82, "currency": "EUR", "feeAmount": 4.34, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 112095.79 to  (Hasni Alaoui Zineb)", "feeCurrency": "EUR", "transactionId": "1894ef2f-8863-4326-ba2d-d73f25924286", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 112095.79 to  (Hasni Alaoui Zineb)", "balanceAfterTransaction": 6604.82, "financialTransactionType": "PAYMENT"}	2025-06-14	\N	\N	\N	\N	\N	2025-06-15 01:37:57.389+00	2025-06-15 01:37:57.389+00	6604.82	Pay MAD 112095.79 to  (Hasni Alaoui Zineb)	PAYMENT
+c7439e86-0c43-4416-a15c-434deefc8896	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1000.00	EUR	Pay MAD 10296.10 to  (Hasni Alaoui Zineb)	\N	OTHER	COMPLETED	4.32	EUR	\N	\N	\N	\N	63fba3ac-0cd8-4cb6-88e9-a295ca4c32bb	API	{"bank": "Airwallex", "date": "2025-06-12T15:39:57.000Z", "note": "", "amount": -1000, "source": "API", "balance": 17510.63, "currency": "EUR", "feeAmount": 4.32, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 10296.10 to  (Hasni Alaoui Zineb)", "feeCurrency": "EUR", "transactionId": "63fba3ac-0cd8-4cb6-88e9-a295ca4c32bb", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 10296.10 to  (Hasni Alaoui Zineb)", "balanceAfterTransaction": 17510.63, "financialTransactionType": "PAYMENT"}	2025-06-12	\N	\N	\N	\N	\N	2025-06-15 01:37:57.399+00	2025-06-15 01:37:57.399+00	17510.63	Pay MAD 10296.10 to  (Hasni Alaoui Zineb)	PAYMENT
+8b942cc1-099f-45c1-aa11-a3bc29bd90b1	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-5647.00	EUR	Pay EUR 5634.05 to  (Mademoiselle WADE NDEYE FATOU)	\N	OTHER	COMPLETED	12.95	EUR	\N	\N	\N	\N	df2d6735-89de-46f3-9bd4-2f3cdaf1433d	API	{"bank": "Airwallex", "date": "2025-06-12T14:55:46.000Z", "note": "", "amount": -5647, "source": "API", "balance": 18510.63, "currency": "EUR", "feeAmount": 12.95, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 5634.05 to  (Mademoiselle WADE NDEYE FATOU)", "feeCurrency": "EUR", "transactionId": "df2d6735-89de-46f3-9bd4-2f3cdaf1433d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 5634.05 to  (Mademoiselle WADE NDEYE FATOU)", "balanceAfterTransaction": 18510.63, "financialTransactionType": "PAYMENT"}	2025-06-12	\N	\N	\N	\N	\N	2025-06-15 01:37:57.403+00	2025-06-15 01:37:57.403+00	18510.63	Pay EUR 5634.05 to  (Mademoiselle WADE NDEYE FATOU)	PAYMENT
+2f19e646-75ff-4752-86cb-11b0912afbb8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-41.92	EUR	Fee(DEPOSIT_FEE) for 437ebb9a-8418-48c3-b25a-0e5b7fda3f65	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	437ebb9a-8418-48c3-b25a-0e5b7fda3f65	API	{"bank": "Airwallex", "date": "2025-06-12T11:46:08.000Z", "note": "", "amount": -41.92, "source": "API", "balance": 24157.63, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 437ebb9a-8418-48c3-b25a-0e5b7fda3f65", "feeCurrency": "EUR", "transactionId": "437ebb9a-8418-48c3-b25a-0e5b7fda3f65", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 437ebb9a-8418-48c3-b25a-0e5b7fda3f65", "balanceAfterTransaction": 24157.63, "financialTransactionType": "FEE"}	2025-06-12	\N	\N	\N	\N	\N	2025-06-15 01:37:57.409+00	2025-06-15 01:37:57.409+00	24157.63	Fee(DEPOSIT_FEE) for 437ebb9a-8418-48c3-b25a-0e5b7fda3f65	FEE
+06867c40-2fce-4848-aa15-e694b1d23b3a	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-11.70	EUR	Fee(DEPOSIT_FEE) for 5c1f360c-42d8-4093-af14-54b2a030191e	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	5c1f360c-42d8-4093-af14-54b2a030191e	API	{"bank": "Airwallex", "date": "2025-06-04T08:26:11.000Z", "note": "", "amount": -11.7, "source": "API", "balance": 10226.55, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 5c1f360c-42d8-4093-af14-54b2a030191e", "feeCurrency": "EUR", "transactionId": "5c1f360c-42d8-4093-af14-54b2a030191e", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 5c1f360c-42d8-4093-af14-54b2a030191e", "balanceAfterTransaction": 10226.55, "financialTransactionType": "FEE"}	2025-06-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.418+00	2025-06-15 01:37:57.418+00	10226.55	Fee(DEPOSIT_FEE) for 5c1f360c-42d8-4093-af14-54b2a030191e	FEE
+0dfb1e6b-ffb0-409d-9b72-c44450c09bc6	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-15.26	USD	Fee(DEPOSIT_FEE) for 74e5bcee-a6ad-4946-8bcf-47b57bac698d	\N	FEE	COMPLETED	0.00	USD	\N	\N	\N	\N	74e5bcee-a6ad-4946-8bcf-47b57bac698d	API	{"bank": "Airwallex", "date": "2025-06-04T08:08:57.000Z", "note": "", "amount": -15.26, "source": "API", "balance": 5169.74, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 74e5bcee-a6ad-4946-8bcf-47b57bac698d", "feeCurrency": "USD", "transactionId": "74e5bcee-a6ad-4946-8bcf-47b57bac698d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 74e5bcee-a6ad-4946-8bcf-47b57bac698d", "balanceAfterTransaction": 5169.74, "financialTransactionType": "FEE"}	2025-06-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.426+00	2025-06-15 01:37:57.426+00	5169.74	Fee(DEPOSIT_FEE) for 74e5bcee-a6ad-4946-8bcf-47b57bac698d	FEE
+d606bda9-5dfa-4c7b-9a5f-b7942610689c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1670.67	USD	Pay USD 1663.67 to  (Ouyang Feiyun)	\N	OTHER	COMPLETED	7.00	USD	\N	\N	\N	\N	4aff2088-8f97-4339-a47e-c6c40e796709	API	{"bank": "Airwallex", "date": "2025-06-04T08:05:20.000Z", "note": "", "amount": -1670.67, "source": "API", "balance": 100, "currency": "USD", "feeAmount": 7, "reference": "", "sourceType": "PAYMENT", "description": "Pay USD 1663.67 to  (Ouyang Feiyun)", "feeCurrency": "USD", "transactionId": "4aff2088-8f97-4339-a47e-c6c40e796709", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay USD 1663.67 to  (Ouyang Feiyun)", "balanceAfterTransaction": 100, "financialTransactionType": "PAYMENT"}	2025-06-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.434+00	2025-06-15 01:37:57.434+00	100.00	Pay USD 1663.67 to  (Ouyang Feiyun)	PAYMENT
+c3f9f02c-2ec9-4be9-a693-c85359fcb2a6	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-5.33	USD	Fee(DEPOSIT_FEE) for 3f600791-9994-4cab-a1de-1332a14c5d13	\N	FEE	COMPLETED	0.00	USD	\N	\N	\N	\N	3f600791-9994-4cab-a1de-1332a14c5d13	API	{"bank": "Airwallex", "date": "2025-06-02T19:26:48.000Z", "note": "", "amount": -5.33, "source": "API", "balance": 1770.67, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 3f600791-9994-4cab-a1de-1332a14c5d13", "feeCurrency": "USD", "transactionId": "3f600791-9994-4cab-a1de-1332a14c5d13", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 3f600791-9994-4cab-a1de-1332a14c5d13", "balanceAfterTransaction": 1770.67, "financialTransactionType": "FEE"}	2025-06-02	\N	\N	\N	\N	\N	2025-06-15 01:37:57.439+00	2025-06-15 01:37:57.439+00	1770.67	Fee(DEPOSIT_FEE) for 3f600791-9994-4cab-a1de-1332a14c5d13	FEE
+75868bad-3f22-40f4-979e-309cdcd75ac5	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-15200.00	EUR	Pay EUR 15186.89 to (COMIN'IT)	\N	OTHER	COMPLETED	13.11	EUR	\N	\N	\N	\N	43854327-ae9c-4fd3-a3e6-dbbea689516f	API	{"bank": "Airwallex", "date": "2025-06-02T18:59:35.000Z", "note": "", "amount": -15200, "source": "API", "balance": 6338.25, "currency": "EUR", "feeAmount": 13.11, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 15186.89 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "43854327-ae9c-4fd3-a3e6-dbbea689516f", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 15186.89 to (COMIN'IT)", "balanceAfterTransaction": 6338.25, "financialTransactionType": "PAYMENT"}	2025-06-02	\N	\N	\N	\N	\N	2025-06-15 01:37:57.443+00	2025-06-15 01:37:57.443+00	6338.25	Pay EUR 15186.89 to (COMIN'IT)	PAYMENT
+8ed46b79-d05c-410d-b9fc-6821bb6726a8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.10	EUR	Fee(DEPOSIT_FEE) for 79b43120-2e44-4a33-90ea-79502838c4e9	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	79b43120-2e44-4a33-90ea-79502838c4e9	API	{"bank": "Airwallex", "date": "2025-06-01T10:11:39.000Z", "note": "", "amount": -23.1, "source": "API", "balance": 21538.25, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 79b43120-2e44-4a33-90ea-79502838c4e9", "feeCurrency": "EUR", "transactionId": "79b43120-2e44-4a33-90ea-79502838c4e9", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 79b43120-2e44-4a33-90ea-79502838c4e9", "balanceAfterTransaction": 21538.25, "financialTransactionType": "FEE"}	2025-06-01	\N	\N	\N	\N	\N	2025-06-15 01:37:57.447+00	2025-06-15 01:37:57.447+00	21538.25	Fee(DEPOSIT_FEE) for 79b43120-2e44-4a33-90ea-79502838c4e9	FEE
+790d7203-8abc-42c1-9d81-36762801abb1	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.10	EUR	Fee(DEPOSIT_FEE) for d96f6bf1-705e-4a88-af4e-b17414cf0709	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	d96f6bf1-705e-4a88-af4e-b17414cf0709	API	{"bank": "Airwallex", "date": "2025-06-01T10:11:39.000Z", "note": "", "amount": -23.1, "source": "API", "balance": 13861.48, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for d96f6bf1-705e-4a88-af4e-b17414cf0709", "feeCurrency": "EUR", "transactionId": "d96f6bf1-705e-4a88-af4e-b17414cf0709", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for d96f6bf1-705e-4a88-af4e-b17414cf0709", "balanceAfterTransaction": 13861.48, "financialTransactionType": "FEE"}	2025-06-01	\N	\N	\N	\N	\N	2025-06-15 01:37:57.456+00	2025-06-15 01:37:57.456+00	13861.48	Fee(DEPOSIT_FEE) for d96f6bf1-705e-4a88-af4e-b17414cf0709	FEE
+ba1e6db7-6602-4368-8c30-69aa04638c0c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7400.00	EUR	Pay EUR 7386.75 to (COMIN'IT)	\N	OTHER	COMPLETED	13.25	EUR	\N	\N	\N	\N	12963425-8fb1-4ca2-a792-e962c6bffc99	API	{"bank": "Airwallex", "date": "2025-05-30T14:05:24.000Z", "note": "", "amount": -7400, "source": "API", "balance": 6184.71, "currency": "EUR", "feeAmount": 13.25, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7386.75 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "12963425-8fb1-4ca2-a792-e962c6bffc99", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7386.75 to (COMIN'IT)", "balanceAfterTransaction": 6184.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.461+00	2025-06-15 01:37:57.461+00	6184.71	Pay EUR 7386.75 to (COMIN'IT)	PAYMENT
+06fabe22-ddc1-4125-9057-0af12ee89c32	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7400.00	EUR	Pay EUR 7386.75 to (COMIN'IT)	\N	OTHER	COMPLETED	13.25	EUR	\N	\N	\N	\N	bcb31f9e-b1ee-49ef-8a27-b676af192836	API	{"bank": "Airwallex", "date": "2025-05-30T14:04:44.000Z", "note": "", "amount": -7400, "source": "API", "balance": 13584.71, "currency": "EUR", "feeAmount": 13.25, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7386.75 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "bcb31f9e-b1ee-49ef-8a27-b676af192836", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7386.75 to (COMIN'IT)", "balanceAfterTransaction": 13584.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.464+00	2025-06-15 01:37:57.464+00	13584.71	Pay EUR 7386.75 to (COMIN'IT)	PAYMENT
+a0f0db17-3694-4f3c-88dc-757ec294b517	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7400.00	EUR	Pay EUR 7386.75 to (COMIN'IT)	\N	OTHER	COMPLETED	13.25	EUR	\N	\N	\N	\N	8a18a994-1b89-4106-8c99-cf535bfb8997	API	{"bank": "Airwallex", "date": "2025-05-30T14:04:08.000Z", "note": "", "amount": -7400, "source": "API", "balance": 20984.71, "currency": "EUR", "feeAmount": 13.25, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7386.75 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "8a18a994-1b89-4106-8c99-cf535bfb8997", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7386.75 to (COMIN'IT)", "balanceAfterTransaction": 20984.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.467+00	2025-06-15 01:37:57.467+00	20984.71	Pay EUR 7386.75 to (COMIN'IT)	PAYMENT
+ae2d2c52-08cc-4a01-92a9-6edf6eb92f5c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7700.00	EUR	Pay EUR 7686.75 to (COMIN'IT)	\N	OTHER	COMPLETED	13.25	EUR	\N	\N	\N	\N	6d05f3e6-e46e-4b2a-8bf9-4d1425bac971	API	{"bank": "Airwallex", "date": "2025-05-30T14:03:30.000Z", "note": "", "amount": -7700, "source": "API", "balance": 28384.71, "currency": "EUR", "feeAmount": 13.25, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7686.75 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "6d05f3e6-e46e-4b2a-8bf9-4d1425bac971", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7686.75 to (COMIN'IT)", "balanceAfterTransaction": 28384.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.47+00	2025-06-15 01:37:57.47+00	28384.71	Pay EUR 7686.75 to (COMIN'IT)	PAYMENT
+67647a78-e16f-4f34-b3c8-ab1ac98b9ef7	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7700.00	EUR	Pay EUR 7686.74 to (COMIN'IT)	\N	OTHER	COMPLETED	13.26	EUR	\N	\N	\N	\N	a7b1842f-3803-45e5-936e-3772f16de7af	API	{"bank": "Airwallex", "date": "2025-05-30T14:02:49.000Z", "note": "", "amount": -7700, "source": "API", "balance": 36084.71, "currency": "EUR", "feeAmount": 13.26, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7686.74 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "a7b1842f-3803-45e5-936e-3772f16de7af", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7686.74 to (COMIN'IT)", "balanceAfterTransaction": 36084.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.473+00	2025-06-15 01:37:57.473+00	36084.71	Pay EUR 7686.74 to (COMIN'IT)	PAYMENT
+97695e3e-18f1-42c7-bf02-2029c50b6e15	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7700.00	EUR	Pay EUR 7686.74 to (COMIN'IT)	\N	OTHER	COMPLETED	13.26	EUR	\N	\N	\N	\N	4e0fd1df-2a85-473f-b37c-37021cf7aa40	API	{"bank": "Airwallex", "date": "2025-05-30T14:01:56.000Z", "note": "", "amount": -7700, "source": "API", "balance": 43784.71, "currency": "EUR", "feeAmount": 13.26, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7686.74 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "4e0fd1df-2a85-473f-b37c-37021cf7aa40", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7686.74 to (COMIN'IT)", "balanceAfterTransaction": 43784.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.477+00	2025-06-15 01:37:57.477+00	43784.71	Pay EUR 7686.74 to (COMIN'IT)	PAYMENT
+49188777-3081-4d7e-a69c-6acb92156291	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7600.00	EUR	Pay EUR 7586.74 to (COMIN'IT)	\N	OTHER	COMPLETED	13.26	EUR	\N	\N	\N	\N	88c96bdd-c396-4260-b933-15110663c702	API	{"bank": "Airwallex", "date": "2025-05-30T14:00:36.000Z", "note": "", "amount": -7600, "source": "API", "balance": 51484.71, "currency": "EUR", "feeAmount": 13.26, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7586.74 to (COMIN'IT)", "feeCurrency": "EUR", "transactionId": "88c96bdd-c396-4260-b933-15110663c702", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7586.74 to (COMIN'IT)", "balanceAfterTransaction": 51484.71, "financialTransactionType": "PAYMENT"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.48+00	2025-06-15 01:37:57.48+00	51484.71	Pay EUR 7586.74 to (COMIN'IT)	PAYMENT
+15e7d275-60d3-4a30-9253-05240e5c9299	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.10	EUR	Fee(DEPOSIT_FEE) for b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b	API	{"bank": "Airwallex", "date": "2025-05-30T12:13:42.000Z", "note": "", "amount": -23.1, "source": "API", "balance": 59084.71, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b", "feeCurrency": "EUR", "transactionId": "b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b", "balanceAfterTransaction": 59084.71, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.482+00	2025-06-15 01:37:57.482+00	59084.71	Fee(DEPOSIT_FEE) for b5f2078e-76e3-431a-9dc3-50b5dbfdaf5b	FEE
+ee1c2fda-4574-4480-ae52-6e831325afc4	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.40	EUR	Fee(DEPOSIT_FEE) for 60bd2a2c-fe2a-47e4-8e16-4c11434014a1	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	60bd2a2c-fe2a-47e4-8e16-4c11434014a1	API	{"bank": "Airwallex", "date": "2025-05-30T12:09:48.000Z", "note": "", "amount": -23.4, "source": "API", "balance": 51407.94, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 60bd2a2c-fe2a-47e4-8e16-4c11434014a1", "feeCurrency": "EUR", "transactionId": "60bd2a2c-fe2a-47e4-8e16-4c11434014a1", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 60bd2a2c-fe2a-47e4-8e16-4c11434014a1", "balanceAfterTransaction": 51407.94, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.486+00	2025-06-15 01:37:57.486+00	51407.94	Fee(DEPOSIT_FEE) for 60bd2a2c-fe2a-47e4-8e16-4c11434014a1	FEE
+bcf1de41-6b2f-4119-bfbf-5ae74200aa39	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.40	EUR	Fee(DEPOSIT_FEE) for a886b57d-107f-4dd4-a78f-8504c31c8824	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	a886b57d-107f-4dd4-a78f-8504c31c8824	API	{"bank": "Airwallex", "date": "2025-05-30T12:08:41.000Z", "note": "", "amount": -23.4, "source": "API", "balance": 43630.16, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for a886b57d-107f-4dd4-a78f-8504c31c8824", "feeCurrency": "EUR", "transactionId": "a886b57d-107f-4dd4-a78f-8504c31c8824", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for a886b57d-107f-4dd4-a78f-8504c31c8824", "balanceAfterTransaction": 43630.16, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.49+00	2025-06-15 01:37:57.49+00	43630.16	Fee(DEPOSIT_FEE) for a886b57d-107f-4dd4-a78f-8504c31c8824	FEE
+a1b7ab3e-5f68-43b1-b24f-b6750a800320	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.40	EUR	Fee(DEPOSIT_FEE) for 90372bf3-84bd-485f-8e26-49289496c46c	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	90372bf3-84bd-485f-8e26-49289496c46c	API	{"bank": "Airwallex", "date": "2025-05-30T12:08:41.000Z", "note": "", "amount": -23.4, "source": "API", "balance": 35852.38, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 90372bf3-84bd-485f-8e26-49289496c46c", "feeCurrency": "EUR", "transactionId": "90372bf3-84bd-485f-8e26-49289496c46c", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 90372bf3-84bd-485f-8e26-49289496c46c", "balanceAfterTransaction": 35852.38, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.494+00	2025-06-15 01:37:57.494+00	35852.38	Fee(DEPOSIT_FEE) for 90372bf3-84bd-485f-8e26-49289496c46c	FEE
+975019c1-de39-4ca3-a12d-fafa832a0ade	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-22.49	EUR	Fee(DEPOSIT_FEE) for 69bbe5a6-eb5c-421a-9e96-e20f410c3ee8	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	69bbe5a6-eb5c-421a-9e96-e20f410c3ee8	API	{"bank": "Airwallex", "date": "2025-05-30T12:06:35.000Z", "note": "", "amount": -22.49, "source": "API", "balance": 28074.6, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 69bbe5a6-eb5c-421a-9e96-e20f410c3ee8", "feeCurrency": "EUR", "transactionId": "69bbe5a6-eb5c-421a-9e96-e20f410c3ee8", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 69bbe5a6-eb5c-421a-9e96-e20f410c3ee8", "balanceAfterTransaction": 28074.6, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.498+00	2025-06-15 01:37:57.498+00	28074.60	Fee(DEPOSIT_FEE) for 69bbe5a6-eb5c-421a-9e96-e20f410c3ee8	FEE
+077c389c-e9f5-43b9-9eba-fd5546e87d71	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-22.49	EUR	Fee(DEPOSIT_FEE) for 3d0908a8-41cc-42cf-8211-ace622386fcb	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	3d0908a8-41cc-42cf-8211-ace622386fcb	API	{"bank": "Airwallex", "date": "2025-05-30T12:06:09.000Z", "note": "", "amount": -22.49, "source": "API", "balance": 20599.85, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 3d0908a8-41cc-42cf-8211-ace622386fcb", "feeCurrency": "EUR", "transactionId": "3d0908a8-41cc-42cf-8211-ace622386fcb", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 3d0908a8-41cc-42cf-8211-ace622386fcb", "balanceAfterTransaction": 20599.85, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.503+00	2025-06-15 01:37:57.503+00	20599.85	Fee(DEPOSIT_FEE) for 3d0908a8-41cc-42cf-8211-ace622386fcb	FEE
+b98dc9f5-e086-46cc-92ff-faad40ab037b	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-22.49	EUR	Fee(DEPOSIT_FEE) for 433e7ec5-0f01-4aab-a215-9909a1bf2aed	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	433e7ec5-0f01-4aab-a215-9909a1bf2aed	API	{"bank": "Airwallex", "date": "2025-05-30T12:02:43.000Z", "note": "", "amount": -22.49, "source": "API", "balance": 13125.1, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 433e7ec5-0f01-4aab-a215-9909a1bf2aed", "feeCurrency": "EUR", "transactionId": "433e7ec5-0f01-4aab-a215-9909a1bf2aed", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 433e7ec5-0f01-4aab-a215-9909a1bf2aed", "balanceAfterTransaction": 13125.1, "financialTransactionType": "FEE"}	2025-05-30	\N	\N	\N	\N	\N	2025-06-15 01:37:57.51+00	2025-06-15 01:37:57.51+00	13125.10	Fee(DEPOSIT_FEE) for 433e7ec5-0f01-4aab-a215-9909a1bf2aed	FEE
+5fb8bb90-c1b7-40d3-8359-c084c14b1b62	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2296.62	EUR	Pay MAD 23567.71 to  (MOSTAFA EL ALLIOUI)	\N	OTHER	COMPLETED	4.39	EUR	\N	\N	\N	\N	cd81f83e-05e2-43e5-8e46-53142482224d	API	{"bank": "Airwallex", "date": "2025-05-26T22:14:13.000Z", "note": "", "amount": -2296.62, "source": "API", "balance": 5650.35, "currency": "EUR", "feeAmount": 4.39, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 23567.71 to  (MOSTAFA EL ALLIOUI)", "feeCurrency": "EUR", "transactionId": "cd81f83e-05e2-43e5-8e46-53142482224d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 23567.71 to  (MOSTAFA EL ALLIOUI)", "balanceAfterTransaction": 5650.35, "financialTransactionType": "PAYMENT"}	2025-05-26	\N	\N	\N	\N	\N	2025-06-15 01:37:57.516+00	2025-06-15 01:37:57.516+00	5650.35	Pay MAD 23567.71 to  (MOSTAFA EL ALLIOUI)	PAYMENT
+78218c42-9c89-4979-bf5f-c9eaf0a29275	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1496.00	EUR	Pay MAD 15335.33 to  (MOHAMED JOUAHER)	\N	OTHER	COMPLETED	4.39	EUR	\N	\N	\N	\N	29be026a-59c7-4f44-8e1a-c386e0230096	API	{"bank": "Airwallex", "date": "2025-05-26T22:08:53.000Z", "note": "", "amount": -1496, "source": "API", "balance": 7946.97, "currency": "EUR", "feeAmount": 4.39, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 15335.33 to  (MOHAMED JOUAHER)", "feeCurrency": "EUR", "transactionId": "29be026a-59c7-4f44-8e1a-c386e0230096", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 15335.33 to  (MOHAMED JOUAHER)", "balanceAfterTransaction": 7946.97, "financialTransactionType": "PAYMENT"}	2025-05-26	\N	\N	\N	\N	\N	2025-06-15 01:37:57.521+00	2025-06-15 01:37:57.521+00	7946.97	Pay MAD 15335.33 to  (MOHAMED JOUAHER)	PAYMENT
+2b40b766-93ae-4708-8cfa-8aac7f0cfefc	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7743.00	EUR	Pay MAD 79568.80 to  (ADIL LOUSKI)	\N	OTHER	COMPLETED	4.39	EUR	\N	\N	\N	\N	801917b5-3f6a-4903-8e3e-b8331c362310	API	{"bank": "Airwallex", "date": "2025-05-26T22:04:49.000Z", "note": "", "amount": -7743, "source": "API", "balance": 9442.97, "currency": "EUR", "feeAmount": 4.39, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 79568.80 to  (ADIL LOUSKI)", "feeCurrency": "EUR", "transactionId": "801917b5-3f6a-4903-8e3e-b8331c362310", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 79568.80 to  (ADIL LOUSKI)", "balanceAfterTransaction": 9442.97, "financialTransactionType": "PAYMENT"}	2025-05-26	\N	\N	\N	\N	\N	2025-06-15 01:37:57.525+00	2025-06-15 01:37:57.525+00	9442.97	Pay MAD 79568.80 to  (ADIL LOUSKI)	PAYMENT
+620d399b-d45e-48f0-9cc4-f2ab7468d8c9	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7737.60	EUR	Pay EUR 7724.42 to  (Mr BEN AMOR WAEL)	\N	OTHER	COMPLETED	13.18	EUR	\N	\N	\N	\N	5a536648-4cc3-41ac-9276-afe791d840b3	API	{"bank": "Airwallex", "date": "2025-05-26T21:51:21.000Z", "note": "", "amount": -7737.6, "source": "API", "balance": 17185.97, "currency": "EUR", "feeAmount": 13.18, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 7724.42 to  (Mr BEN AMOR WAEL)", "feeCurrency": "EUR", "transactionId": "5a536648-4cc3-41ac-9276-afe791d840b3", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 7724.42 to  (Mr BEN AMOR WAEL)", "balanceAfterTransaction": 17185.97, "financialTransactionType": "PAYMENT"}	2025-05-26	\N	\N	\N	\N	\N	2025-06-15 01:37:57.53+00	2025-06-15 01:37:57.53+00	17185.97	Pay EUR 7724.42 to  (Mr BEN AMOR WAEL)	PAYMENT
+17618e68-6eff-40f1-878b-4176423c194d	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1049.74	EUR	Pay MAD 10743.83 to  (MR DKHISSI KAMAL)	\N	OTHER	COMPLETED	4.39	EUR	\N	\N	\N	\N	8960b1a0-3850-42ca-a99a-4213c6617094	API	{"bank": "Airwallex", "date": "2025-05-26T17:42:26.000Z", "note": "", "amount": -1049.74, "source": "API", "balance": 24923.57, "currency": "EUR", "feeAmount": 4.39, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 10743.83 to  (MR DKHISSI KAMAL)", "feeCurrency": "EUR", "transactionId": "8960b1a0-3850-42ca-a99a-4213c6617094", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 10743.83 to  (MR DKHISSI KAMAL)", "balanceAfterTransaction": 24923.57, "financialTransactionType": "PAYMENT"}	2025-05-26	\N	\N	\N	\N	\N	2025-06-15 01:37:57.535+00	2025-06-15 01:37:57.535+00	24923.57	Pay MAD 10743.83 to  (MR DKHISSI KAMAL)	PAYMENT
+dedff7cf-b75d-476e-84bb-17ba81500ac1	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-21.70	EUR	Fee(DEPOSIT_FEE) for 458300d4-9882-4d55-9760-94eea8553308	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	458300d4-9882-4d55-9760-94eea8553308	API	{"bank": "Airwallex", "date": "2025-05-16T10:35:53.000Z", "note": "", "amount": -21.7, "source": "API", "balance": 25973.31, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 458300d4-9882-4d55-9760-94eea8553308", "feeCurrency": "EUR", "transactionId": "458300d4-9882-4d55-9760-94eea8553308", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 458300d4-9882-4d55-9760-94eea8553308", "balanceAfterTransaction": 25973.31, "financialTransactionType": "FEE"}	2025-05-16	\N	\N	\N	\N	\N	2025-06-15 01:37:57.541+00	2025-06-15 01:37:57.541+00	25973.31	Fee(DEPOSIT_FEE) for 458300d4-9882-4d55-9760-94eea8553308	FEE
+0a4e230a-ada4-46dc-a406-09ec6d3f2a44	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-5648.59	EUR	Pay EUR 5635.17 to  (Mademoiselle WADE NDEYE FATOU)	\N	OTHER	COMPLETED	13.42	EUR	\N	\N	\N	\N	9a7402df-f341-42f4-9c0b-9d3b2b4b069a	API	{"bank": "Airwallex", "date": "2025-05-15T20:05:05.000Z", "note": "", "amount": -5648.59, "source": "API", "balance": 18760.92, "currency": "EUR", "feeAmount": 13.42, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 5635.17 to  (Mademoiselle WADE NDEYE FATOU)", "feeCurrency": "EUR", "transactionId": "9a7402df-f341-42f4-9c0b-9d3b2b4b069a", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 5635.17 to  (Mademoiselle WADE NDEYE FATOU)", "balanceAfterTransaction": 18760.92, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.547+00	2025-06-15 01:37:57.547+00	18760.92	Pay EUR 5635.17 to  (Mademoiselle WADE NDEYE FATOU)	PAYMENT
+5c400d95-6ecc-461f-aea3-851a0db75adc	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-11533.79	EUR	Pay EUR 11520.37 to  (Mehdi Benchekroun)	\N	OTHER	COMPLETED	13.42	EUR	\N	\N	\N	\N	a2a37d10-9b20-404d-80b4-f7f75993dc3b	API	{"bank": "Airwallex", "date": "2025-05-15T19:42:13.000Z", "note": "", "amount": -11533.79, "source": "API", "balance": 24409.51, "currency": "EUR", "feeAmount": 13.42, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 11520.37 to  (Mehdi Benchekroun)", "feeCurrency": "EUR", "transactionId": "a2a37d10-9b20-404d-80b4-f7f75993dc3b", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 11520.37 to  (Mehdi Benchekroun)", "balanceAfterTransaction": 24409.51, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.552+00	2025-06-15 01:37:57.552+00	24409.51	Pay EUR 11520.37 to  (Mehdi Benchekroun)	PAYMENT
+04e65b9f-591d-4dd7-9aa4-d83a7e2a9362	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-14271.16	EUR	Pay EUR 14257.74 to  (Mehdi Benchekroun)	\N	OTHER	COMPLETED	13.42	EUR	\N	\N	\N	\N	0f3d0c3c-a0e1-4fbf-b22e-c27bab7b35b8	API	{"bank": "Airwallex", "date": "2025-05-15T19:41:16.000Z", "note": "", "amount": -14271.16, "source": "API", "balance": 35943.3, "currency": "EUR", "feeAmount": 13.42, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 14257.74 to  (Mehdi Benchekroun)", "feeCurrency": "EUR", "transactionId": "0f3d0c3c-a0e1-4fbf-b22e-c27bab7b35b8", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 14257.74 to  (Mehdi Benchekroun)", "balanceAfterTransaction": 35943.3, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.559+00	2025-06-15 01:37:57.559+00	35943.30	Pay EUR 14257.74 to  (Mehdi Benchekroun)	PAYMENT
+df2a90d9-8d0c-4fee-9ea7-907978ac29e5	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-13586.82	EUR	Pay EUR 13573.40 to  (Mehdi Benchekroun)	\N	OTHER	COMPLETED	13.42	EUR	\N	\N	\N	\N	88efceba-9e05-4b54-8426-3d91fbe96727	API	{"bank": "Airwallex", "date": "2025-05-15T19:39:03.000Z", "note": "", "amount": -13586.82, "source": "API", "balance": 50214.46, "currency": "EUR", "feeAmount": 13.42, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 13573.40 to  (Mehdi Benchekroun)", "feeCurrency": "EUR", "transactionId": "88efceba-9e05-4b54-8426-3d91fbe96727", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 13573.40 to  (Mehdi Benchekroun)", "balanceAfterTransaction": 50214.46, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.566+00	2025-06-15 01:37:57.566+00	50214.46	Pay EUR 13573.40 to  (Mehdi Benchekroun)	PAYMENT
+d3e689e3-ff32-41cb-9f03-a83cc6aa6aac	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-4679.93	EUR	Pay MAD 47694.42 to  (Mme  MOULAGBA JEMAA)	\N	OTHER	COMPLETED	4.47	EUR	\N	\N	\N	\N	f2bae69a-7148-4652-99ce-bddc07131af1	API	{"bank": "Airwallex", "date": "2025-05-15T15:53:11.000Z", "note": "", "amount": -4679.93, "source": "API", "balance": 63801.28, "currency": "EUR", "feeAmount": 4.47, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 47694.42 to  (Mme  MOULAGBA JEMAA)", "feeCurrency": "EUR", "transactionId": "f2bae69a-7148-4652-99ce-bddc07131af1", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 47694.42 to  (Mme  MOULAGBA JEMAA)", "balanceAfterTransaction": 63801.28, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.579+00	2025-06-15 01:37:57.579+00	63801.28	Pay MAD 47694.42 to  (Mme  MOULAGBA JEMAA)	PAYMENT
+13e997ad-f07d-4aaf-9da9-f8294a02e787	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-9475.99	EUR	Pay XOF 5999149.00 to  (MOUSSA GARBA)	\N	OTHER	COMPLETED	4.47	EUR	\N	\N	\N	\N	f1d03ba8-653e-4172-82ae-2e4c8d3ad46d	API	{"bank": "Airwallex", "date": "2025-05-15T15:50:19.000Z", "note": "", "amount": -9475.99, "source": "API", "balance": 68481.21, "currency": "EUR", "feeAmount": 4.47, "reference": "", "sourceType": "PAYMENT", "description": "Pay XOF 5999149.00 to  (MOUSSA GARBA)", "feeCurrency": "EUR", "transactionId": "f1d03ba8-653e-4172-82ae-2e4c8d3ad46d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay XOF 5999149.00 to  (MOUSSA GARBA)", "balanceAfterTransaction": 68481.21, "financialTransactionType": "PAYMENT"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.593+00	2025-06-15 01:37:57.593+00	68481.21	Pay XOF 5999149.00 to  (MOUSSA GARBA)	PAYMENT
+002c1150-0579-41eb-a228-1c83997d3273	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-35.01	EUR	Fee(DEPOSIT_FEE) for f5ce5249-c219-4713-8c60-5806585a50d2	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	f5ce5249-c219-4713-8c60-5806585a50d2	API	{"bank": "Airwallex", "date": "2025-05-15T03:44:38.000Z", "note": "", "amount": -35.01, "source": "API", "balance": 77957.2, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for f5ce5249-c219-4713-8c60-5806585a50d2", "feeCurrency": "EUR", "transactionId": "f5ce5249-c219-4713-8c60-5806585a50d2", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for f5ce5249-c219-4713-8c60-5806585a50d2", "balanceAfterTransaction": 77957.2, "financialTransactionType": "FEE"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.6+00	2025-06-15 01:37:57.6+00	77957.20	Fee(DEPOSIT_FEE) for f5ce5249-c219-4713-8c60-5806585a50d2	FEE
+51f9bb73-fe3c-44a2-9c0a-984e15ae4149	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-43.24	EUR	Fee(DEPOSIT_FEE) for 86a71450-82f5-468f-b45a-ab7b3b235370	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	86a71450-82f5-468f-b45a-ab7b3b235370	API	{"bank": "Airwallex", "date": "2025-05-15T03:44:37.000Z", "note": "", "amount": -43.24, "source": "API", "balance": 66323.41, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 86a71450-82f5-468f-b45a-ab7b3b235370", "feeCurrency": "EUR", "transactionId": "86a71450-82f5-468f-b45a-ab7b3b235370", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 86a71450-82f5-468f-b45a-ab7b3b235370", "balanceAfterTransaction": 66323.41, "financialTransactionType": "FEE"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.605+00	2025-06-15 01:37:57.605+00	66323.41	Fee(DEPOSIT_FEE) for 86a71450-82f5-468f-b45a-ab7b3b235370	FEE
+620c5ac2-8d57-4a28-b508-6d317a79e881	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7.87	EUR	Fee(DEPOSIT_FEE) for 7e48661d-8381-4d2d-81a6-098a75620faa	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	7e48661d-8381-4d2d-81a6-098a75620faa	API	{"bank": "Airwallex", "date": "2025-05-15T03:44:37.000Z", "note": "", "amount": -7.87, "source": "API", "balance": 51952.25, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 7e48661d-8381-4d2d-81a6-098a75620faa", "feeCurrency": "EUR", "transactionId": "7e48661d-8381-4d2d-81a6-098a75620faa", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 7e48661d-8381-4d2d-81a6-098a75620faa", "balanceAfterTransaction": 51952.25, "financialTransactionType": "FEE"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.612+00	2025-06-15 01:37:57.612+00	51952.25	Fee(DEPOSIT_FEE) for 7e48661d-8381-4d2d-81a6-098a75620faa	FEE
+2d956672-7994-4195-8a78-1f2261d37ba3	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2.91	EUR	Fee(DEPOSIT_FEE) for 789feac4-3227-4409-a50c-821078f21c2e	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	789feac4-3227-4409-a50c-821078f21c2e	API	{"bank": "Airwallex", "date": "2025-05-15T03:44:37.000Z", "note": "", "amount": -2.91, "source": "API", "balance": 49337.13, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 789feac4-3227-4409-a50c-821078f21c2e", "feeCurrency": "EUR", "transactionId": "789feac4-3227-4409-a50c-821078f21c2e", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 789feac4-3227-4409-a50c-821078f21c2e", "balanceAfterTransaction": 49337.13, "financialTransactionType": "FEE"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.617+00	2025-06-15 01:37:57.617+00	49337.13	Fee(DEPOSIT_FEE) for 789feac4-3227-4409-a50c-821078f21c2e	FEE
+6eee0cf5-482d-47db-8b3d-148776a25e8e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-28.81	EUR	Fee(DEPOSIT_FEE) for a1c2eb05-913e-439a-9a42-624bb78fb182	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	a1c2eb05-913e-439a-9a42-624bb78fb182	API	{"bank": "Airwallex", "date": "2025-05-15T03:44:37.000Z", "note": "", "amount": -28.81, "source": "API", "balance": 48368.6, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for a1c2eb05-913e-439a-9a42-624bb78fb182", "feeCurrency": "EUR", "transactionId": "a1c2eb05-913e-439a-9a42-624bb78fb182", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for a1c2eb05-913e-439a-9a42-624bb78fb182", "balanceAfterTransaction": 48368.6, "financialTransactionType": "FEE"}	2025-05-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.622+00	2025-06-15 01:37:57.622+00	48368.60	Fee(DEPOSIT_FEE) for a1c2eb05-913e-439a-9a42-624bb78fb182	FEE
+c63145c1-e8b3-41a6-8834-bb9698baf1ed	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-333.89	EUR	Fee(FX_DELTA_FEE) for 8761d95d-5a1e-4079-b710-d1985811a2e3	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	8761d95d-5a1e-4079-b710-d1985811a2e3	API	{"bank": "Airwallex", "date": "2025-05-14T18:37:05.000Z", "note": "", "amount": -333.89, "source": "API", "balance": 38792.61, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(FX_DELTA_FEE) for 8761d95d-5a1e-4079-b710-d1985811a2e3", "feeCurrency": "EUR", "transactionId": "8761d95d-5a1e-4079-b710-d1985811a2e3", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(FX_DELTA_FEE) for 8761d95d-5a1e-4079-b710-d1985811a2e3", "balanceAfterTransaction": 38792.61, "financialTransactionType": "FEE"}	2025-05-14	\N	\N	\N	\N	\N	2025-06-15 01:37:57.63+00	2025-06-15 01:37:57.63+00	38792.61	Fee(FX_DELTA_FEE) for 8761d95d-5a1e-4079-b710-d1985811a2e3	FEE
+8c5772cc-9cdc-4f9b-9cb2-431a7d847212	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-37.20	EUR	Fee(DEPOSIT_FEE) for 6881e17a-3f1e-410d-b14f-d8dc9e2d29c6	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	6881e17a-3f1e-410d-b14f-d8dc9e2d29c6	API	{"bank": "Airwallex", "date": "2025-05-14T15:58:41.000Z", "note": "", "amount": -37.2, "source": "API", "balance": 25544.08, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 6881e17a-3f1e-410d-b14f-d8dc9e2d29c6", "feeCurrency": "EUR", "transactionId": "6881e17a-3f1e-410d-b14f-d8dc9e2d29c6", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 6881e17a-3f1e-410d-b14f-d8dc9e2d29c6", "balanceAfterTransaction": 25544.08, "financialTransactionType": "FEE"}	2025-05-14	\N	\N	\N	\N	\N	2025-06-15 01:37:57.638+00	2025-06-15 01:37:57.638+00	25544.08	Fee(DEPOSIT_FEE) for 6881e17a-3f1e-410d-b14f-d8dc9e2d29c6	FEE
+8ed5fbe6-7d8a-487f-95ab-2e78eb633a1a	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-37.29	EUR	Fee(DEPOSIT_FEE) for d6a7ad2d-b705-4d15-9a06-a08de0157cf8	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	d6a7ad2d-b705-4d15-9a06-a08de0157cf8	API	{"bank": "Airwallex", "date": "2025-05-14T15:56:36.000Z", "note": "", "amount": -37.29, "source": "API", "balance": 13181.28, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for d6a7ad2d-b705-4d15-9a06-a08de0157cf8", "feeCurrency": "EUR", "transactionId": "d6a7ad2d-b705-4d15-9a06-a08de0157cf8", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for d6a7ad2d-b705-4d15-9a06-a08de0157cf8", "balanceAfterTransaction": 13181.28, "financialTransactionType": "FEE"}	2025-05-14	\N	\N	\N	\N	\N	2025-06-15 01:37:57.644+00	2025-06-15 01:37:57.644+00	13181.28	Fee(DEPOSIT_FEE) for d6a7ad2d-b705-4d15-9a06-a08de0157cf8	FEE
+bbd5332c-881e-4bde-99f8-4cfa150875ef	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-8132.80	EUR	Pay EUR 8110.82 to  (Mr BEN AMOR WAEL)	\N	OTHER	COMPLETED	21.98	EUR	\N	\N	\N	\N	c508bd30-e101-4097-9b8f-e5ef286373e1	API	{"bank": "Airwallex", "date": "2025-04-25T16:02:26.000Z", "note": "", "amount": -8132.8, "source": "API", "balance": 788.07, "currency": "EUR", "feeAmount": 21.98, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 8110.82 to  (Mr BEN AMOR WAEL)", "feeCurrency": "EUR", "transactionId": "c508bd30-e101-4097-9b8f-e5ef286373e1", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 8110.82 to  (Mr BEN AMOR WAEL)", "balanceAfterTransaction": 788.07, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.651+00	2025-06-15 01:37:57.651+00	788.07	Pay EUR 8110.82 to  (Mr BEN AMOR WAEL)	PAYMENT
+0513cfd0-65ba-4b01-a95b-215710ade896	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2161.20	EUR	Pay MAD 22282.44 to  (MR DKHISSI KAMAL)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	92006984-3e9b-4477-af42-6e4f2397e815	API	{"bank": "Airwallex", "date": "2025-04-25T15:34:09.000Z", "note": "", "amount": -2161.2, "source": "API", "balance": 8920.87, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 22282.44 to  (MR DKHISSI KAMAL)", "feeCurrency": "EUR", "transactionId": "92006984-3e9b-4477-af42-6e4f2397e815", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 22282.44 to  (MR DKHISSI KAMAL)", "balanceAfterTransaction": 8920.87, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.658+00	2025-06-15 01:37:57.658+00	8920.87	Pay MAD 22282.44 to  (MR DKHISSI KAMAL)	PAYMENT
+8f94d3cc-c6c6-4f88-9121-9e95a044821d	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-6068.04	EUR	Pay XOF 3910822.00 to  (Ousmane Mazou)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	5126e473-207d-40c9-b43d-8c45583da2b3	API	{"bank": "Airwallex", "date": "2025-04-25T15:27:15.000Z", "note": "", "amount": -6068.04, "source": "API", "balance": 11082.07, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay XOF 3910822.00 to  (Ousmane Mazou)", "feeCurrency": "EUR", "transactionId": "5126e473-207d-40c9-b43d-8c45583da2b3", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay XOF 3910822.00 to  (Ousmane Mazou)", "balanceAfterTransaction": 11082.07, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.664+00	2025-06-15 01:37:57.664+00	11082.07	Pay XOF 3910822.00 to  (Ousmane Mazou)	PAYMENT
+e0089d8f-b9d8-4a21-ba3a-1c399b4db68a	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-4499.23	EUR	Pay MAD 46411.88 to  (Mme  MOULAGBA JEMAA)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	0a578bdf-a2c1-435a-b5b6-be9a529f8a9e	API	{"bank": "Airwallex", "date": "2025-04-25T15:24:15.000Z", "note": "", "amount": -4499.23, "source": "API", "balance": 17150.11, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 46411.88 to  (Mme  MOULAGBA JEMAA)", "feeCurrency": "EUR", "transactionId": "0a578bdf-a2c1-435a-b5b6-be9a529f8a9e", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 46411.88 to  (Mme  MOULAGBA JEMAA)", "balanceAfterTransaction": 17150.11, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.674+00	2025-06-15 01:37:57.674+00	17150.11	Pay MAD 46411.88 to  (Mme  MOULAGBA JEMAA)	PAYMENT
+ed28668b-cbc7-4d6f-b3fd-a2efe05cfd99	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1000.00	EUR	Pay XOF 642047.00 to  (Ousmane Mazou)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	02bf7f17-f3ee-499b-a35d-2f61a89f994a	API	{"bank": "Airwallex", "date": "2025-04-25T15:16:57.000Z", "note": "", "amount": -1000, "source": "API", "balance": 21649.34, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay XOF 642047.00 to  (Ousmane Mazou)", "feeCurrency": "EUR", "transactionId": "02bf7f17-f3ee-499b-a35d-2f61a89f994a", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay XOF 642047.00 to  (Ousmane Mazou)", "balanceAfterTransaction": 21649.34, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.681+00	2025-06-15 01:37:57.681+00	21649.34	Pay XOF 642047.00 to  (Ousmane Mazou)	PAYMENT
+c156a1a5-4d0d-466b-8bd1-e93c43977478	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1000.00	EUR	Pay MAD 10279.75 to  (Mme  MOULAGBA JEMAA)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	fb10cd78-f6a9-47d0-94a0-f9f1f4080a95	API	{"bank": "Airwallex", "date": "2025-04-25T15:08:06.000Z", "note": "", "amount": -1000, "source": "API", "balance": 22649.34, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 10279.75 to  (Mme  MOULAGBA JEMAA)", "feeCurrency": "EUR", "transactionId": "fb10cd78-f6a9-47d0-94a0-f9f1f4080a95", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 10279.75 to  (Mme  MOULAGBA JEMAA)", "balanceAfterTransaction": 22649.34, "financialTransactionType": "PAYMENT"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.687+00	2025-06-15 01:37:57.687+00	22649.34	Pay MAD 10279.75 to  (Mme  MOULAGBA JEMAA)	PAYMENT
+1e23ea88-a9be-4e41-b201-f9fef7d5b7ce	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-3.21	EUR	Fee(DEPOSIT_FEE) for 763b2eff-c954-4aa5-9a57-145648c97e9c	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	763b2eff-c954-4aa5-9a57-145648c97e9c	API	{"bank": "Airwallex", "date": "2025-04-25T14:13:40.000Z", "note": "", "amount": -3.21, "source": "API", "balance": 37236.16, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 763b2eff-c954-4aa5-9a57-145648c97e9c", "feeCurrency": "EUR", "transactionId": "763b2eff-c954-4aa5-9a57-145648c97e9c", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 763b2eff-c954-4aa5-9a57-145648c97e9c", "balanceAfterTransaction": 37236.16, "financialTransactionType": "FEE"}	2025-04-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.696+00	2025-06-15 01:37:57.696+00	37236.16	Fee(DEPOSIT_FEE) for 763b2eff-c954-4aa5-9a57-145648c97e9c	FEE
+07ced0ea-e95f-4874-9887-f40461841f75	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-16.83	EUR	Fee(DEPOSIT_FEE) for 7f5108e5-e1e0-4aa1-9284-a8296890ea51	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	7f5108e5-e1e0-4aa1-9284-a8296890ea51	API	{"bank": "Airwallex", "date": "2025-04-23T14:06:25.000Z", "note": "", "amount": -16.83, "source": "API", "balance": 36170.21, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 7f5108e5-e1e0-4aa1-9284-a8296890ea51", "feeCurrency": "EUR", "transactionId": "7f5108e5-e1e0-4aa1-9284-a8296890ea51", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 7f5108e5-e1e0-4aa1-9284-a8296890ea51", "balanceAfterTransaction": 36170.21, "financialTransactionType": "FEE"}	2025-04-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.704+00	2025-06-15 01:37:57.704+00	36170.21	Fee(DEPOSIT_FEE) for 7f5108e5-e1e0-4aa1-9284-a8296890ea51	FEE
+067d567e-5c30-429c-a327-7baebdf06fe8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-21.56	EUR	Fee(DEPOSIT_FEE) for 320bee84-4049-4b17-a59f-82e412817b7f	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	320bee84-4049-4b17-a59f-82e412817b7f	API	{"bank": "Airwallex", "date": "2025-04-23T14:06:25.000Z", "note": "", "amount": -21.56, "source": "API", "balance": 30575.38, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 320bee84-4049-4b17-a59f-82e412817b7f", "feeCurrency": "EUR", "transactionId": "320bee84-4049-4b17-a59f-82e412817b7f", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 320bee84-4049-4b17-a59f-82e412817b7f", "balanceAfterTransaction": 30575.38, "financialTransactionType": "FEE"}	2025-04-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.718+00	2025-06-15 01:37:57.718+00	30575.38	Fee(DEPOSIT_FEE) for 320bee84-4049-4b17-a59f-82e412817b7f	FEE
+5454cf56-0887-4e66-ac22-3c8438fecf65	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-6.80	EUR	Fee(DEPOSIT_FEE) for e17cf9a3-d241-4775-8f4b-0397332ce98c	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	e17cf9a3-d241-4775-8f4b-0397332ce98c	API	{"bank": "Airwallex", "date": "2025-04-22T16:11:12.000Z", "note": "", "amount": -6.8, "source": "API", "balance": 23411.74, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for e17cf9a3-d241-4775-8f4b-0397332ce98c", "feeCurrency": "EUR", "transactionId": "e17cf9a3-d241-4775-8f4b-0397332ce98c", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for e17cf9a3-d241-4775-8f4b-0397332ce98c", "balanceAfterTransaction": 23411.74, "financialTransactionType": "FEE"}	2025-04-22	\N	\N	\N	\N	\N	2025-06-15 01:37:57.727+00	2025-06-15 01:37:57.727+00	23411.74	Fee(DEPOSIT_FEE) for e17cf9a3-d241-4775-8f4b-0397332ce98c	FEE
+30052c7b-d886-4922-9d9a-077ba76dd4c1	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-41.18	EUR	Fee(DEPOSIT_FEE) for 96938059-ebe7-4b3c-96f4-1db771671ae5	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	96938059-ebe7-4b3c-96f4-1db771671ae5	API	{"bank": "Airwallex", "date": "2025-04-22T16:05:50.000Z", "note": "", "amount": -41.18, "source": "API", "balance": 21150.46, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for 96938059-ebe7-4b3c-96f4-1db771671ae5", "feeCurrency": "EUR", "transactionId": "96938059-ebe7-4b3c-96f4-1db771671ae5", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for 96938059-ebe7-4b3c-96f4-1db771671ae5", "balanceAfterTransaction": 21150.46, "financialTransactionType": "FEE"}	2025-04-22	\N	\N	\N	\N	\N	2025-06-15 01:37:57.735+00	2025-06-15 01:37:57.735+00	21150.46	Fee(DEPOSIT_FEE) for 96938059-ebe7-4b3c-96f4-1db771671ae5	FEE
+a183c2e4-25a8-4e27-9a0e-c004fcc02124	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1864.09	EUR	Pay MAD 19253.93 to  (MOHAMED JOUAHER)	\N	OTHER	COMPLETED	4.39	EUR	\N	\N	\N	\N	ce90f11a-da16-4e5d-8a2e-5a53a5243d5d	API	{"bank": "Airwallex", "date": "2025-04-16T07:32:23.000Z", "note": "", "amount": -1864.09, "source": "API", "balance": 7463.64, "currency": "EUR", "feeAmount": 4.39, "reference": "", "sourceType": "PAYMENT", "description": "Pay MAD 19253.93 to  (MOHAMED JOUAHER)", "feeCurrency": "EUR", "transactionId": "ce90f11a-da16-4e5d-8a2e-5a53a5243d5d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay MAD 19253.93 to  (MOHAMED JOUAHER)", "balanceAfterTransaction": 7463.64, "financialTransactionType": "PAYMENT"}	2025-04-16	\N	\N	\N	\N	\N	2025-06-15 01:37:57.744+00	2025-06-15 01:37:57.744+00	7463.64	Pay MAD 19253.93 to  (MOHAMED JOUAHER)	PAYMENT
+2bfe683e-344f-4bd6-8b5a-f64ff9ae586f	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-4099.60	EUR	Pay XOF 2651616.00 to  (MOUSSA GARBA)	\N	OTHER	COMPLETED	4.40	EUR	\N	\N	\N	\N	387a83f5-049e-423b-a131-92213368f807	API	{"bank": "Airwallex", "date": "2025-04-16T07:18:41.000Z", "note": "", "amount": -4099.6, "source": "API", "balance": 9327.73, "currency": "EUR", "feeAmount": 4.4, "reference": "", "sourceType": "PAYMENT", "description": "Pay XOF 2651616.00 to  (MOUSSA GARBA)", "feeCurrency": "EUR", "transactionId": "387a83f5-049e-423b-a131-92213368f807", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay XOF 2651616.00 to  (MOUSSA GARBA)", "balanceAfterTransaction": 9327.73, "financialTransactionType": "PAYMENT"}	2025-04-16	\N	\N	\N	\N	\N	2025-06-15 01:37:57.752+00	2025-06-15 01:37:57.752+00	9327.73	Pay XOF 2651616.00 to  (MOUSSA GARBA)	PAYMENT
+3a7eeacb-74a0-42a0-b9de-2e313c71d169	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-5.91	EUR	Fee(DEPOSIT_FEE) for deb3bdae-7435-4cae-a50c-1a35ba8424d2	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	deb3bdae-7435-4cae-a50c-1a35ba8424d2	API	{"bank": "Airwallex", "date": "2025-04-13T02:01:54.000Z", "note": "", "amount": -5.91, "source": "API", "balance": 13427.33, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for deb3bdae-7435-4cae-a50c-1a35ba8424d2", "feeCurrency": "EUR", "transactionId": "deb3bdae-7435-4cae-a50c-1a35ba8424d2", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for deb3bdae-7435-4cae-a50c-1a35ba8424d2", "balanceAfterTransaction": 13427.33, "financialTransactionType": "FEE"}	2025-04-13	\N	\N	\N	\N	\N	2025-06-15 01:37:57.76+00	2025-06-15 01:37:57.76+00	13427.33	Fee(DEPOSIT_FEE) for deb3bdae-7435-4cae-a50c-1a35ba8424d2	FEE
+87878ddf-ec47-4587-87ff-c1712871f53e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-21.56	EUR	Fee(DEPOSIT_FEE) for e597b68e-b3b1-4881-b4a8-148c1a6579e9	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	e597b68e-b3b1-4881-b4a8-148c1a6579e9	API	{"bank": "Airwallex", "date": "2025-04-11T09:11:44.000Z", "note": "", "amount": -21.56, "source": "API", "balance": 11463.24, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for e597b68e-b3b1-4881-b4a8-148c1a6579e9", "feeCurrency": "EUR", "transactionId": "e597b68e-b3b1-4881-b4a8-148c1a6579e9", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for e597b68e-b3b1-4881-b4a8-148c1a6579e9", "balanceAfterTransaction": 11463.24, "financialTransactionType": "FEE"}	2025-04-11	\N	\N	\N	\N	\N	2025-06-15 01:37:57.768+00	2025-06-15 01:37:57.768+00	11463.24	Fee(DEPOSIT_FEE) for e597b68e-b3b1-4881-b4a8-148c1a6579e9	FEE
+6a52843d-8648-4a75-b721-9763c3a74dbc	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-12.64	EUR	Fee(DEPOSIT_FEE) for dc1300ab-aaf9-424a-bcb9-39a1356d702e	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	dc1300ab-aaf9-424a-bcb9-39a1356d702e	API	{"bank": "Airwallex", "date": "2025-04-11T09:11:42.000Z", "note": "", "amount": -12.64, "source": "API", "balance": 4299.6, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for dc1300ab-aaf9-424a-bcb9-39a1356d702e", "feeCurrency": "EUR", "transactionId": "dc1300ab-aaf9-424a-bcb9-39a1356d702e", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for dc1300ab-aaf9-424a-bcb9-39a1356d702e", "balanceAfterTransaction": 4299.6, "financialTransactionType": "FEE"}	2025-04-11	\N	\N	\N	\N	\N	2025-06-15 01:37:57.778+00	2025-06-15 01:37:57.778+00	4299.60	Fee(DEPOSIT_FEE) for dc1300ab-aaf9-424a-bcb9-39a1356d702e	FEE
+ecc16ca2-02eb-4f47-936e-b54fe8d00ada	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-3340.96	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_9ZyxFqObN9OM35EpHPi3iQ	API	{"bank": "Airwallex", "date": "2025-03-24T22:05:42.000Z", "note": "", "amount": -3340.96, "source": "API", "balance": 100, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_9ZyxFqObN9OM35EpHPi3iQ", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 100, "financialTransactionType": "TRANSFER"}	2025-03-24	\N	\N	\N	\N	\N	2025-06-15 01:37:57.786+00	2025-06-15 01:37:57.786+00	100.00	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+f932061b-3f24-4866-8dff-22fafe59ece7	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-7713.69	EUR	Pay XOF 4976288.00 to  (MOUSSA GARBA)	\N	OTHER	COMPLETED	4.59	EUR	\N	\N	\N	\N	0e9799e5-06c4-464d-8799-f9740eeba321	API	{"bank": "Airwallex", "date": "2025-03-19T23:15:35.000Z", "note": "", "amount": -7713.69, "source": "API", "balance": 3440.96, "currency": "EUR", "feeAmount": 4.59, "reference": "", "sourceType": "PAYMENT", "description": "Pay XOF 4976288.00 to  (MOUSSA GARBA)", "feeCurrency": "EUR", "transactionId": "0e9799e5-06c4-464d-8799-f9740eeba321", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay XOF 4976288.00 to  (MOUSSA GARBA)", "balanceAfterTransaction": 3440.96, "financialTransactionType": "PAYMENT"}	2025-03-19	\N	\N	\N	\N	\N	2025-06-15 01:37:57.795+00	2025-06-15 01:37:57.795+00	3440.96	Pay XOF 4976288.00 to  (MOUSSA GARBA)	PAYMENT
+e2d4910b-4464-41e4-b653-9ace746e000e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23.47	EUR	Fee(DEPOSIT_FEE) for f7605523-a78c-424b-b74b-05ee9bf6974f	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	f7605523-a78c-424b-b74b-05ee9bf6974f	API	{"bank": "Airwallex", "date": "2025-03-19T22:28:12.000Z", "note": "", "amount": -23.47, "source": "API", "balance": 11154.65, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for f7605523-a78c-424b-b74b-05ee9bf6974f", "feeCurrency": "EUR", "transactionId": "f7605523-a78c-424b-b74b-05ee9bf6974f", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for f7605523-a78c-424b-b74b-05ee9bf6974f", "balanceAfterTransaction": 11154.65, "financialTransactionType": "FEE"}	2025-03-19	\N	\N	\N	\N	\N	2025-06-15 01:37:57.801+00	2025-06-15 01:37:57.801+00	11154.65	Fee(DEPOSIT_FEE) for f7605523-a78c-424b-b74b-05ee9bf6974f	FEE
+66396309-848a-42c5-8f28-256939f200a0	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-0.04	EUR	Fee(DEPOSIT_FEE) for a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a	\N	FEE	COMPLETED	0.00	EUR	\N	\N	\N	\N	a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a	API	{"bank": "Airwallex", "date": "2025-03-17T21:04:53.000Z", "note": "", "amount": -0.04, "source": "API", "balance": 3355.92, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "FEE", "description": "Fee(DEPOSIT_FEE) for a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a", "feeCurrency": "EUR", "transactionId": "a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Fee(DEPOSIT_FEE) for a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a", "balanceAfterTransaction": 3355.92, "financialTransactionType": "FEE"}	2025-03-17	\N	\N	\N	\N	\N	2025-06-15 01:37:57.813+00	2025-06-15 01:37:57.813+00	3355.92	Fee(DEPOSIT_FEE) for a2c2ff3f-3c4a-44d8-91d7-775b9e788b3a	FEE
+5f00721b-ba7c-4059-8a11-cdf3adec16bb	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	1985.04	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	f30815a9-4016-43a1-80d2-d067a5cfe44a	API	{"bank": "Airwallex", "date": "2025-03-07T05:41:49.000Z", "note": "", "amount": 1985.04, "source": "API", "balance": 3340.96, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "f30815a9-4016-43a1-80d2-d067a5cfe44a", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3340.96, "financialTransactionType": "DEPOSIT"}	2025-03-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.826+00	2025-06-15 01:37:57.826+00	3340.96	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+e3b74630-b10a-4aa0-a370-89dd748d37c8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1644.08	EUR	Pay PHP 100000.00 to  (Mary Hope E Sarrosa)	\N	OTHER	COMPLETED	4.64	EUR	\N	\N	\N	\N	789769c8-3297-4f36-b5aa-cde179b26e07	API	{"bank": "Airwallex", "date": "2025-03-06T22:44:04.000Z", "note": "", "amount": -1644.08, "source": "API", "balance": 1355.92, "currency": "EUR", "feeAmount": 4.64, "reference": "", "sourceType": "PAYMENT", "description": "Pay PHP 100000.00 to  (Mary Hope E Sarrosa)", "feeCurrency": "EUR", "transactionId": "789769c8-3297-4f36-b5aa-cde179b26e07", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay PHP 100000.00 to  (Mary Hope E Sarrosa)", "balanceAfterTransaction": 1355.92, "financialTransactionType": "PAYMENT"}	2025-03-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.833+00	2025-06-15 01:37:57.833+00	1355.92	Pay PHP 100000.00 to  (Mary Hope E Sarrosa)	PAYMENT
+5107e296-9698-4fee-b03b-43c008759d1c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1412.76	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_3GXJvGfGPfuXlTgbJXTOig	API	{"bank": "Airwallex", "date": "2025-02-11T00:20:57.000Z", "note": "", "amount": -1412.76, "source": "API", "balance": 3000, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_3GXJvGfGPfuXlTgbJXTOig", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 3000, "financialTransactionType": "TRANSFER"}	2025-02-11	\N	\N	\N	\N	\N	2025-06-15 01:37:57.847+00	2025-06-15 01:37:57.847+00	3000.00	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+39f990e7-d7f4-4a26-a619-a8ad7ffbefd3	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1072.00	EUR	Pay EUR 1069.09 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.91	EUR	\N	\N	\N	\N	3022e529-f4c5-4a11-90d7-306b59065745	API	{"bank": "Airwallex", "date": "2025-02-11T00:19:05.000Z", "note": "", "amount": -1072, "source": "API", "balance": 4412.76, "currency": "EUR", "feeAmount": 2.91, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1069.09 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "3022e529-f4c5-4a11-90d7-306b59065745", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1069.09 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 4412.76, "financialTransactionType": "PAYMENT"}	2025-02-11	\N	\N	\N	\N	\N	2025-06-15 01:37:57.854+00	2025-06-15 01:37:57.854+00	4412.76	Pay EUR 1069.09 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+d5bec4a8-39ed-4368-bb62-db7cdca89fdc	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	5000.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	7e4f0283-7ea3-4291-b78d-6707278a4c25	API	{"bank": "Airwallex", "date": "2025-02-06T04:18:06.000Z", "note": "", "amount": 5000, "source": "API", "balance": 5484.76, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "7e4f0283-7ea3-4291-b78d-6707278a4c25", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 5484.76, "financialTransactionType": "DEPOSIT"}	2025-02-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.861+00	2025-06-15 01:37:57.861+00	5484.76	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+d70d2dc5-8ab3-4d94-b434-96a3c777fa7e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-600.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_9OPByDpqM1CCIMg9Hth7Kw	API	{"bank": "Airwallex", "date": "2025-01-13T10:54:00.000Z", "note": "", "amount": -600, "source": "API", "balance": 484.76, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_9OPByDpqM1CCIMg9Hth7Kw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 484.76, "financialTransactionType": "TRANSFER"}	2025-01-13	\N	\N	\N	\N	\N	2025-06-15 01:37:57.871+00	2025-06-15 01:37:57.871+00	484.76	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+e69673dd-f957-44a3-840a-f72a89b4e75b	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1024.00	EUR	Pay EUR 1021.12 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.88	EUR	\N	\N	\N	\N	dae92654-4a0f-45b8-82bb-2e4503d0a588	API	{"bank": "Airwallex", "date": "2025-01-07T12:08:21.000Z", "note": "", "amount": -1024, "source": "API", "balance": 1084.76, "currency": "EUR", "feeAmount": 2.88, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1021.12 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "dae92654-4a0f-45b8-82bb-2e4503d0a588", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1021.12 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 1084.76, "financialTransactionType": "PAYMENT"}	2025-01-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.879+00	2025-06-15 01:37:57.879+00	1084.76	Pay EUR 1021.12 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+936987f6-1efb-4513-87f7-80ecb7d58181	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	1024.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	0cd04dbe-89cb-43ed-a1b2-49941e941620	API	{"bank": "Airwallex", "date": "2025-01-06T04:18:04.000Z", "note": "", "amount": 1024, "source": "API", "balance": 2108.76, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "0cd04dbe-89cb-43ed-a1b2-49941e941620", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2108.76, "financialTransactionType": "DEPOSIT"}	2025-01-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.883+00	2025-06-15 01:37:57.883+00	2108.76	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+52132b45-d584-4935-9ee2-280ac11910fb	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1500.00	EUR	Pay EUR 1497.16 to  (Mary Hope Sarrosa)	\N	OTHER	COMPLETED	2.84	EUR	\N	\N	\N	\N	eb3f792f-854f-4743-bc8b-87cf1282ef82	API	{"bank": "Airwallex", "date": "2024-12-06T09:26:12.000Z", "note": "", "amount": -1500, "source": "API", "balance": 1084.76, "currency": "EUR", "feeAmount": 2.84, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1497.16 to  (Mary Hope Sarrosa)", "feeCurrency": "EUR", "transactionId": "eb3f792f-854f-4743-bc8b-87cf1282ef82", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1497.16 to  (Mary Hope Sarrosa)", "balanceAfterTransaction": 1084.76, "financialTransactionType": "PAYMENT"}	2024-12-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.887+00	2025-06-15 01:37:57.887+00	1084.76	Pay EUR 1497.16 to  (Mary Hope Sarrosa)	PAYMENT
+b175a509-3f33-4768-b271-5d37a1c98396	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1296.00	EUR	Pay EUR 1293.16 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.84	EUR	\N	\N	\N	\N	e15940a5-48e8-41d9-a5c1-311e90367d4f	API	{"bank": "Airwallex", "date": "2024-12-06T09:22:14.000Z", "note": "", "amount": -1296, "source": "API", "balance": 2584.76, "currency": "EUR", "feeAmount": 2.84, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1293.16 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "e15940a5-48e8-41d9-a5c1-311e90367d4f", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1293.16 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 2584.76, "financialTransactionType": "PAYMENT"}	2024-12-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.891+00	2025-06-15 01:37:57.891+00	2584.76	Pay EUR 1293.16 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+19589c17-4b44-49ad-8961-cb5a7e19c982	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3280.76	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	d55fc62d-e3a0-4df6-a27c-0500e11ad76f	API	{"bank": "Airwallex", "date": "2024-12-06T04:19:46.000Z", "note": "", "amount": 3280.76, "source": "API", "balance": 3880.76, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "d55fc62d-e3a0-4df6-a27c-0500e11ad76f", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3880.76, "financialTransactionType": "DEPOSIT"}	2024-12-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.894+00	2025-06-15 01:37:57.894+00	3880.76	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+7337e5cc-de1a-4754-9313-d38b57eecef5	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-500.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_vcbpp0xqMMC9QsGyep_ldA	API	{"bank": "Airwallex", "date": "2024-11-28T15:07:17.000Z", "note": "", "amount": -500, "source": "API", "balance": 600, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_vcbpp0xqMMC9QsGyep_ldA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 600, "financialTransactionType": "TRANSFER"}	2024-11-28	\N	\N	\N	\N	\N	2025-06-15 01:37:57.897+00	2025-06-15 01:37:57.897+00	600.00	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+703f7b5b-97d7-4d38-9062-549d76503948	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1240.57	EUR	Pay EUR 1237.78 to  (Mary Hope Sarrosa)	\N	OTHER	COMPLETED	2.79	EUR	\N	\N	\N	\N	449733f8-92d6-4cbc-b764-b50dace520cf	API	{"bank": "Airwallex", "date": "2024-11-06T08:48:41.000Z", "note": "", "amount": -1240.57, "source": "API", "balance": 1100, "currency": "EUR", "feeAmount": 2.79, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1237.78 to  (Mary Hope Sarrosa)", "feeCurrency": "EUR", "transactionId": "449733f8-92d6-4cbc-b764-b50dace520cf", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1237.78 to  (Mary Hope Sarrosa)", "balanceAfterTransaction": 1100, "financialTransactionType": "PAYMENT"}	2024-11-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.9+00	2025-06-15 01:37:57.9+00	1100.00	Pay EUR 1237.78 to  (Mary Hope Sarrosa)	PAYMENT
+1bd24642-a566-47ec-982e-eccdf8365518	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1376.00	EUR	Pay EUR 1373.21 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.79	EUR	\N	\N	\N	\N	8c902296-b67b-48a9-8ebb-c79ccb9c71ff	API	{"bank": "Airwallex", "date": "2024-11-06T08:14:52.000Z", "note": "", "amount": -1376, "source": "API", "balance": 2340.57, "currency": "EUR", "feeAmount": 2.79, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1373.21 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "8c902296-b67b-48a9-8ebb-c79ccb9c71ff", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1373.21 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 2340.57, "financialTransactionType": "PAYMENT"}	2024-11-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.902+00	2025-06-15 01:37:57.902+00	2340.57	Pay EUR 1373.21 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+9c5f2c6f-085e-48c8-9f29-5819152c7a4a	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2361.22	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	759d5f55-7b75-4df9-8b92-32d4841ab653	API	{"bank": "Airwallex", "date": "2024-11-06T04:20:05.000Z", "note": "", "amount": 2361.22, "source": "API", "balance": 3716.57, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "759d5f55-7b75-4df9-8b92-32d4841ab653", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3716.57, "financialTransactionType": "DEPOSIT"}	2024-11-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.905+00	2025-06-15 01:37:57.905+00	3716.57	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+cf584971-a046-442e-914c-3a41c38c6c1c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-50.00	EUR	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_Lld8y091OBiBtZiyTztoEg	API	{"bank": "Airwallex", "date": "2024-10-23T11:38:41.000Z", "note": "", "amount": -50, "source": "API", "balance": 1355.35, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "EUR", "transactionId": "tr_Lld8y091OBiBtZiyTztoEg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 1355.35, "financialTransactionType": "TRANSFER"}	2024-10-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.907+00	2025-06-15 01:37:57.907+00	1355.35	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+8af5fc81-b888-433a-81e2-928d41081b74	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-50.00	EUR	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_H-EaUp-2MoeOS5jZB9KBxA	API	{"bank": "Airwallex", "date": "2024-10-23T11:15:47.000Z", "note": "", "amount": -50, "source": "API", "balance": 1405.35, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "EUR", "transactionId": "tr_H-EaUp-2MoeOS5jZB9KBxA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 1405.35, "financialTransactionType": "TRANSFER"}	2024-10-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.911+00	2025-06-15 01:37:57.911+00	1405.35	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+22a5ae40-d4bb-40ad-95da-971e359304bf	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-200.00	EUR	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_oFh4ctrAO9SZita7jE9MIA	API	{"bank": "Airwallex", "date": "2024-10-23T11:14:41.000Z", "note": "", "amount": -200, "source": "API", "balance": 1455.35, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "EUR", "transactionId": "tr_oFh4ctrAO9SZita7jE9MIA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 1455.35, "financialTransactionType": "TRANSFER"}	2024-10-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.913+00	2025-06-15 01:37:57.913+00	1455.35	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+250ccdda-a391-4e1d-8319-a1d2197e39f8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1280.00	EUR	Pay EUR 1277.26 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.74	EUR	\N	\N	\N	\N	a32061b5-67a5-43ac-aeb3-f9787c087dbb	API	{"bank": "Airwallex", "date": "2024-10-07T10:35:23.000Z", "note": "", "amount": -1280, "source": "API", "balance": 1655.35, "currency": "EUR", "feeAmount": 2.74, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1277.26 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "a32061b5-67a5-43ac-aeb3-f9787c087dbb", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1277.26 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 1655.35, "financialTransactionType": "PAYMENT"}	2024-10-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.917+00	2025-06-15 01:37:57.917+00	1655.35	Pay EUR 1277.26 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+31aaec2c-3694-4672-bbae-a91c1d1f5e1f	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2935.35	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	91cb7b47-4d3c-4b7b-b8d0-2736dfb05b38	API	{"bank": "Airwallex", "date": "2024-10-07T00:09:16.000Z", "note": "", "amount": 2935.35, "source": "API", "balance": 2935.35, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "91cb7b47-4d3c-4b7b-b8d0-2736dfb05b38", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2935.35, "financialTransactionType": "DEPOSIT"}	2024-10-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.919+00	2025-06-15 01:37:57.919+00	2935.35	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+a305080b-fbc7-4eb6-afc0-ebac36cf3847	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-400.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_zhmZ0fCRPqSfzaZaKAzaRA	API	{"bank": "Airwallex", "date": "2024-09-06T08:52:49.000Z", "note": "", "amount": -400, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_zhmZ0fCRPqSfzaZaKAzaRA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-09-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.921+00	2025-06-15 01:37:57.921+00	0.00	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+64a320dd-f581-47d9-9eb0-406fd1eaca69	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2550.03	EUR	Pay EUR 2547.33 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.70	EUR	\N	\N	\N	\N	619f8fb9-a5be-4627-86c4-e4887bd18a4e	API	{"bank": "Airwallex", "date": "2024-09-06T08:51:28.000Z", "note": "", "amount": -2550.03, "source": "API", "balance": 400, "currency": "EUR", "feeAmount": 2.7, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 2547.33 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "619f8fb9-a5be-4627-86c4-e4887bd18a4e", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 2547.33 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 400, "financialTransactionType": "PAYMENT"}	2024-09-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.924+00	2025-06-15 01:37:57.924+00	400.00	Pay EUR 2547.33 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+f7f2d739-7665-4df7-8ebb-f370748a89b0	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2950.03	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	7af9ef6c-b11e-4b73-9b5e-896629591ebc	API	{"bank": "Airwallex", "date": "2024-09-06T03:30:38.000Z", "note": "", "amount": 2950.03, "source": "API", "balance": 2950.03, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "7af9ef6c-b11e-4b73-9b5e-896629591ebc", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2950.03, "financialTransactionType": "DEPOSIT"}	2024-09-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.926+00	2025-06-15 01:37:57.926+00	2950.03	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+62bb6912-567e-406d-854d-4a2d0087db9d	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1368.00	EUR	Pay EUR 1365.25 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.75	EUR	\N	\N	\N	\N	20fee74f-3603-44f0-9f01-163ea3e734e2	API	{"bank": "Airwallex", "date": "2024-08-07T09:33:54.000Z", "note": "", "amount": -1368, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 2.75, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1365.25 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "20fee74f-3603-44f0-9f01-163ea3e734e2", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1365.25 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 0, "financialTransactionType": "PAYMENT"}	2024-08-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.928+00	2025-06-15 01:37:57.928+00	0.00	Pay EUR 1365.25 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+31b2a452-0251-4b57-a591-ca354cb746ff	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	1368.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	e5879db1-b191-441a-a1ca-169d0f8c759a	API	{"bank": "Airwallex", "date": "2024-08-06T03:20:44.000Z", "note": "", "amount": 1368, "source": "API", "balance": 1368, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "e5879db1-b191-441a-a1ca-169d0f8c759a", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 1368, "financialTransactionType": "DEPOSIT"}	2024-08-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.93+00	2025-06-15 01:37:57.93+00	1368.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+4d0c4419-e23e-4ea1-80d9-3e1a77f0a7a4	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1280.00	EUR	Pay EUR 1277.25 to  (Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.75	EUR	\N	\N	\N	\N	894372aa-67fb-499d-b64e-5635da320d08	API	{"bank": "Airwallex", "date": "2024-07-15T09:36:20.000Z", "note": "", "amount": -1280, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 2.75, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1277.25 to  (Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "894372aa-67fb-499d-b64e-5635da320d08", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1277.25 to  (Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 0, "financialTransactionType": "PAYMENT"}	2024-07-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.933+00	2025-06-15 01:37:57.933+00	0.00	Pay EUR 1277.25 to  (Mary Hope Sarrosa Espanola)	PAYMENT
+e21394a5-f363-4332-b1f0-e90d4c70c189	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-861.00	EUR	Pay EUR 858.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.75	EUR	\N	\N	\N	\N	1b49372d-fc6f-482f-8562-2f73fe8bf4ea	API	{"bank": "Airwallex", "date": "2024-07-15T09:34:45.000Z", "note": "", "amount": -861, "source": "API", "balance": 1280, "currency": "EUR", "feeAmount": 2.75, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 858.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "1b49372d-fc6f-482f-8562-2f73fe8bf4ea", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 858.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 1280, "financialTransactionType": "PAYMENT"}	2024-07-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.935+00	2025-06-15 01:37:57.935+00	1280.00	Pay EUR 858.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+90512a44-b120-4af8-bfd6-8cfbc2afd614	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2141.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	179b8984-f83f-45ff-96cb-98b13d211954	API	{"bank": "Airwallex", "date": "2024-07-15T04:43:21.000Z", "note": "", "amount": 2141, "source": "API", "balance": 2141, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "179b8984-f83f-45ff-96cb-98b13d211954", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2141, "financialTransactionType": "DEPOSIT"}	2024-07-15	\N	\N	\N	\N	\N	2025-06-15 01:37:57.938+00	2025-06-15 01:37:57.938+00	2141.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+79790b10-35c5-463b-b971-f8b70a5f6080	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1790.49	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_oRLb3Yx6NeKh3_QPq3eNgA	API	{"bank": "Airwallex", "date": "2024-07-04T09:34:40.000Z", "note": "", "amount": -1790.49, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_oRLb3Yx6NeKh3_QPq3eNgA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-07-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.94+00	2025-06-15 01:37:57.94+00	0.00	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+255f181a-43cb-4252-a1ec-84826e0b46b2	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-8812.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_gufXUN1HOc66iJBq9wyPfQ	API	{"bank": "Airwallex", "date": "2024-06-06T13:09:21.000Z", "note": "", "amount": -8812, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_gufXUN1HOc66iJBq9wyPfQ", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-06-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.942+00	2025-06-15 01:37:57.942+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+fb7c219f-588a-4df2-b655-5a2b0ebbc331	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	8812.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	c995bbef-13d2-400f-99ce-d2d749f014ad	API	{"bank": "Airwallex", "date": "2024-06-06T12:44:31.000Z", "note": "", "amount": 8812, "source": "API", "balance": 8812, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "c995bbef-13d2-400f-99ce-d2d749f014ad", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 8812, "financialTransactionType": "DEPOSIT"}	2024-06-06	\N	\N	\N	\N	\N	2025-06-15 01:37:57.945+00	2025-06-15 01:37:57.945+00	8812.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+4fa34544-090f-4899-8dc4-c6f4175932d4	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1296.00	EUR	Pay EUR 1293.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.76	EUR	\N	\N	\N	\N	82dae38c-10d7-42c3-805f-4aaa51628526	API	{"bank": "Airwallex", "date": "2024-06-05T08:03:47.000Z", "note": "", "amount": -1296, "source": "API", "balance": 1790.49, "currency": "EUR", "feeAmount": 2.76, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1293.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "82dae38c-10d7-42c3-805f-4aaa51628526", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1293.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 1790.49, "financialTransactionType": "PAYMENT"}	2024-06-05	\N	\N	\N	\N	\N	2025-06-15 01:37:57.949+00	2025-06-15 01:37:57.949+00	1790.49	Pay EUR 1293.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+38bf017c-152f-4d01-affd-785daeaf76cd	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1120.00	EUR	Pay EUR 1117.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.76	EUR	\N	\N	\N	\N	ace5af77-bab2-4c2b-a8b5-351da210d852	API	{"bank": "Airwallex", "date": "2024-06-05T08:00:15.000Z", "note": "", "amount": -1120, "source": "API", "balance": 3086.49, "currency": "EUR", "feeAmount": 2.76, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1117.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "ace5af77-bab2-4c2b-a8b5-351da210d852", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1117.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 3086.49, "financialTransactionType": "PAYMENT"}	2024-06-05	\N	\N	\N	\N	\N	2025-06-15 01:37:57.953+00	2025-06-15 01:37:57.953+00	3086.49	Pay EUR 1117.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+b41226d8-19a0-4341-9308-792af87d7dbc	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3673.23	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	d04d49ac-0e48-4b41-907d-8931689303ad	API	{"bank": "Airwallex", "date": "2024-06-05T03:51:08.000Z", "note": "", "amount": 3673.23, "source": "API", "balance": 4206.49, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "d04d49ac-0e48-4b41-907d-8931689303ad", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 4206.49, "financialTransactionType": "DEPOSIT"}	2024-06-05	\N	\N	\N	\N	\N	2025-06-15 01:37:57.956+00	2025-06-15 01:37:57.956+00	4206.49	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+13cac82d-7a45-477b-8818-56331bb579de	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-15500.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_gebtIY4uMZmiY-KQreDFgw	API	{"bank": "Airwallex", "date": "2024-06-04T17:41:49.000Z", "note": "", "amount": -15500, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_gebtIY4uMZmiY-KQreDFgw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-06-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.959+00	2025-06-15 01:37:57.959+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+e306a727-06ce-41e4-aff9-090a6dd9da85	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	15500.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	43bfa42a-ac47-43d0-92fa-e3875d619af2	API	{"bank": "Airwallex", "date": "2024-06-04T17:29:45.000Z", "note": "", "amount": 15500, "source": "API", "balance": 15500, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "43bfa42a-ac47-43d0-92fa-e3875d619af2", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 15500, "financialTransactionType": "DEPOSIT"}	2024-06-04	\N	\N	\N	\N	\N	2025-06-15 01:37:57.962+00	2025-06-15 01:37:57.962+00	15500.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+64ebab8e-44ee-4f4c-bc22-fa358f46ad90	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-300.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_4zsw8JiTOp-gKhK_dqdoVw	API	{"bank": "Airwallex", "date": "2024-06-01T19:21:32.000Z", "note": "", "amount": -300, "source": "API", "balance": 533.26, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_4zsw8JiTOp-gKhK_dqdoVw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 533.26, "financialTransactionType": "TRANSFER"}	2024-06-01	\N	\N	\N	\N	\N	2025-06-15 01:37:57.966+00	2025-06-15 01:37:57.966+00	533.26	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+b6167a42-ff1e-4c1e-a858-dddadd06e854	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-200.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_ISWPYBNlOdiLrUTHhmphmA	API	{"bank": "Airwallex", "date": "2024-05-28T09:33:10.000Z", "note": "", "amount": -200, "source": "API", "balance": 833.26, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_ISWPYBNlOdiLrUTHhmphmA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 833.26, "financialTransactionType": "TRANSFER"}	2024-05-28	\N	\N	\N	\N	\N	2025-06-15 01:37:57.97+00	2025-06-15 01:37:57.97+00	833.26	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+13c9f6f9-f15b-4123-9d0d-0770afb85a43	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-150.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_NLum4U3cNYmCxqvgrK_jvg	API	{"bank": "Airwallex", "date": "2024-05-25T22:07:23.000Z", "note": "", "amount": -150, "source": "API", "balance": 1033.26, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_NLum4U3cNYmCxqvgrK_jvg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 1033.26, "financialTransactionType": "TRANSFER"}	2024-05-25	\N	\N	\N	\N	\N	2025-06-15 01:37:57.973+00	2025-06-15 01:37:57.973+00	1033.26	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+81e68533-c58c-4a8e-a554-d5e774e9e1de	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-23374.81	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_69qtpcItMFWh-YoEvxHl6Q	API	{"bank": "Airwallex", "date": "2024-05-23T10:02:29.000Z", "note": "", "amount": -23374.81, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_69qtpcItMFWh-YoEvxHl6Q", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-05-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.976+00	2025-06-15 01:37:57.976+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+5c59d849-d25c-4794-afee-a6632210da74	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	23374.81	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	3028155f-348f-4468-955b-016deaf48e2b	API	{"bank": "Airwallex", "date": "2024-05-23T09:20:19.000Z", "note": "", "amount": 23374.81, "source": "API", "balance": 23374.81, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "3028155f-348f-4468-955b-016deaf48e2b", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 23374.81, "financialTransactionType": "DEPOSIT"}	2024-05-23	\N	\N	\N	\N	\N	2025-06-15 01:37:57.98+00	2025-06-15 01:37:57.98+00	23374.81	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+caefc0e4-483f-4d09-a5de-2fdda262b8b3	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-4239.99	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_VD0KhnL1PkmyCLBsSmvMXA	API	{"bank": "Airwallex", "date": "2024-05-16T10:56:11.000Z", "note": "", "amount": -4239.99, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_VD0KhnL1PkmyCLBsSmvMXA", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-05-16	\N	\N	\N	\N	\N	2025-06-15 01:37:57.985+00	2025-06-15 01:37:57.985+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+bb5b3f16-3a1e-47b6-93d0-061dbae45998	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-500.00	EUR	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_fO3-WH5PPv2oKdv9DpjzJw	API	{"bank": "Airwallex", "date": "2024-05-16T10:53:48.000Z", "note": "", "amount": -500, "source": "API", "balance": 1183.26, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "feeCurrency": "EUR", "transactionId": "tr_fO3-WH5PPv2oKdv9DpjzJw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)", "balanceAfterTransaction": 1183.26, "financialTransactionType": "TRANSFER"}	2024-05-16	\N	\N	\N	\N	\N	2025-06-15 01:37:57.989+00	2025-06-15 01:37:57.989+00	1183.26	Transfer from 亞堅美時有限公司(acct_X579crGYPXeLrlz-VlZHAw)	TRANSFER
+5360c224-3647-48eb-865b-4b740615b2e3	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1272.00	EUR	Pay EUR 1269.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.79	EUR	\N	\N	\N	\N	c733aa52-65b1-4787-9b3a-b3e7c3791107	API	{"bank": "Airwallex", "date": "2024-05-07T09:29:03.000Z", "note": "", "amount": -1272, "source": "API", "balance": 1683.26, "currency": "EUR", "feeAmount": 2.79, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1269.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "c733aa52-65b1-4787-9b3a-b3e7c3791107", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1269.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 1683.26, "financialTransactionType": "PAYMENT"}	2024-05-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.994+00	2025-06-15 01:37:57.994+00	1683.26	Pay EUR 1269.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+c7dbd14a-a3b0-44ad-83a3-8bc0cadf4422	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1239.00	EUR	Pay EUR 1236.21 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.79	EUR	\N	\N	\N	\N	033247db-8b2a-4aad-a27a-5b93fb7a9b4d	API	{"bank": "Airwallex", "date": "2024-05-07T09:27:01.000Z", "note": "", "amount": -1239, "source": "API", "balance": 2955.26, "currency": "EUR", "feeAmount": 2.79, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1236.21 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "033247db-8b2a-4aad-a27a-5b93fb7a9b4d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1236.21 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 2955.26, "financialTransactionType": "PAYMENT"}	2024-05-07	\N	\N	\N	\N	\N	2025-06-15 01:37:57.998+00	2025-06-15 01:37:57.998+00	2955.26	Pay EUR 1236.21 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+2f021a7a-6abc-4135-8119-69967dbcea4c	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3616.08	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	375c0267-6635-4ba7-9196-d3af6874ba7f	API	{"bank": "Airwallex", "date": "2024-05-07T03:19:21.000Z", "note": "", "amount": 3616.08, "source": "API", "balance": 4194.26, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "375c0267-6635-4ba7-9196-d3af6874ba7f", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 4194.26, "financialTransactionType": "DEPOSIT"}	2024-05-07	\N	\N	\N	\N	\N	2025-06-15 01:37:58.003+00	2025-06-15 01:37:58.003+00	4194.26	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+83302acf-2e64-4753-b3e7-d4418c413e5d	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	4239.99	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	ccef85f7-1837-476e-a4f4-2407cc89aa7a	API	{"bank": "Airwallex", "date": "2024-05-03T10:35:44.000Z", "note": "", "amount": 4239.99, "source": "API", "balance": 4239.99, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "ccef85f7-1837-476e-a4f4-2407cc89aa7a", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 4239.99, "financialTransactionType": "DEPOSIT"}	2024-05-03	\N	\N	\N	\N	\N	2025-06-15 01:37:58.007+00	2025-06-15 01:37:58.007+00	4239.99	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+19c7fb86-a240-474f-8124-b147cbb10bec	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-10000.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_BhQLO06-Mka42P393geDVg	API	{"bank": "Airwallex", "date": "2024-04-23T15:47:03.000Z", "note": "", "amount": -10000, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_BhQLO06-Mka42P393geDVg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-04-23	\N	\N	\N	\N	\N	2025-06-15 01:37:58.012+00	2025-06-15 01:37:58.012+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+13c43e68-b879-4d7e-9c4d-075c846f210a	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	10000.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	b6c9206d-af08-4576-aeaa-6f65fa091e7f	API	{"bank": "Airwallex", "date": "2024-04-22T16:33:40.000Z", "note": "", "amount": 10000, "source": "API", "balance": 10000, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "b6c9206d-af08-4576-aeaa-6f65fa091e7f", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 10000, "financialTransactionType": "DEPOSIT"}	2024-04-22	\N	\N	\N	\N	\N	2025-06-15 01:37:58.016+00	2025-06-15 01:37:58.016+00	10000.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+97c2afee-a403-487b-a261-f6167ad897ae	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1184.00	EUR	Pay EUR 1181.18 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.82	EUR	\N	\N	\N	\N	8fc6d27c-0397-454c-acd3-b3677ba6ba59	API	{"bank": "Airwallex", "date": "2024-04-15T09:04:32.000Z", "note": "", "amount": -1184, "source": "API", "balance": 578.18, "currency": "EUR", "feeAmount": 2.82, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1181.18 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "8fc6d27c-0397-454c-acd3-b3677ba6ba59", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1181.18 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 578.18, "financialTransactionType": "PAYMENT"}	2024-04-15	\N	\N	\N	\N	\N	2025-06-15 01:37:58.022+00	2025-06-15 01:37:58.022+00	578.18	Pay EUR 1181.18 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+16c582a9-0c4a-4d06-9313-cde2a77f648d	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1127.00	EUR	Pay EUR 1124.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.82	EUR	\N	\N	\N	\N	21bbff78-a737-48fe-9655-36df953bcd2d	API	{"bank": "Airwallex", "date": "2024-04-15T09:00:42.000Z", "note": "", "amount": -1127, "source": "API", "balance": 1762.18, "currency": "EUR", "feeAmount": 2.82, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1124.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "21bbff78-a737-48fe-9655-36df953bcd2d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1124.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 1762.18, "financialTransactionType": "PAYMENT"}	2024-04-15	\N	\N	\N	\N	\N	2025-06-15 01:37:58.028+00	2025-06-15 01:37:58.028+00	1762.18	Pay EUR 1124.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+293afb81-a507-45e2-a25b-68a9eeb367cf	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2407.96	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	c98c839a-6a55-40b5-9c1b-3753b47d7061	API	{"bank": "Airwallex", "date": "2024-04-15T08:49:56.000Z", "note": "", "amount": 2407.96, "source": "API", "balance": 2889.18, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "c98c839a-6a55-40b5-9c1b-3753b47d7061", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2889.18, "financialTransactionType": "DEPOSIT"}	2024-04-15	\N	\N	\N	\N	\N	2025-06-15 01:37:58.033+00	2025-06-15 01:37:58.033+00	2889.18	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+fece420b-8daf-4d6c-b0a5-d97398d9c3ff	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-15000.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_zD-BO2kZN6av1Sa_lwtRHg	API	{"bank": "Airwallex", "date": "2024-03-25T10:56:41.000Z", "note": "", "amount": -15000, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_zD-BO2kZN6av1Sa_lwtRHg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-03-25	\N	\N	\N	\N	\N	2025-06-15 01:37:58.036+00	2025-06-15 01:37:58.036+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+c3f40bc3-87a0-42c3-b57b-c4a1de53407a	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	15000.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	26634663-46f6-4bcc-b84f-c4648095ab53	API	{"bank": "Airwallex", "date": "2024-03-25T10:40:21.000Z", "note": "", "amount": 15000, "source": "API", "balance": 15000, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "26634663-46f6-4bcc-b84f-c4648095ab53", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 15000, "financialTransactionType": "DEPOSIT"}	2024-03-25	\N	\N	\N	\N	\N	2025-06-15 01:37:58.04+00	2025-06-15 01:37:58.04+00	15000.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+81164ad7-027f-4558-87aa-6f3f6934da96	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1208.00	EUR	Pay EUR 1205.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.76	EUR	\N	\N	\N	\N	21a63ffd-974e-4bd1-9e59-b7e4360224d5	API	{"bank": "Airwallex", "date": "2024-03-05T09:26:46.000Z", "note": "", "amount": -1208, "source": "API", "balance": 481.22, "currency": "EUR", "feeAmount": 2.76, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1205.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "21a63ffd-974e-4bd1-9e59-b7e4360224d5", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1205.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 481.22, "financialTransactionType": "PAYMENT"}	2024-03-05	\N	\N	\N	\N	\N	2025-06-15 01:37:58.044+00	2025-06-15 01:37:58.044+00	481.22	Pay EUR 1205.24 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+07d93469-d6d4-441e-b34a-4cd76ba61ac0	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1043.00	EUR	Pay EUR 1040.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.76	EUR	\N	\N	\N	\N	08bd08a4-1ea0-4840-96e4-55c0c2e2a6ff	API	{"bank": "Airwallex", "date": "2024-03-05T09:24:51.000Z", "note": "", "amount": -1043, "source": "API", "balance": 1689.22, "currency": "EUR", "feeAmount": 2.76, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1040.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "08bd08a4-1ea0-4840-96e4-55c0c2e2a6ff", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1040.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 1689.22, "financialTransactionType": "PAYMENT"}	2024-03-05	\N	\N	\N	\N	\N	2025-06-15 01:37:58.048+00	2025-06-15 01:37:58.048+00	1689.22	Pay EUR 1040.24 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+e45089ec-543c-489d-9fdf-0b4c435b6007	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2364.22	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	da7d0016-c3ab-48d1-8391-95f918b09d5c	API	{"bank": "Airwallex", "date": "2024-03-05T04:20:22.000Z", "note": "", "amount": 2364.22, "source": "API", "balance": 2732.22, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "da7d0016-c3ab-48d1-8391-95f918b09d5c", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2732.22, "financialTransactionType": "DEPOSIT"}	2024-03-05	\N	\N	\N	\N	\N	2025-06-15 01:37:58.052+00	2025-06-15 01:37:58.052+00	2732.22	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+5b279fca-e445-4cde-87fb-90189bb27cc8	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2435.54	EUR	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_OKqxKCyVNf6xETJlxUNChg	API	{"bank": "Airwallex", "date": "2024-02-08T11:30:14.000Z", "note": "", "amount": -2435.54, "source": "API", "balance": 368, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "EUR", "transactionId": "tr_OKqxKCyVNf6xETJlxUNChg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 368, "financialTransactionType": "TRANSFER"}	2024-02-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.056+00	2025-06-15 01:37:58.056+00	368.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+3775c240-2b90-4b52-be8d-b4fe49c0cedb	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1169.00	EUR	Pay EUR 1166.22 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.78	EUR	\N	\N	\N	\N	c5ef8c62-8569-4dba-bcc7-bf35b788daf6	API	{"bank": "Airwallex", "date": "2024-02-08T09:13:20.000Z", "note": "", "amount": -1169, "source": "API", "balance": 2803.54, "currency": "EUR", "feeAmount": 2.78, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1166.22 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "c5ef8c62-8569-4dba-bcc7-bf35b788daf6", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1166.22 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 2803.54, "financialTransactionType": "PAYMENT"}	2024-02-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.06+00	2025-06-15 01:37:58.06+00	2803.54	Pay EUR 1166.22 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+1764348e-29b2-40a6-9f8d-e4bcb86da1fd	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3604.54	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	bb9a0379-b874-4a2d-829f-ad6a8a49511a	API	{"bank": "Airwallex", "date": "2024-02-08T09:08:04.000Z", "note": "", "amount": 3604.54, "source": "API", "balance": 3972.54, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "bb9a0379-b874-4a2d-829f-ad6a8a49511a", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3972.54, "financialTransactionType": "DEPOSIT"}	2024-02-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.064+00	2025-06-15 01:37:58.064+00	3972.54	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+8fb8e7e3-9c63-407d-a63d-c8f4dc0eec77	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-40000.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_iERVr0M2N9uzCIlEUJcxvg	API	{"bank": "Airwallex", "date": "2024-02-08T07:11:38.000Z", "note": "", "amount": -40000, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_iERVr0M2N9uzCIlEUJcxvg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2024-02-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.068+00	2025-06-15 01:37:58.068+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+139d2d9c-0e13-4d2d-839f-2197f6f1d88b	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	40000.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	acde2e3b-6eec-44c1-81f3-a6c2acdcd1e3	API	{"bank": "Airwallex", "date": "2024-02-08T07:07:42.000Z", "note": "", "amount": 40000, "source": "API", "balance": 40000, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "acde2e3b-6eec-44c1-81f3-a6c2acdcd1e3", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 40000, "financialTransactionType": "DEPOSIT"}	2024-02-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.072+00	2025-06-15 01:37:58.072+00	40000.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+8b508e54-c963-488c-9073-cd77f91c893e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2632.00	EUR	Pay EUR 2629.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.79	EUR	\N	\N	\N	\N	6afc17a1-35ce-4a52-830f-46e010bd12ac	API	{"bank": "Airwallex", "date": "2024-02-04T03:32:54.000Z", "note": "", "amount": -2632, "source": "API", "balance": 368, "currency": "EUR", "feeAmount": 2.79, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 2629.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "6afc17a1-35ce-4a52-830f-46e010bd12ac", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 2629.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 368, "financialTransactionType": "PAYMENT"}	2024-02-04	\N	\N	\N	\N	\N	2025-06-15 01:37:58.076+00	2025-06-15 01:37:58.076+00	368.00	Pay EUR 2629.21 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+e56a2f7a-62f6-4039-8b5f-c2196101fafe	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3000.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	7f9742cd-5959-4861-acfd-725c19846bd3	API	{"bank": "Airwallex", "date": "2024-01-08T07:07:56.000Z", "note": "", "amount": 3000, "source": "API", "balance": 3000, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "7f9742cd-5959-4861-acfd-725c19846bd3", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3000, "financialTransactionType": "DEPOSIT"}	2024-01-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.081+00	2025-06-15 01:37:58.081+00	3000.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+ef6970e6-6cd1-4769-85c5-45c2aff2fa54	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1008.00	EUR	Pay EUR 1005.26 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.74	EUR	\N	\N	\N	\N	8e3839b6-b9de-45e4-a5ab-0d9721a47172	API	{"bank": "Airwallex", "date": "2024-01-08T01:48:46.000Z", "note": "", "amount": -1008, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 2.74, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1005.26 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "8e3839b6-b9de-45e4-a5ab-0d9721a47172", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1005.26 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 0, "financialTransactionType": "PAYMENT"}	2024-01-08	\N	\N	\N	\N	\N	2025-06-15 01:37:58.085+00	2025-06-15 01:37:58.085+00	0.00	Pay EUR 1005.26 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+82203bf3-a41e-46b1-b972-d672a8307367	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	1008.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	5176a126-6bf4-411b-8345-622651974101	API	{"bank": "Airwallex", "date": "2024-01-05T04:29:11.000Z", "note": "", "amount": 1008, "source": "API", "balance": 1008, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "5176a126-6bf4-411b-8345-622651974101", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 1008, "financialTransactionType": "DEPOSIT"}	2024-01-05	\N	\N	\N	\N	\N	2025-06-15 01:37:58.09+00	2025-06-15 01:37:58.09+00	1008.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+0831247e-25bd-4eb4-8568-8f38157f60c2	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-2408.00	EUR	Pay EUR 2405.23 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	\N	OTHER	COMPLETED	2.77	EUR	\N	\N	\N	\N	9ac6dffb-2a08-4a40-8890-ba6273a8b75d	API	{"bank": "Airwallex", "date": "2023-12-05T08:35:49.000Z", "note": "", "amount": -2408, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 2.77, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 2405.23 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "feeCurrency": "EUR", "transactionId": "9ac6dffb-2a08-4a40-8890-ba6273a8b75d", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 2405.23 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)", "balanceAfterTransaction": 0, "financialTransactionType": "PAYMENT"}	2023-12-05	\N	\N	\N	\N	\N	2025-06-15 01:37:58.095+00	2025-06-15 01:37:58.095+00	0.00	Pay EUR 2405.23 to Sarrosa Mary Hope(Mary Hope Sarrosa Espanola)	PAYMENT
+1126e050-11bb-4506-837b-6f356d77468f	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-14.56	USD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	USD	\N	\N	\N	\N	tr_0rJ5C-dzO8-KuSICqoJEXQ	API	{"bank": "Airwallex", "date": "2023-12-04T20:41:06.000Z", "note": "", "amount": -14.56, "source": "API", "balance": 0, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "USD", "transactionId": "tr_0rJ5C-dzO8-KuSICqoJEXQ", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2023-12-04	\N	\N	\N	\N	\N	2025-06-15 01:37:58.101+00	2025-06-15 01:37:58.101+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+ea7b06c3-70b5-401f-9843-a4d9601ea674	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-36000.00	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_-dD6yX0CNKOQ3fyj9uXFnw	API	{"bank": "Airwallex", "date": "2023-12-04T20:41:06.000Z", "note": "", "amount": -36000, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_-dD6yX0CNKOQ3fyj9uXFnw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2023-12-04	\N	\N	\N	\N	\N	2025-06-15 01:37:58.106+00	2025-06-15 01:37:58.106+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+4005f01a-b699-42f8-8434-b06f551e2b7b	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	36000.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	834411a0-b8dd-4adf-bb0d-8b84d866735e	API	{"bank": "Airwallex", "date": "2023-12-04T20:23:33.000Z", "note": "", "amount": 36000, "source": "API", "balance": 36000, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "834411a0-b8dd-4adf-bb0d-8b84d866735e", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 36000, "financialTransactionType": "DEPOSIT"}	2023-12-04	\N	\N	\N	\N	\N	2025-06-15 01:37:58.11+00	2025-06-15 01:37:58.11+00	36000.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+f47123a9-8d6f-434f-be94-5924a2e38169	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1120.00	EUR	Pay EUR 1117.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.75	EUR	\N	\N	\N	\N	1bcb8380-c482-4637-a6e1-813a44359c35	API	{"bank": "Airwallex", "date": "2023-12-01T06:28:05.000Z", "note": "", "amount": -1120, "source": "API", "balance": 2408, "currency": "EUR", "feeAmount": 2.75, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1117.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "1bcb8380-c482-4637-a6e1-813a44359c35", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1117.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 2408, "financialTransactionType": "PAYMENT"}	2023-12-01	\N	\N	\N	\N	\N	2025-06-15 01:37:58.114+00	2025-06-15 01:37:58.114+00	2408.00	Pay EUR 1117.25 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+7979b6b8-7496-4b42-8bd0-33d92623029f	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	3528.00	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	898085b0-d810-44b8-a8e1-a2a4155e43ef	API	{"bank": "Airwallex", "date": "2023-12-01T04:15:46.000Z", "note": "", "amount": 3528, "source": "API", "balance": 3528, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "898085b0-d810-44b8-a8e1-a2a4155e43ef", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 3528, "financialTransactionType": "DEPOSIT"}	2023-12-01	\N	\N	\N	\N	\N	2025-06-15 01:37:58.119+00	2025-06-15 01:37:58.119+00	3528.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+12d2c8e8-b033-47e5-a6cb-1573b990e82a	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1585.95	USD	Card transaction - CAPTURE -1585.95 for PHP	\N	OTHER	COMPLETED	0.00	USD	\N	\N	\N	\N	332873912970	API	{"bank": "Airwallex", "date": "2023-11-24T23:42:11.000Z", "note": "", "amount": -1585.95, "source": "API", "balance": 14.56, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "ISSUING", "description": "Card transaction - CAPTURE -1585.95 for PHP", "feeCurrency": "USD", "transactionId": "332873912970", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Card transaction - CAPTURE -1585.95 for PHP", "balanceAfterTransaction": 14.56, "financialTransactionType": "ISSUING"}	2023-11-24	\N	\N	\N	\N	\N	2025-06-15 01:37:58.124+00	2025-06-15 01:37:58.124+00	14.56	Card transaction - CAPTURE -1585.95 for PHP	ISSUING
+0a7a8c12-e5eb-4ee5-af9b-1fc5f94ce78e	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1.10	USD	Card transaction - REVERSAL RELEASE -1.1 for EUR	\N	OTHER	COMPLETED	0.00	USD	\N	\N	\N	\N	332809413043	API	{"bank": "Airwallex", "date": "2023-11-24T09:46:41.000Z", "note": "", "amount": -1.1, "source": "API", "balance": 12.72, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "ISSUING", "description": "Card transaction - REVERSAL RELEASE -1.1 for EUR", "feeCurrency": "USD", "transactionId": "332809413043", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Card transaction - REVERSAL RELEASE -1.1 for EUR", "balanceAfterTransaction": 12.72, "financialTransactionType": "ISSUING"}	2023-11-24	\N	\N	\N	\N	\N	2025-06-15 01:37:58.132+00	2025-06-15 01:37:58.132+00	12.72	Card transaction - REVERSAL RELEASE -1.1 for EUR	ISSUING
+fd2a0797-dbd6-4dfc-b71a-975df9699ec4	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	12500.00	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	d43e2091-330a-4d29-85bf-b4f82ae11a42	API	{"bank": "Airwallex", "date": "2023-11-24T09:00:26.000Z", "note": "", "amount": 12500, "source": "API", "balance": 12500, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "d43e2091-330a-4d29-85bf-b4f82ae11a42", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 12500, "financialTransactionType": "DEPOSIT"}	2023-11-24	\N	\N	\N	\N	\N	2025-06-15 01:37:58.163+00	2025-06-15 01:37:58.163+00	12500.00	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+bd207d4d-dacb-45c3-b80d-abdd2b1a27f5	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1645.08	EUR	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	EUR	\N	\N	\N	\N	tr_2kFi8SAgNiOyu_mWODnruw	API	{"bank": "Airwallex", "date": "2023-11-03T09:54:58.000Z", "note": "", "amount": -1645.08, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "EUR", "transactionId": "tr_2kFi8SAgNiOyu_mWODnruw", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2023-11-03	\N	\N	\N	\N	\N	2025-06-15 01:37:58.168+00	2025-06-15 01:37:58.168+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+7ebd1f30-82c8-48af-97a2-48d0f3be2290	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1274.00	EUR	Pay EUR 1271.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.82	EUR	\N	\N	\N	\N	cf88589f-46d6-4013-a3aa-dec781c14c7b	API	{"bank": "Airwallex", "date": "2023-11-02T11:33:14.000Z", "note": "", "amount": -1274, "source": "API", "balance": 1645.08, "currency": "EUR", "feeAmount": 2.82, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1271.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "cf88589f-46d6-4013-a3aa-dec781c14c7b", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1271.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 1645.08, "financialTransactionType": "PAYMENT"}	2023-11-02	\N	\N	\N	\N	\N	2025-06-15 01:37:58.173+00	2025-06-15 01:37:58.173+00	1645.08	Pay EUR 1271.18 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+ad0545d3-410d-4f48-b5e3-eebbdfab3a17	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	2919.08	EUR	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	EUR	\N	\N	\N	\N	6620eebc-0110-490d-9ca0-7e74af1857b9	API	{"bank": "Airwallex", "date": "2023-11-02T04:14:08.000Z", "note": "", "amount": 2919.08, "source": "API", "balance": 2919.08, "currency": "EUR", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "EUR", "transactionId": "6620eebc-0110-490d-9ca0-7e74af1857b9", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 2919.08, "financialTransactionType": "DEPOSIT"}	2023-11-02	\N	\N	\N	\N	\N	2025-06-15 01:37:58.177+00	2025-06-15 01:37:58.177+00	2919.08	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+773bd4ab-24b6-4265-9d8c-64f4176c2c7f	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-1141.00	EUR	Pay EUR 1138.14 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	\N	OTHER	COMPLETED	2.86	EUR	\N	\N	\N	\N	c15ea374-3e87-461d-b3eb-9cbfd0fbc920	API	{"bank": "Airwallex", "date": "2023-10-03T11:45:53.000Z", "note": "", "amount": -1141, "source": "API", "balance": 0, "currency": "EUR", "feeAmount": 2.86, "reference": "", "sourceType": "PAYMENT", "description": "Pay EUR 1138.14 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "feeCurrency": "EUR", "transactionId": "c15ea374-3e87-461d-b3eb-9cbfd0fbc920", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Pay EUR 1138.14 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)", "balanceAfterTransaction": 0, "financialTransactionType": "PAYMENT"}	2023-10-03	\N	\N	\N	\N	\N	2025-06-15 01:37:58.182+00	2025-06-15 01:37:58.182+00	0.00	Pay EUR 1138.14 to Goicoechea Bercedo Alejandro(Alejandro Goicoechea Bercedo)	PAYMENT
+cdbbcb3c-224b-4a6a-adb2-ede4b550e8b7	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-13404.09	HKD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	HKD	\N	\N	\N	\N	tr_88sx_M92Mh-3Toj9Tv8Sxg	API	{"bank": "Airwallex", "date": "2023-10-03T10:21:37.000Z", "note": "", "amount": -13404.09, "source": "API", "balance": 0, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "HKD", "transactionId": "tr_88sx_M92Mh-3Toj9Tv8Sxg", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2023-10-03	\N	\N	\N	\N	\N	2025-06-15 01:37:58.187+00	2025-06-15 01:37:58.187+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+f9e0d7d4-df9b-4e00-8028-2fd166a09d22	146fe471-dfd1-4ee8-addf-add4b5879fe4	CREDIT	22800.34	HKD	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	\N	INVOICE_PAYMENT	COMPLETED	0.00	HKD	\N	\N	\N	\N	996cf9d3-2445-4bb4-84ac-fc8077e4fcea	API	{"bank": "Airwallex", "date": "2023-10-03T08:09:29.000Z", "note": "", "amount": 22800.34, "source": "API", "balance": 22800.34, "currency": "HKD", "feeAmount": 0, "reference": "", "sourceType": "DEPOSIT", "description": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "feeCurrency": "HKD", "transactionId": "996cf9d3-2445-4bb4-84ac-fc8077e4fcea", "conversionRate": null, "transactionType": "CREDIT", "originalDescription": "Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0", "balanceAfterTransaction": 22800.34, "financialTransactionType": "DEPOSIT"}	2023-10-03	\N	\N	\N	\N	\N	2025-06-15 01:37:58.21+00	2025-06-15 01:37:58.21+00	22800.34	Deposit to  6bba5e47-c929-4b67-a447-1eb18aa1d8d0	DEPOSIT
+b22fe86f-7246-4270-bb1d-6c78c1c89e84	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-250.51	USD	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	\N	TRANSFER	COMPLETED	0.00	USD	\N	\N	\N	\N	tr_3xsAC_LHO0aKayG1pNPE7w	API	{"bank": "Airwallex", "date": "2023-10-02T14:58:39.000Z", "note": "", "amount": -250.51, "source": "API", "balance": 0, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "TRANSFER", "description": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "feeCurrency": "USD", "transactionId": "tr_3xsAC_LHO0aKayG1pNPE7w", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)", "balanceAfterTransaction": 0, "financialTransactionType": "TRANSFER"}	2023-10-02	\N	\N	\N	\N	\N	2025-06-15 01:37:58.215+00	2025-06-15 01:37:58.215+00	0.00	Transfer from 亞堅美時有限公司(acct_5S2kjyuSMEuIjUUJVDotvA)	TRANSFER
+28b9fe29-6a13-4aed-aadd-74080358ab6c	146fe471-dfd1-4ee8-addf-add4b5879fe4	DEBIT	-32.12	USD	Card transaction - CAPTURE -32.12 for EUR	\N	OTHER	COMPLETED	0.00	USD	\N	\N	\N	\N	327370000448	API	{"bank": "Airwallex", "date": "2023-10-01T04:48:17.000Z", "note": "", "amount": -32.12, "source": "API", "balance": 243.81, "currency": "USD", "feeAmount": 0, "reference": "", "sourceType": "ISSUING", "description": "Card transaction - CAPTURE -32.12 for EUR", "feeCurrency": "USD", "transactionId": "327370000448", "conversionRate": null, "transactionType": "DEBIT", "originalDescription": "Card transaction - CAPTURE -32.12 for EUR", "balanceAfterTransaction": 243.81, "financialTransactionType": "ISSUING"}	2023-10-01	\N	\N	\N	\N	\N	2025-06-15 01:37:58.249+00	2025-06-15 01:37:58.249+00	243.81	Card transaction - CAPTURE -32.12 for EUR	ISSUING
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.users (id, name, email, email_verified, image, password, role, is_active, first_name, last_name, phone, timezone, language, company_id, created_at, updated_at, last_login_at) FROM stdin;
+cmbwoftyz0000dlv7z0ns1a0j	Philippe Barthelemy	philb75@gmail.com	\N	\N	$2b$10$oWfMwyBsWgErzAJO06Mwleng9Squt4VWzHmKCCFg1vM/e3dIpqKCK	ADMINISTRATOR	t	Philippe	Barthelemy	\N	Europe/Paris	en	\N	2025-06-14 20:16:22.908	2025-07-29 19:16:52.578	2025-07-29 19:16:52.577
+\.
+
+
+--
+-- Data for Name: verificationtokens; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.verificationtokens (identifier, token, expires) FROM stdin;
+\.
+
+
+--
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.accounts
+    ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bank_accounts bank_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bank_accounts
+    ADD CONSTRAINT bank_accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: consultant_payments consultant_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.consultant_payments
+    ADD CONSTRAINT consultant_payments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: contacts contacts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_rates exchange_rates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.exchange_rates
+    ADD CONSTRAINT exchange_rates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: invoices invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices
+    ADD CONSTRAINT invoices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: partner_profit_shares partner_profit_shares_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.partner_profit_shares
+    ADD CONSTRAINT partner_profit_shares_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: profit_distributions profit_distributions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.profit_distributions
+    ADD CONSTRAINT profit_distributions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: suppliers suppliers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.suppliers
+    ADD CONSTRAINT suppliers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT transactions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: accounts_provider_provider_account_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX accounts_provider_provider_account_id_key ON public.accounts USING btree (provider, provider_account_id);
+
+
+--
+-- Name: bank_accounts_airwallex_account_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX bank_accounts_airwallex_account_id_key ON public.bank_accounts USING btree (airwallex_account_id);
+
+
+--
+-- Name: contacts_airwallex_payer_account_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX contacts_airwallex_payer_account_id_key ON public.contacts USING btree (airwallex_payer_account_id);
+
+
+--
+-- Name: exchange_rates_from_currency_to_currency_rate_date_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX exchange_rates_from_currency_to_currency_rate_date_key ON public.exchange_rates USING btree (from_currency, to_currency, rate_date);
+
+
+--
+-- Name: invoices_invoice_number_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX invoices_invoice_number_key ON public.invoices USING btree (invoice_number);
+
+
+--
+-- Name: profit_distributions_period_base_currency_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX profit_distributions_period_base_currency_key ON public.profit_distributions USING btree (period, base_currency);
+
+
+--
+-- Name: sessions_session_token_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX sessions_session_token_key ON public.sessions USING btree (session_token);
+
+
+--
+-- Name: suppliers_airwallex_beneficiary_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX suppliers_airwallex_beneficiary_id_key ON public.suppliers USING btree (airwallex_beneficiary_id);
+
+
+--
+-- Name: suppliers_email_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX suppliers_email_key ON public.suppliers USING btree (email);
+
+
+--
+-- Name: transactions_airwallex_transaction_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX transactions_airwallex_transaction_id_key ON public.transactions USING btree (airwallex_transaction_id);
+
+
+--
+-- Name: users_email_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email);
+
+
+--
+-- Name: verificationtokens_identifier_token_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX verificationtokens_identifier_token_key ON public.verificationtokens USING btree (identifier, token);
+
+
+--
+-- Name: verificationtokens_token_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX verificationtokens_token_key ON public.verificationtokens USING btree (token);
+
+
+--
+-- Name: accounts accounts_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.accounts
+    ADD CONSTRAINT accounts_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: bank_accounts bank_accounts_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bank_accounts
+    ADD CONSTRAINT bank_accounts_contact_id_fkey FOREIGN KEY (contact_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: consultant_payments consultant_payments_consultant_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.consultant_payments
+    ADD CONSTRAINT consultant_payments_consultant_contact_id_fkey FOREIGN KEY (consultant_contact_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: consultant_payments consultant_payments_payment_transaction_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.consultant_payments
+    ADD CONSTRAINT consultant_payments_payment_transaction_id_fkey FOREIGN KEY (payment_transaction_id) REFERENCES public.transactions(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: consultant_payments consultant_payments_related_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.consultant_payments
+    ADD CONSTRAINT consultant_payments_related_invoice_id_fkey FOREIGN KEY (related_invoice_id) REFERENCES public.invoices(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: contacts contacts_parent_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.contacts
+    ADD CONSTRAINT contacts_parent_company_id_fkey FOREIGN KEY (parent_company_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: invoices invoices_bank_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices
+    ADD CONSTRAINT invoices_bank_account_id_fkey FOREIGN KEY (bank_account_id) REFERENCES public.bank_accounts(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: invoices invoices_client_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices
+    ADD CONSTRAINT invoices_client_contact_id_fkey FOREIGN KEY (client_contact_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: invoices invoices_payment_transaction_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.invoices
+    ADD CONSTRAINT invoices_payment_transaction_id_fkey FOREIGN KEY (payment_transaction_id) REFERENCES public.transactions(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: partner_profit_shares partner_profit_shares_partner_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.partner_profit_shares
+    ADD CONSTRAINT partner_profit_shares_partner_contact_id_fkey FOREIGN KEY (partner_contact_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: partner_profit_shares partner_profit_shares_profit_distribution_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.partner_profit_shares
+    ADD CONSTRAINT partner_profit_shares_profit_distribution_id_fkey FOREIGN KEY (profit_distribution_id) REFERENCES public.profit_distributions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: transactions transactions_bank_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT transactions_bank_account_id_fkey FOREIGN KEY (bank_account_id) REFERENCES public.bank_accounts(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: transactions transactions_counterparty_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT transactions_counterparty_contact_id_fkey FOREIGN KEY (counterparty_contact_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: users users_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.contacts(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

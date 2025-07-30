@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         name,
         firstName,
         lastName,
-        role: "USER", // Default role
+        role: "UNASSIGNED", // Default role
       },
       select: {
         id: true,

@@ -98,9 +98,9 @@ export default function SignUp() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Account Created!</h2>
             <p className="text-gray-600 mb-4">
-              Your account has been created successfully. You're being signed in...
+              Your account has been created successfully. You're being signed in and will be taken to the approval status page...
             </p>
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2" style={{borderBottomColor: '#2E3A7C'}}></div>
           </Card>
         </div>
       </div>

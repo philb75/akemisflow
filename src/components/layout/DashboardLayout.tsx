@@ -18,83 +18,76 @@ const navigationItems = [
     ),
   },
   {
-    name: 'Clients',
-    href: '/clients',
+    name: 'Entities',
+    href: '/entities',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
       </svg>
     ),
     submenu: [
-      { name: 'All Clients', href: '/clients' },
-      { name: 'Add Client', href: '/clients/new' },
-      { name: 'Client Reports', href: '/clients/reports' },
+      { name: 'Clients', href: '/entities/clients' },
+      { name: 'Suppliers', href: '/entities/suppliers' },
+      { name: 'Bank Accounts', href: '/entities/bank-accounts' },
     ]
   },
   {
-    name: 'Invoices',
-    href: '/invoices',
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
-    submenu: [
-      { name: 'All Invoices', href: '/invoices' },
-      { name: 'Create Invoice', href: '/invoices/new' },
-      { name: 'Pending', href: '/invoices/pending' },
-      { name: 'Paid', href: '/invoices/paid' },
-    ]
-  },
-  {
-    name: 'Transactions',
-    href: '/transactions',
+    name: 'Finance',
+    href: '/finance',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
       </svg>
     ),
     submenu: [
-      { name: 'All Transactions', href: '/transactions' },
-      { name: 'Income', href: '/transactions/income' },
-      { name: 'Expenses', href: '/transactions/expenses' },
+      { name: 'Invoices', href: '/finance/invoices' },
+      { name: 'Payments', href: '/finance/payments' },
+      { name: 'Transactions', href: '/finance/transactions' },
+      { name: 'Shareholder Ledger', href: '/finance/shareholder-ledger' },
     ]
   },
   {
-    name: 'Bank Accounts',
-    href: '/bank-accounts',
+    name: 'Contracts',
+    href: '/contracts',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Consultants',
-    href: '/consultants',
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
     submenu: [
-      { name: 'All Consultants', href: '/consultants' },
-      { name: 'Add Consultant', href: '/consultants/new' },
-      { name: 'Payments', href: '/consultants/payments' },
+      { name: 'Client Contracts', href: '/contracts/clients' },
+      { name: 'Supplier Contracts', href: '/contracts/suppliers' },
     ]
   },
   {
-    name: 'Reports',
-    href: '/reports',
+    name: 'Reporting & Audit',
+    href: '/reporting',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ),
     submenu: [
-      { name: 'Financial Overview', href: '/reports/financial' },
-      { name: 'Profit & Loss', href: '/reports/profit-loss' },
-      { name: 'Tax Reports', href: '/reports/tax' },
+      { name: 'Client Statements', href: '/reporting/client-statements' },
+      { name: 'Supplier Statements', href: '/reporting/supplier-statements' },
+      { name: 'Financial Statements', href: '/reporting/financial-statements' },
+      { name: 'Profit-Share Statements', href: '/reporting/profit-share-statements' },
+    ]
+  },
+  {
+    name: 'Administration',
+    href: '/admin',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+    submenu: [
+      { name: 'User & Role Management', href: '/admin/users' },
+      { name: 'System Configuration', href: '/admin/configuration' },
+      { name: 'Integrations', href: '/admin/integrations' },
+      { name: 'Audit Trails & Logs', href: '/admin/audit-logs' },
     ]
   },
 ]
@@ -109,8 +102,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  const toggleMenu = (menuName: string) => {
-    setExpandedMenu(expandedMenu === menuName ? null : menuName)
+  const toggleMenu = (menuName: string, forceExpand = false) => {
+    if (forceExpand) {
+      setExpandedMenu(menuName)
+    } else {
+      setExpandedMenu(expandedMenu === menuName ? null : menuName)
+    }
+  }
+
+  // Helper function to check if any submenu item is active
+  const isSubmenuActive = (item: any) => {
+    if (!item.submenu) return false
+    return item.submenu.some((subItem: any) => pathname === subItem.href)
+  }
+
+  // Helper function to check if the main menu item is active
+  const isMainMenuActive = (item: any) => {
+    return pathname === item.href || pathname.startsWith(item.href + '/')
+  }
+
+  // Helper function to determine if menu should be expanded
+  const shouldMenuBeExpanded = (item: any) => {
+    return expandedMenu === item.name || isSubmenuActive(item) || isMainMenuActive(item)
   }
 
   return (
@@ -147,7 +160,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     ? {backgroundColor: '#2E3A7C'} 
                     : {}
                   }
-                  onClick={() => item.submenu && !sidebarCollapsed ? toggleMenu(item.name) : null}
+                  onClick={() => item.submenu && !sidebarCollapsed ? toggleMenu(item.name, true) : null}
                 >
                   <Link href={item.href} className="flex items-center space-x-3 flex-1" title={sidebarCollapsed ? item.name : undefined}>
                     <span className={cn(
@@ -164,7 +177,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <svg
                       className={cn(
                         "h-4 w-4 transition-transform",
-                        expandedMenu === item.name ? "rotate-90" : ""
+                        shouldMenuBeExpanded(item) ? "rotate-90" : ""
                       )}
                       fill="none"
                       viewBox="0 0 24 24"
@@ -176,7 +189,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </div>
                 
                 {/* Submenu */}
-                {item.submenu && expandedMenu === item.name && !sidebarCollapsed && (
+                {item.submenu && shouldMenuBeExpanded(item) && !sidebarCollapsed && (
                   <div className="mt-1 space-y-1 pl-6">
                     {item.submenu.map((subItem) => (
                       <Link
@@ -185,11 +198,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         className={cn(
                           "block px-3 py-2 text-sm rounded-md transition-colors",
                           pathname === subItem.href
-                            ? "text-white"
+                            ? "text-gray-800"
                             : "text-gray-600 hover:bg-gray-100"
                         )}
                         style={pathname === subItem.href 
-                          ? {backgroundColor: '#4A6BA8'} 
+                          ? {backgroundColor: '#E5E7EB'} 
                           : {}
                         }
                       >
@@ -256,49 +269,27 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'pl-16' : 'pl-64'}`}>
         {/* Top Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {navigationItems.find(item => item.href === pathname)?.name || 'Dashboard'}
-                </h1>
-                <div className="flex items-center mt-1 space-x-2">
-                  {session?.user?.role === 'ADMIN' && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white" style={{backgroundColor: '#2E3A7C'}}>
-                      Admin
-                    </span>
-                  )}
-                  <span className="text-sm text-gray-600">
-                    Welcome back, {session?.user?.name}
-                  </span>
-                </div>
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="flex h-16 items-center justify-between px-6">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900">AkemisFlow</h1>
+              <span className="text-sm text-gray-500">Financial Management System</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">
+                {session?.user?.name}
               </div>
-              
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-900">
-                    {new Date().toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {new Date().toLocaleTimeString('en-US', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </div>
-                </div>
+              <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700">
+                  {session?.user?.name?.charAt(0) || 'U'}
+                </span>
               </div>
             </div>
           </div>
-        </header>
+        </div>
 
         {/* Page Content */}
-        <main className="p-6">
+        <main className="min-h-screen">
           {children}
         </main>
       </div>

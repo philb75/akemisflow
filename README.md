@@ -2,6 +2,15 @@
 
 A comprehensive financial management system for Akemis operations, built with Next.js, PostgreSQL, and modern web technologies.
 
+## 🚀 Deployment
+
+This application supports both local development (Docker) and production deployment (Supabase + Vercel).
+
+- **Local Development**: Uses Docker PostgreSQL
+- **Production**: Uses Supabase (database) + Vercel (hosting)
+
+See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
+
 ## 🚀 Quick Start
 
 ### Choose Your Development Environment

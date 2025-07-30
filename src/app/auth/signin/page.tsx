@@ -57,21 +57,21 @@ function SignInForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#dcd7ca] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
           {/* Akemis logo */}
-          <div className="flex justify-center mb-6">
-            <div className="flex flex-col items-center space-y-2">
+          <div className="flex justify-center mb-8">
+            <div className="flex flex-col items-center space-y-4">
               <img 
                 src="/images/logo.png" 
                 alt="Akemis Logo" 
-                className="h-16 w-auto"
+                className="h-24 w-auto"
               />
               <div className="text-center">
-                <div className="text-2xl font-bold" style={{color: '#2E3A7C'}}>
+                <div className="text-3xl font-bold" style={{color: '#2E3A7C'}}>
                   AkemisFlow
                 </div>
-                <div className="text-sm" style={{color: '#4A6BA8'}}>Financial Management</div>
+                <div className="text-base" style={{color: '#4A6BA8'}}>Financial Management</div>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@ function SignInForm() {
           </p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-10 shadow-xl border-0">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">

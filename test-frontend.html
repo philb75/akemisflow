@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test</title>
+</head>
+<body>
+    <h1>Testing AkemisFlow Frontend</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Test API connectivity
+        fetch('/api/transactions')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('test-results').innerHTML = `
+                    <h2>API Test Results:</h2>
+                    <p>✅ API Working</p>
+                    <p>Transactions found: ${data.transactions ? data.transactions.length : 0}</p>
+                    <p>Stats: ${JSON.stringify(data.stats, null, 2)}</p>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML = `
+                    <h2>API Test Results:</h2>
+                    <p>❌ API Error: ${error.message}</p>
+                `;
+            });
+            
+        // Test Airwallex sync
+        setTimeout(() => {
+            fetch('/api/transactions/sync-airwallex', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'test'})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('test-results').innerHTML += `
+                    <h2>Airwallex Test Results:</h2>
+                    <p>✅ Airwallex ${data.success ? 'Working' : 'Failed'}</p>
+                    <p>Message: ${data.message}</p>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML += `
+                    <h2>Airwallex Test Results:</h2>
+                    <p>❌ Airwallex Error: ${error.message}</p>
+                `;
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

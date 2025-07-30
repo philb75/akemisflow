@@ -1,0 +1,17 @@
+{
+  "filename": "local_backup_2025-07-30T08-15-59-339Z.sql",
+  "path": "backups/local/local_backup_2025-07-30T08-15-59-339Z.sql",
+  "type": "local",
+  "timestamp": "2025-07-30T08:15:59.449Z",
+  "size": 220490,
+  "sizeFormatted": "215.32 KB",
+  "hash": "0b45316a3f97248659b02c66d86075dee9646b62b7c0bbe87ed83b50233799c3",
+  "options": {},
+  "tables": {
+    "contacts": 19,
+    "suppliers": 29,
+    "bank_accounts": 1,
+    "transactions": 148,
+    "invoices": 0
+  }
+}
