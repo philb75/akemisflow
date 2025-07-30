@@ -95,6 +95,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         } catch (error) {
           console.error("Database authentication error:", error);
+          console.error("Error details:", {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            email: credentials.email
+          });
           return null;
         } finally {
           if (client) {
