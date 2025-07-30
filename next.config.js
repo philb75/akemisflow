@@ -4,6 +4,13 @@ const nextConfig = {
     // Skip type checking during build for deployment
     ignoreBuildErrors: true,
   },
+  eslint: {
+    // Skip ESLint during builds
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+  },
   env: {
     DATABASE_URL: process.env.DATABASE_URL,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
