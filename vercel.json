@@ -1,16 +1,14 @@
 {
-  "buildCommand": "prisma generate && next build",
+  "buildCommand": "prisma generate --no-engine && next build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
-    "NODE_ENV": "production",
-    "SKIP_ENV_VALIDATION": "true"
+    "NODE_ENV": "production"
   },
   "build": {
     "env": {
-      "NODE_ENV": "production",
-      "SKIP_ENV_VALIDATION": "true"
+      "NODE_ENV": "production"
     }
   },
   "functions": {
