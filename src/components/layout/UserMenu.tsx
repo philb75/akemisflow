@@ -78,7 +78,7 @@ export function UserMenu() {
           <button
             onClick={() => {
               setIsOpen(false)
-              signOut({ callbackUrl: "/" })
+              signOut({ callbackUrl: "/auth/signin" })
             }}
             className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50"
           >
