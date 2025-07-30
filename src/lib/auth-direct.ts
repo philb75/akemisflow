@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { Client } from "pg"
+import { authConfig } from "./auth-config"
 
 // Direct database connection - bypassing Prisma
 async function getDbConnection() {
@@ -19,6 +20,7 @@ async function getDbConnection() {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   session: {
     strategy: "jwt",
   },
@@ -34,6 +36,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        console.log("Auth attempt for:", credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
           console.log("Missing credentials");
           return null;
@@ -43,6 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           // Connect directly to database
           client = await getDbConnection();
+          console.log("Database connected successfully");
           
           // Find user by email
           const result = await client.query(
