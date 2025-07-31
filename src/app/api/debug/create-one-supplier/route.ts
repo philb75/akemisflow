@@ -37,15 +37,11 @@ export async function POST() {
       return NextResponse.json({ success: true, logs, skipped: true, supplierId: existing.id })
     }
     
-    // Create supplier with only core fields that definitely exist  
+    // Create supplier with absolute minimum fields
     const supplierData = {
       first_name: beneficiary.first_name || 'Unknown',
       last_name: beneficiary.last_name || 'User', 
       email: beneficiary.email,
-      phone: beneficiary.phone_number || null,
-      company: beneficiary.company_name || null,
-      country: beneficiary.address?.country || null,
-      airwallex_beneficiary_id: beneficiary.id,
       status: 'ACTIVE'
     }
     
