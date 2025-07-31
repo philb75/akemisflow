@@ -5,10 +5,55 @@ export async function GET() {
   console.log('Test DB Route - Starting connection test')
   
   // Log environment variables (without exposing sensitive data)
+  const dbUrl = process.env.DATABASE_URL || ''
+  const directUrl = process.env.DIRECT_URL || ''
+  
+  // Parse connection string to check components
+  const dbUrlParts = {
+    hasProtocol: dbUrl.startsWith('postgresql://'),
+    hasPooler: dbUrl.includes('.pooler.supabase.com'),
+    hasPort6543: dbUrl.includes(':6543'),
+    hasPgBouncer: dbUrl.includes('pgbouncer=true'),
+    hasSSLMode: dbUrl.includes('sslmode='),
+    hasConnectionLimit: dbUrl.includes('connection_limit='),
+    hasPassword: dbUrl.includes('@') && dbUrl.split('@')[0].includes(':'),
+  }
+  
+  // More detailed parsing
+  let connectionDetails = {
+    protocol: '',
+    username: '',
+    host: '',
+    port: '',
+    database: '',
+    queryParams: '',
+  }
+  
+  try {
+    if (dbUrl.startsWith('postgresql://')) {
+      const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):(\d+)\/([^?]+)(\?.*)?/)
+      if (urlMatch) {
+        connectionDetails = {
+          protocol: 'postgresql',
+          username: urlMatch[1],
+          host: urlMatch[3],
+          port: urlMatch[4],
+          database: urlMatch[5],
+          queryParams: urlMatch[6] || '',
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing connection string:', e)
+  }
+  
   const envCheck = {
     hasDbUrl: !!process.env.DATABASE_URL,
     hasDirectUrl: !!process.env.DIRECT_URL,
     dbUrlLength: process.env.DATABASE_URL?.length || 0,
+    directUrlLength: process.env.DIRECT_URL?.length || 0,
+    dbUrlParts,
+    connectionDetails,
     nodeEnv: process.env.NODE_ENV,
     vercelEnv: process.env.VERCEL_ENV,
   }
