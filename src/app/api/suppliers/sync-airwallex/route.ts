@@ -74,7 +74,34 @@ export async function POST(request: NextRequest) {
           })
         }
         
-        const supplierData = {
+        // Create supplier data with environment-aware field names
+        const supplierData = useSupabase ? {
+          // Supabase uses snake_case
+          first_name: beneficiary.first_name || '',
+          last_name: beneficiary.last_name || '',
+          email: beneficiary.email,
+          phone: beneficiary.phone_number || null,
+          company: beneficiary.company_name || null,
+          address: beneficiary.address?.street_address || null,
+          city: beneficiary.address?.city || null,
+          country: beneficiary.address?.country || null,
+          postal_code: beneficiary.address?.postcode || null,
+          bank_account_name: beneficiary.bank_details?.account_name || null,
+          bank_account_number: beneficiary.bank_details?.account_number || null,
+          bank_name: beneficiary.bank_details?.bank_name || null,
+          swift_code: beneficiary.bank_details?.swift_code || null,
+          airwallex_beneficiary_id: beneficiary.id,
+          status: 'ACTIVE' as const,
+          airwallex_sync_status: 'SYNCED',
+          airwallex_last_sync_at: new Date().toISOString(),
+          airwallex_raw_data: {
+            beneficiaryId: beneficiary.id,
+            entityType: beneficiary.entity_type,
+            paymentMethods: beneficiary.payment_methods,
+            lastSynced: new Date().toISOString()
+          }
+        } : {
+          // Prisma uses camelCase
           firstName: beneficiary.first_name || '',
           lastName: beneficiary.last_name || '',
           companyName: beneficiary.company_name || null,
@@ -211,12 +238,12 @@ export async function GET(request: NextRequest) {
       const { count: synced } = await supabase
         .from('suppliers')
         .select('*', { count: 'exact', head: true })
-        .not('airwallexBeneficiaryId', 'is', null)
+        .not('airwallex_beneficiary_id', 'is', null)
       
       const { data: suppliers } = await supabase
         .from('suppliers')
-        .select('id, firstName, lastName, email, airwallexBeneficiaryId, status, updated_at')
-        .not('airwallexBeneficiaryId', 'is', null)
+        .select('id, first_name, last_name, email, airwallex_beneficiary_id, status, updated_at')
+        .not('airwallex_beneficiary_id', 'is', null)
         .order('updated_at', { ascending: false })
         .limit(10)
       
@@ -257,9 +284,9 @@ export async function GET(request: NextRequest) {
         },
         recent_synced_suppliers: (airwallexSuppliers || []).map(supplier => ({
           id: supplier.id,
-          name: `${supplier.firstName} ${supplier.lastName}`,
+          name: useSupabase ? `${supplier.first_name} ${supplier.last_name}` : `${supplier.firstName} ${supplier.lastName}`,
           email: supplier.email,
-          airwallexBeneficiaryId: supplier.airwallexBeneficiaryId,
+          airwallexBeneficiaryId: useSupabase ? supplier.airwallex_beneficiary_id : supplier.airwallexBeneficiaryId,
           status: supplier.status,
           lastSyncAt: useSupabase ? supplier.updated_at : supplier.updatedAt
         }))

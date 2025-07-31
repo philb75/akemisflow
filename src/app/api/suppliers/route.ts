@@ -83,7 +83,22 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supplierData = {
+    // Create supplier data with environment-aware field names
+    const supplierData = useSupabase ? {
+      // Supabase uses snake_case
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      phone: phone || null,
+      company: company || null,
+      vat_number: vatNumber || null,
+      address: address || null,
+      city: city || null,
+      postal_code: postalCode || null,
+      country: country || null,
+      status: 'ACTIVE'
+    } : {
+      // Prisma uses camelCase
       firstName,
       lastName,
       email,
