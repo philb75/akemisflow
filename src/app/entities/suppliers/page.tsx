@@ -29,8 +29,10 @@ import {
   CreditCard,
   Save,
   Database,
-  ExternalLink
+  ExternalLink,
+  ArrowRight
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface Supplier {
   id: string
@@ -453,13 +455,24 @@ export default function SuppliersPage() {
                   <Database className="w-5 h-5 text-blue-600" />
                   <h3 className="text-lg font-semibold">Database Information</h3>
                   {!isEditing && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => startEditing(supplier)}
-                    >
-                      Edit
-                    </Button>
+                    <>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => startEditing(supplier)}
+                      >
+                        Edit
+                      </Button>
+                      <Link href={`/entities/suppliers/${supplier.id}`}>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                        >
+                          <ArrowRight className="w-4 h-4 mr-1" />
+                          View Details
+                        </Button>
+                      </Link>
+                    </>
                   )}
                 </div>
                 

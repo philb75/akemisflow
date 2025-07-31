@@ -58,6 +58,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   company       Contact?  @relation(fields: [companyId], references: [id])
+  uploadedDocuments Document[] @relation("UploadedDocuments")
+  verifiedDocuments Document[] @relation("VerifiedDocuments")
 
   @@map("users")
 }
@@ -130,6 +132,7 @@ model Contact {
   partnerProfitShares   PartnerProfitShare[]
   transactions          Transaction[]        @relation("CounterpartyTransactions")
   users                 User[]
+  documents             Document[]
 
   @@map("contacts")
 }
@@ -238,6 +241,7 @@ model Invoice {
   bankAccount          BankAccount?        @relation(fields: [bankAccountId], references: [id])
   clientContact        Contact             @relation("ClientInvoices", fields: [clientContactId], references: [id])
   paymentTransaction   Transaction?        @relation("InvoicePayments", fields: [paymentTransactionId], references: [id])
+  documents            Document[]
 
   @@map("invoices")
 }
@@ -388,6 +392,7 @@ model Supplier {
   
   createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  documents          Document[]
 
   @@map("suppliers")
 }
@@ -533,4 +538,69 @@ enum ExchangeRateType {
   SPOT
   FORWARD
   HISTORICAL
+}
+
+model Document {
+  id              String        @id @default(uuid()) @db.Uuid
+  fileName        String        @map("file_name") @db.VarChar(255)
+  originalName    String        @map("original_name") @db.VarChar(255)
+  fileType        String        @map("file_type") @db.VarChar(50)
+  fileSize        Int           @map("file_size")
+  mimeType        String        @map("mime_type") @db.VarChar(100)
+  
+  // Storage information
+  storageProvider String        @map("storage_provider") @db.VarChar(20) // local, supabase
+  storagePath     String        @map("storage_path") @db.VarChar(500)
+  bucketName      String?       @map("bucket_name") @db.VarChar(100)
+  publicUrl       String?       @map("public_url") @db.VarChar(500)
+  
+  // Relations
+  contactId       String?       @map("contact_id") @db.Uuid
+  supplierId      String?       @map("supplier_id") @db.Uuid
+  invoiceId       String?       @map("invoice_id") @db.Uuid
+  userId          String        @map("user_id")
+  
+  // Document metadata
+  documentType    DocumentType  @map("document_type")
+  category        String?       @db.VarChar(100)
+  description     String?
+  tags            String[]      @default([])
+  
+  // Compliance and validity
+  expiryDate      DateTime?     @map("expiry_date") @db.Date
+  isActive        Boolean       @default(true) @map("is_active")
+  isVerified      Boolean       @default(false) @map("is_verified")
+  verifiedBy      String?       @map("verified_by")
+  verifiedAt      DateTime?     @map("verified_at") @db.Timestamptz(6)
+  
+  // Version control
+  version         Int           @default(1)
+  previousVersionId String?     @map("previous_version_id") @db.Uuid
+  
+  // Audit trail
+  uploadedAt      DateTime      @default(now()) @map("uploaded_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?     @map("deleted_at") @db.Timestamptz(6)
+  
+  // Relations
+  contact         Contact?      @relation(fields: [contactId], references: [id])
+  supplier        Supplier?     @relation(fields: [supplierId], references: [id])
+  invoice         Invoice?      @relation(fields: [invoiceId], references: [id])
+  uploadedBy      User          @relation("UploadedDocuments", fields: [userId], references: [id])
+  verifiedByUser  User?         @relation("VerifiedDocuments", fields: [verifiedBy], references: [id])
+  previousVersion Document?     @relation("DocumentVersions", fields: [previousVersionId], references: [id])
+  nextVersions    Document[]    @relation("DocumentVersions")
+  
+  @@index([contactId, documentType])
+  @@index([supplierId, documentType])
+  @@index([invoiceId])
+  @@index([expiryDate])
+  @@index([isActive, documentType])
+  @@map("documents")
+}
+
+enum DocumentType {
+  ID              // ID documents (passport, national ID, driver's license, etc.)
+  PROOF_OF_ADDRESS // Proof of address documents
+  BANK            // Bank-related documents (statements, account info, etc.)
 }

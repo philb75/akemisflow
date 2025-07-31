@@ -4,6 +4,21 @@ import { auth } from "@/lib/auth"
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  const response = NextResponse.next()
+
+  // Add security headers for document downloads
+  if (pathname.startsWith('/api/documents') && pathname.includes('/download')) {
+    response.headers.set('X-Content-Type-Options', 'nosniff')
+    response.headers.set('X-Frame-Options', 'DENY')
+    response.headers.set('X-XSS-Protection', '1; mode=block')
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.set('Content-Security-Policy', "default-src 'self'")
+  }
+
+  // Add general security headers
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  response.headers.set('X-DNS-Prefetch-Control', 'off')
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
 
   // Allow public paths (but NOT the root path)
   if (
@@ -24,7 +39,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/uploads/') ||
     pathname.endsWith('.html')
   ) {
-    return NextResponse.next()
+    return response
   }
 
   // Get the session
@@ -47,7 +62,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

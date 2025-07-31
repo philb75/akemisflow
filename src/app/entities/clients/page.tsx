@@ -26,8 +26,10 @@ import {
   ExternalLink,
   FileText,
   Clock,
-  AlertCircle
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface Client {
   id: string
@@ -682,13 +684,24 @@ export default function ClientsPage() {
                               <Database className="w-5 h-5 text-blue-600" />
                               <h3 className="text-lg font-semibold">Client Information</h3>
                               {!isEditing && (
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => startEditing(client)}
-                                >
-                                  Edit
-                                </Button>
+                                <>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => startEditing(client)}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Link href={`/entities/clients/${client.id}`}>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                    >
+                                      <ArrowRight className="w-4 h-4 mr-1" />
+                                      View Details
+                                    </Button>
+                                  </Link>
+                                </>
                               )}
                             </div>
                             
