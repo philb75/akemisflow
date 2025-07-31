@@ -10,6 +10,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check if Airwallex is configured
+    const isConfigured = process.env.AIRWALLEX_CLIENT_ID && process.env.AIRWALLEX_API_KEY
+    
+    if (!isConfigured) {
+      console.error('[Airwallex Sync] API credentials not configured')
+      return NextResponse.json({
+        success: false,
+        message: 'Airwallex API not configured',
+        error: 'Missing AIRWALLEX_CLIENT_ID or AIRWALLEX_API_KEY environment variables. Please configure these in your environment settings.'
+      }, { status: 503 })
+    }
+
     console.log('🔄 Starting Airwallex supplier sync...')
     
     // Run the supplier sync
@@ -54,6 +66,27 @@ export async function GET(request: NextRequest) {
     
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check if Airwallex is configured
+    const isConfigured = process.env.AIRWALLEX_CLIENT_ID && process.env.AIRWALLEX_API_KEY
+    
+    if (!isConfigured) {
+      console.warn('[Airwallex Sync] API credentials not configured for GET request')
+      return NextResponse.json({
+        success: true,
+        message: 'Airwallex API not configured',
+        data: {
+          database_summary: {
+            totalSuppliers: 0,
+            syncedSuppliers: 0,
+            pendingSuppliers: 0,
+            errorSuppliers: 0,
+            notConfigured: true
+          },
+          airwallex_suppliers: []
+        }
+      }, { status: 200 })
     }
 
     // Get sync summary without running sync

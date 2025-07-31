@@ -14,6 +14,11 @@ Add these environment variables in Vercel Dashboard:
 STORAGE_PROVIDER=supabase
 SUPABASE_STORAGE_BUCKET=documents
 
+# Airwallex Integration (Required for supplier/client sync)
+AIRWALLEX_CLIENT_ID=XAqyZmYLTSizOYHgBaPYlA
+AIRWALLEX_API_KEY=ccee18a2d6a11d284d182a5674c893d6f3c6fb3ee25d845af32fdb6bcf6a77cc1693aa8945ae6f14de09881575131845
+AIRWALLEX_BASE_URL=https://api.airwallex.com
+
 # These should already exist:
 # NEXT_PUBLIC_SUPABASE_URL
 # NEXT_PUBLIC_SUPABASE_ANON_KEY

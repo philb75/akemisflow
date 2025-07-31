@@ -237,11 +237,15 @@ export default function SuppliersPage() {
           Conflicts: ${result.data.sync_results.conflicts}`)
       } else {
         const error = await response.json()
-        alert('Sync failed: ' + error.message)
+        if (response.status === 503 && error.error?.includes('environment variables')) {
+          alert('Airwallex API is not configured. Please add the required environment variables in your deployment settings.')
+        } else {
+          alert('Sync failed: ' + (error.error || error.message || 'Unknown error'))
+        }
       }
     } catch (error) {
       console.error('Sync error:', error)
-      alert('Sync failed: ' + error.message)
+      alert('Sync failed: ' + (error instanceof Error ? error.message : 'Network error'))
     } finally {
       setSyncing(false)
     }

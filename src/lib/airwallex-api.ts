@@ -181,9 +181,15 @@ export class AirwallexAPIClient {
     this.apiKey = process.env.AIRWALLEX_API_KEY || ''
     this.baseUrl = process.env.AIRWALLEX_BASE_URL || 'https://api.airwallex.com'
 
-    // Don't throw during build time - check credentials when actually using the API
-    if (typeof window !== 'undefined' && (!this.clientId || !this.apiKey)) {
-      console.warn('Airwallex API credentials not configured')
+    // Log configuration status for debugging
+    if (!this.clientId || !this.apiKey) {
+      console.warn('[Airwallex] API credentials not configured:', {
+        hasClientId: !!this.clientId,
+        hasApiKey: !!this.apiKey,
+        baseUrl: this.baseUrl
+      })
+    } else {
+      console.log('[Airwallex] API client initialized successfully')
     }
   }
 
