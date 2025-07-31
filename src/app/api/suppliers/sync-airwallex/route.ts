@@ -82,13 +82,13 @@ export async function POST(request: NextRequest) {
         
         // Create supplier data with environment-aware field names
         const baseSupplierData = useSupabase ? {
-          // Supabase uses snake_case
+          // Supabase uses snake_case - only include fields that exist in schema
           first_name: beneficiary.first_name || '',
           last_name: beneficiary.last_name || '',
           email: beneficiary.email,
           phone: beneficiary.phone_number || null,
           company: beneficiary.company_name || null,
-          address: beneficiary.address?.street_address || null,
+          // NOTE: 'address' column doesn't exist in Supabase schema, so removed
           city: beneficiary.address?.city || null,
           country: beneficiary.address?.country || null,
           postal_code: beneficiary.address?.postcode || null,
@@ -105,7 +105,9 @@ export async function POST(request: NextRequest) {
             beneficiaryId: beneficiary.id,
             entityType: beneficiary.entity_type,
             paymentMethods: beneficiary.payment_methods,
-            lastSynced: new Date().toISOString()
+            lastSynced: new Date().toISOString(),
+            // Store address in raw_data instead since column doesn't exist
+            address: beneficiary.address?.street_address || null
           }
         } : {
           // Prisma uses camelCase

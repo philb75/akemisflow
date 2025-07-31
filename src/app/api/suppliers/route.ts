@@ -122,14 +122,14 @@ export async function POST(req: NextRequest) {
 
     // Create supplier data with environment-aware field names and name formatting
     const baseSupplierData = useSupabase ? {
-      // Supabase uses snake_case
+      // Supabase uses snake_case - only include fields that exist in schema
       first_name: firstName,
       last_name: lastName,
       email,
       phone: phone || null,
       company: company || null,
       vat_number: vatNumber || null,
-      address: address || null,
+      // NOTE: 'address' column doesn't exist in Supabase schema, so removed
       city: city || null,
       postal_code: postalCode || null,
       country: country || null,
