@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/db"
+import { createClient } from '@supabase/supabase-js'
 
-const prisma = new PrismaClient()
+// Environment-aware database client
+// Use Supabase if we have the URL configured (production), otherwise use Prisma (local)
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+
+// Initialize Supabase client for production
+let supabase: any = null
+if (useSupabase) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabase = createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,11 +23,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const suppliers = await prisma.supplier.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
+    // Get suppliers (environment-aware)
+    let suppliers
+    if (useSupabase) {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      suppliers = data
+    } else {
+      suppliers = await prisma.supplier.findMany({
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
+    }
 
     return NextResponse.json(suppliers)
   } catch (error) {
@@ -60,30 +83,52 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const supplier = await prisma.supplier.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        phone: phone || null,
-        company: company || null,
-        vatNumber: vatNumber || null,
-        address: address || null,
-        city: city || null,
-        postalCode: postalCode || null,
-        country: country || null,
-        proofOfAddressUrl: proofOfAddress?.url || null,
-        proofOfAddressName: proofOfAddress?.name || null,
-        proofOfAddressType: proofOfAddress?.type || null,
-        proofOfAddressSize: proofOfAddress?.size || null,
-        idDocumentUrl: idDocument?.url || null,
-        idDocumentName: idDocument?.name || null,
-        idDocumentType: idDocument?.type || null,
-        idDocumentSize: idDocument?.size || null,
-        // Initialize Airwallex sync status
-        airwallexSyncStatus: 'NONE'
+    const supplierData = {
+      firstName,
+      lastName,
+      email,
+      phone: phone || null,
+      companyName: company || null,
+      vatNumber: vatNumber || null,
+      address: address || null,
+      city: city || null,
+      postalCode: postalCode || null,
+      country: country || null,
+      status: 'ACTIVE',
+      metadata: {
+        documents: {
+          proofOfAddress: proofOfAddress ? {
+            url: proofOfAddress.url,
+            name: proofOfAddress.name,
+            type: proofOfAddress.type,
+            size: proofOfAddress.size
+          } : null,
+          idDocument: idDocument ? {
+            url: idDocument.url,
+            name: idDocument.name,
+            type: idDocument.type,
+            size: idDocument.size
+          } : null
+        }
       }
-    })
+    }
+    
+    // Create supplier (environment-aware)
+    let supplier
+    if (useSupabase) {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .insert(supplierData)
+        .select()
+        .single()
+      
+      if (error) throw error
+      supplier = data
+    } else {
+      supplier = await prisma.supplier.create({
+        data: supplierData
+      })
+    }
 
     return NextResponse.json(supplier, { status: 201 })
   } catch (error: any) {
@@ -94,7 +139,7 @@ export async function POST(req: NextRequest) {
       stack: error.stack
     })
     
-    if (error.code === 'P2002') {
+    if (error.code === '23505') { // Postgres unique violation
       return NextResponse.json(
         { error: "A supplier with this email already exists" },
         { status: 409 }

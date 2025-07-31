@@ -2,9 +2,8 @@
 import { airwallexConfig } from './airwallex-config'
 
 interface AirwallexTokenResponse {
-  access_token: string
-  token_type: string
-  expires_in: number
+  token: string
+  expires_at: string
 }
 
 interface AirwallexBeneficiary {
@@ -68,8 +67,9 @@ export class AirwallexClientStandalone {
       }
 
       const data: AirwallexTokenResponse = await response.json()
-      this.accessToken = data.access_token
-      this.tokenExpiry = new Date(Date.now() + (data.expires_in - 60) * 1000)
+      this.accessToken = data.token
+      // Parse the expires_at string and subtract 60 seconds for safety margin
+      this.tokenExpiry = new Date(new Date(data.expires_at).getTime() - 60 * 1000)
       
       console.log('[Airwallex] Authentication successful')
     } catch (error) {
