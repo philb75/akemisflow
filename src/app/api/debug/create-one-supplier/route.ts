@@ -37,31 +37,16 @@ export async function POST() {
       return NextResponse.json({ success: true, logs, skipped: true, supplierId: existing.id })
     }
     
-    // Create supplier with proper snake_case fields
+    // Create supplier with only core fields that definitely exist  
     const supplierData = {
       first_name: beneficiary.first_name || 'Unknown',
-      last_name: beneficiary.last_name || 'User',
+      last_name: beneficiary.last_name || 'User', 
       email: beneficiary.email,
       phone: beneficiary.phone_number || null,
       company: beneficiary.company_name || null,
-      address: beneficiary.address?.street_address || null,
-      city: beneficiary.address?.city || null,
       country: beneficiary.address?.country || null,
-      postal_code: beneficiary.address?.postcode || null,
-      bank_account_name: beneficiary.bank_details?.account_name || null,
-      bank_account_number: beneficiary.bank_details?.account_number || null,
-      bank_name: beneficiary.bank_details?.bank_name || null,
-      swift_code: beneficiary.bank_details?.swift_code || null,
       airwallex_beneficiary_id: beneficiary.id,
-      status: 'ACTIVE',
-      airwallex_sync_status: 'SYNCED',
-      airwallex_last_sync_at: new Date().toISOString(),
-      airwallex_raw_data: {
-        beneficiaryId: beneficiary.id,
-        entityType: beneficiary.entity_type,
-        paymentMethods: beneficiary.payment_methods,
-        lastSynced: new Date().toISOString()
-      }
+      status: 'ACTIVE'
     }
     
     const { data: newSupplier, error } = await supabase
