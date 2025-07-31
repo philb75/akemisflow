@@ -32,7 +32,43 @@ export async function GET(req: NextRequest) {
         .order('created_at', { ascending: false })
       
       if (error) throw error
-      suppliers = data
+      
+      // Transform snake_case to camelCase for frontend compatibility
+      suppliers = (data || []).map(supplier => ({
+        id: supplier.id,
+        firstName: supplier.first_name,
+        lastName: supplier.last_name,
+        email: supplier.email,
+        phone: supplier.phone,
+        company: supplier.company,
+        vatNumber: supplier.vat_number,
+        address: supplier.address,
+        city: supplier.city,
+        postalCode: supplier.postal_code,
+        country: supplier.country,
+        status: supplier.status,
+        isActive: supplier.is_active,
+        createdAt: supplier.created_at,
+        updatedAt: supplier.updated_at,
+        // Airwallex fields
+        airwallexBeneficiaryId: supplier.airwallex_beneficiary_id,
+        airwallexEntityType: supplier.airwallex_entity_type,
+        airwallexLastSyncAt: supplier.airwallex_last_sync_at,
+        airwallexSyncStatus: supplier.airwallex_sync_status,
+        airwallexRawData: supplier.airwallex_raw_data,
+        // Bank fields
+        bankAccountCurrency: supplier.bank_account_currency,
+        bankAccountName: supplier.bank_account_name,
+        bankAccountNumber: supplier.bank_account_number,
+        bankName: supplier.bank_name,
+        bankCountryCode: supplier.bank_country_code,
+        iban: supplier.iban,
+        swiftCode: supplier.swift_code,
+        // Additional fields
+        addressCountryCode: supplier.address_country_code,
+        addressState: supplier.address_state,
+        preferredCurrency: supplier.preferred_currency
+      }))
     } else {
       suppliers = await prisma.supplier.findMany({
         orderBy: {
