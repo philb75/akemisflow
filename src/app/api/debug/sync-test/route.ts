@@ -58,10 +58,10 @@ export async function POST() {
         logs.push(`❌ Count query exception: ${err.message}`)
       }
       
-      // Test insertion with minimal data
+      // Test insertion with minimal data (using snake_case for Supabase)
       const minimalSupplier = {
-        firstName: testBeneficiary.first_name || 'Test',
-        lastName: testBeneficiary.last_name || 'User',
+        first_name: testBeneficiary.first_name || 'Test',
+        last_name: testBeneficiary.last_name || 'User',
         email: `test-${Date.now()}@example.com`, // Unique email
         status: 'ACTIVE'
       }
