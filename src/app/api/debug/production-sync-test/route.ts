@@ -3,7 +3,15 @@ import { AirwallexClientStandalone } from '@/lib/airwallex-client-standalone'
 import { createClient } from '@supabase/supabase-js'
 import { formatSupplierNames } from '@/lib/name-formatter'
 
+export async function GET() {
+  return await runDiagnostic()
+}
+
 export async function POST() {
+  return await runDiagnostic()
+}
+
+async function runDiagnostic() {
   const logs: string[] = []
   
   try {
