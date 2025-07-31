@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { createClient } from '@supabase/supabase-js'
-import { AirwallexClient } from '@/lib/airwallex-client'
+import { AirwallexClientStandalone } from '@/lib/airwallex-client-standalone'
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -47,7 +47,7 @@ export async function POST() {
     console.log('🔄 Starting Airwallex supplier sync with Supabase...')
     
     // Initialize Airwallex client
-    const airwallex = new AirwallexClient()
+    const airwallex = new AirwallexClientStandalone()
     await airwallex.initialize()
     
     // Fetch beneficiaries from Airwallex
