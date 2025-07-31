@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, User, Mail, Phone, MapPin, Building2, CreditCard, FileText } from 'lucide-react'
+import { ArrowLeft, User, Mail, Phone, MapPin, Building2, CreditCard, FileText, Edit, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { DocumentSection } from '@/components/documents'
@@ -72,7 +72,21 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
             <p className="text-sm text-muted-foreground">Supplier Details</p>
           </div>
         </div>
-        <Badge variant={getStatusColor(supplier.status)}>{supplier.status}</Badge>
+        <div className="flex items-center gap-2">
+          <Link href={`/entities/suppliers/${supplier.id}/edit`}>
+            <Button size="sm">
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Supplier
+            </Button>
+          </Link>
+          {supplier.airwallexBeneficiaryId && (
+            <Button variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Sync with Airwallex
+            </Button>
+          )}
+          <Badge variant={getStatusColor(supplier.status)}>{supplier.status}</Badge>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

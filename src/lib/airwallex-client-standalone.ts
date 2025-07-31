@@ -115,4 +115,37 @@ export class AirwallexClientStandalone {
       throw error
     }
   }
+
+  async getBeneficiary(beneficiaryId: string): Promise<AirwallexBeneficiary | null> {
+    await this.ensureAuthenticated()
+
+    try {
+      const url = `${this.baseUrl}/api/v1/beneficiaries/${beneficiaryId}`
+      console.log(`Fetching beneficiary: ${beneficiaryId}`)
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log(`Beneficiary ${beneficiaryId} not found`)
+          return null
+        }
+        const error = await response.text()
+        throw new Error(`Failed to fetch beneficiary: ${response.status} - ${error}`)
+      }
+
+      const beneficiary = await response.json()
+      console.log(`Found beneficiary: ${beneficiary.email}`)
+      return beneficiary
+    } catch (error) {
+      console.error(`[Airwallex] Error fetching beneficiary ${beneficiaryId}:`, error)
+      throw error
+    }
+  }
 }
