@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { AirwallexClientStandalone } from '@/lib/airwallex-client-standalone'
 import { createClient } from '@supabase/supabase-js'
 import { prisma } from '@/lib/db'
+import { formatSupplierNames } from '@/lib/name-formatter'
 
 // Environment-aware database client
 // Use Supabase if we have the URL configured (production), otherwise use Prisma (local)
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🔄 Starting Airwallex supplier sync...')
+    console.log(`🗄️  Environment: ${useSupabase ? 'Production (Supabase)' : 'Local (Prisma)'}`)
     
     // Initialize Airwallex client
     const airwallex = new AirwallexClientStandalone()
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
     
     // Fetch beneficiaries from Airwallex
     const beneficiaries = await airwallex.getBeneficiaries()
-    console.log(`Found ${beneficiaries.length} beneficiaries in Airwallex`)
+    console.log(`📋 Found ${beneficiaries.length} beneficiaries in Airwallex`)
     
     let created = 0
     let updated = 0
@@ -61,11 +63,15 @@ export async function POST(request: NextRequest) {
         let existingSupplier: any = null
         
         if (useSupabase) {
-          const { data } = await supabase
+          const { data, error: lookupError } = await supabase
             .from('suppliers')
-            .select('id, airwallexBeneficiaryId')
+            .select('id, airwallex_beneficiary_id')
             .eq('email', beneficiary.email)
             .single()
+          
+          if (lookupError && lookupError.code !== 'PGRST116') {
+            console.error(`❌ Error looking up supplier ${beneficiary.email}:`, lookupError)
+          }
           existingSupplier = data
         } else {
           existingSupplier = await prisma.supplier.findFirst({
@@ -75,7 +81,7 @@ export async function POST(request: NextRequest) {
         }
         
         // Create supplier data with environment-aware field names
-        const supplierData = useSupabase ? {
+        const baseSupplierData = useSupabase ? {
           // Supabase uses snake_case
           first_name: beneficiary.first_name || '',
           last_name: beneficiary.last_name || '',
@@ -92,6 +98,7 @@ export async function POST(request: NextRequest) {
           swift_code: beneficiary.bank_details?.swift_code || null,
           airwallex_beneficiary_id: beneficiary.id,
           status: 'ACTIVE' as const,
+          is_active: true,
           airwallex_sync_status: 'SYNCED',
           airwallex_last_sync_at: new Date().toISOString(),
           airwallex_raw_data: {
@@ -118,6 +125,7 @@ export async function POST(request: NextRequest) {
           swiftCode: beneficiary.bank_details?.swift_code || null,
           airwallexBeneficiaryId: beneficiary.id,
           status: 'ACTIVE' as const,
+          isActive: true,
           metadata: {
             airwallex: {
               beneficiaryId: beneficiary.id,
@@ -128,9 +136,14 @@ export async function POST(request: NextRequest) {
           }
         }
         
+        // Apply name formatting rules
+        const supplierData = formatSupplierNames(baseSupplierData)
+        
         if (existingSupplier) {
           // Update existing supplier (environment-aware)
           if (useSupabase) {
+            console.log(`🔄 Updating existing supplier: ${beneficiary.email} (ID: ${existingSupplier.id})`)
+            
             const { data: updatedSupplier, error: updateError } = await supabase
               .from('suppliers')
               .update(supplierData)
@@ -138,7 +151,12 @@ export async function POST(request: NextRequest) {
               .select()
               .single()
             
-            if (updateError) throw updateError
+            if (updateError) {
+              console.error(`❌ Update error for ${beneficiary.email}:`, updateError)
+              throw updateError
+            }
+            
+            console.log(`✅ Successfully updated supplier: ${updatedSupplier.id}`)
             updated++
             syncedSuppliers.push(updatedSupplier)
           } else {
@@ -153,13 +171,32 @@ export async function POST(request: NextRequest) {
         } else {
           // Create new supplier (environment-aware)
           if (useSupabase) {
+            console.log(`🚀 Attempting to create supplier: ${beneficiary.email}`)
+            console.log(`📝 Data to insert:`, {
+              first_name: supplierData.first_name,
+              last_name: supplierData.last_name,
+              email: supplierData.email,
+              status: supplierData.status,
+              is_active: supplierData.is_active
+            })
+            
             const { data: newSupplier, error: insertError } = await supabase
               .from('suppliers')
               .insert(supplierData)
               .select()
               .single()
             
-            if (insertError) throw insertError
+            if (insertError) {
+              console.error(`❌ Insert error for ${beneficiary.email}:`, {
+                message: insertError.message,
+                code: insertError.code,
+                hint: insertError.hint,
+                details: insertError.details
+              })
+              throw insertError
+            }
+            
+            console.log(`✅ Successfully created supplier: ${newSupplier.id}`)
             created++
             syncedSuppliers.push(newSupplier)
           } else {
@@ -174,11 +211,16 @@ export async function POST(request: NextRequest) {
         
       } catch (error: any) {
         errors++
-        console.error(`Error processing beneficiary ${beneficiary.id}:`, error)
+        console.error(`❌ Error processing beneficiary ${beneficiary.id} (${beneficiary.email}):`, {
+          message: error.message,
+          code: error.code,
+          stack: useSupabase ? undefined : error.stack
+        })
         errorDetails.push({
           beneficiaryId: beneficiary.id,
           email: beneficiary.email,
-          error: error.message
+          error: error.message,
+          errorCode: error.code
         })
       }
     }

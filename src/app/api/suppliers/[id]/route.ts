@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/db"
+import { createClient } from '@supabase/supabase-js'
+import { formatSupplierNames } from '@/lib/name-formatter'
 
-const prisma = new PrismaClient()
+// Environment-aware database client
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+
+// Initialize Supabase client for production
+let supabase: any = null
+if (useSupabase) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  supabase = createClient(supabaseUrl, supabaseServiceKey)
+}
 
 export async function GET(
   req: NextRequest,
@@ -15,11 +26,53 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const supplier = await prisma.supplier.findUnique({
-      where: {
-        id: params.id
+    // Get supplier (environment-aware)
+    let supplier
+    if (useSupabase) {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('id', params.id)
+        .single()
+      
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return NextResponse.json(
+            { error: "Supplier not found" },
+            { status: 404 }
+          )
+        }
+        throw error
       }
-    })
+      
+      // Transform snake_case to camelCase for frontend
+      supplier = {
+        id: data.id,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        company: data.company,
+        vatNumber: data.vat_number,
+        address: data.address,
+        city: data.city,
+        postalCode: data.postal_code,
+        country: data.country,
+        status: data.status,
+        isActive: data.is_active,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        airwallexBeneficiaryId: data.airwallex_beneficiary_id,
+        airwallexSyncStatus: data.airwallex_sync_status,
+        airwallexLastSyncAt: data.airwallex_last_sync_at
+      }
+    } else {
+      supplier = await prisma.supplier.findUnique({
+        where: {
+          id: params.id
+        }
+      })
+    }
 
     if (!supplier) {
       return NextResponse.json(
@@ -74,33 +127,68 @@ export async function PUT(
       )
     }
 
-    const supplier = await prisma.supplier.update({
-      where: {
-        id: params.id
-      },
-      data: {
-        firstName,
-        lastName,
-        email,
-        phone: phone || null,
-        company: company || null,
-        vatNumber: vatNumber || null,
-        address: address || null,
-        city: city || null,
-        postalCode: postalCode || null,
-        country: country || null,
-        proofOfAddressUrl: proofOfAddress?.url || null,
-        proofOfAddressName: proofOfAddress?.name || null,
-        proofOfAddressType: proofOfAddress?.type || null,
-        proofOfAddressSize: proofOfAddress?.size || null,
-        idDocumentUrl: idDocument?.url || null,
-        idDocumentName: idDocument?.name || null,
-        idDocumentType: idDocument?.type || null,
-        idDocumentSize: idDocument?.size || null,
-        isActive: isActive !== undefined ? isActive : true,
-        status: isActive === false ? 'INACTIVE' : 'ACTIVE'
-      }
-    })
+    // Prepare update data with environment-aware field names
+    const baseUpdateData = useSupabase ? {
+      // Supabase uses snake_case
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      phone: phone || null,
+      company: company || null,
+      vat_number: vatNumber || null,
+      address: address || null,
+      city: city || null,
+      postal_code: postalCode || null,
+      country: country || null,
+      is_active: isActive !== undefined ? isActive : true,
+      status: isActive === false ? 'INACTIVE' : 'ACTIVE'
+    } : {
+      // Prisma uses camelCase
+      firstName,
+      lastName,
+      email,
+      phone: phone || null,
+      company: company || null,
+      vatNumber: vatNumber || null,
+      address: address || null,
+      city: city || null,
+      postalCode: postalCode || null,
+      country: country || null,
+      proofOfAddressUrl: proofOfAddress?.url || null,
+      proofOfAddressName: proofOfAddress?.name || null,
+      proofOfAddressType: proofOfAddress?.type || null,
+      proofOfAddressSize: proofOfAddress?.size || null,
+      idDocumentUrl: idDocument?.url || null,
+      idDocumentName: idDocument?.name || null,
+      idDocumentType: idDocument?.type || null,
+      idDocumentSize: idDocument?.size || null,
+      isActive: isActive !== undefined ? isActive : true,
+      status: isActive === false ? 'INACTIVE' : 'ACTIVE'
+    }
+    
+    // Apply name formatting
+    const updateData = formatSupplierNames(baseUpdateData)
+    
+    // Update supplier (environment-aware)
+    let supplier
+    if (useSupabase) {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .update(updateData)
+        .eq('id', params.id)
+        .select()
+        .single()
+      
+      if (error) throw error
+      supplier = data
+    } else {
+      supplier = await prisma.supplier.update({
+        where: {
+          id: params.id
+        },
+        data: updateData
+      })
+    }
 
     return NextResponse.json(supplier)
   } catch (error: any) {
@@ -138,11 +226,21 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await prisma.supplier.delete({
-      where: {
-        id: params.id
-      }
-    })
+    // Delete supplier (environment-aware)
+    if (useSupabase) {
+      const { error } = await supabase
+        .from('suppliers')
+        .delete()
+        .eq('id', params.id)
+      
+      if (error) throw error
+    } else {
+      await prisma.supplier.delete({
+        where: {
+          id: params.id
+        }
+      })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

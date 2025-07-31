@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { AirwallexClientStandalone } from '@/lib/airwallex-client-standalone'
 import { createClient } from '@supabase/supabase-js'
+import { formatSupplierNames } from '@/lib/name-formatter'
 
 export async function POST() {
   const logs: string[] = []
@@ -37,13 +38,16 @@ export async function POST() {
       return NextResponse.json({ success: true, logs, skipped: true, supplierId: existing.id })
     }
     
-    // Create supplier with absolute minimum fields
-    const supplierData = {
+    // Create supplier with absolute minimum fields and name formatting
+    const baseSupplierData = {
       first_name: beneficiary.first_name || 'Unknown',
       last_name: beneficiary.last_name || 'User', 
       email: beneficiary.email,
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      is_active: true
     }
+    
+    const supplierData = formatSupplierNames(baseSupplierData)
     
     const { data: newSupplier, error } = await supabase
       .from('suppliers')

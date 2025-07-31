@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { createClient } from '@supabase/supabase-js'
+import { formatSupplierNames } from '@/lib/name-formatter'
 
 // Environment-aware database client
 // Use Supabase if we have the URL configured (production), otherwise use Prisma (local)
@@ -119,8 +120,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Create supplier data with environment-aware field names
-    const supplierData = useSupabase ? {
+    // Create supplier data with environment-aware field names and name formatting
+    const baseSupplierData = useSupabase ? {
       // Supabase uses snake_case
       first_name: firstName,
       last_name: lastName,
@@ -132,7 +133,8 @@ export async function POST(req: NextRequest) {
       city: city || null,
       postal_code: postalCode || null,
       country: country || null,
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      is_active: true
     } : {
       // Prisma uses camelCase
       firstName,
@@ -146,6 +148,7 @@ export async function POST(req: NextRequest) {
       postalCode: postalCode || null,
       country: country || null,
       status: 'ACTIVE',
+      isActive: true,
       metadata: {
         documents: {
           proofOfAddress: proofOfAddress ? {
@@ -163,6 +166,9 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+    
+    // Apply name formatting rules
+    const supplierData = formatSupplierNames(baseSupplierData)
     
     // Create supplier (environment-aware)
     let supplier
