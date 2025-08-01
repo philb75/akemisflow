@@ -47,6 +47,11 @@ interface Supplier {
   postalCode?: string
   country?: string
   
+  // Personal details (requested fields)
+  birthDate?: string
+  birthPlace?: string
+  position?: string
+  
   // Airwallex fields
   airwallexBeneficiaryId?: string
   airwallexEntityType?: string
@@ -481,68 +486,230 @@ export default function SuppliersPage() {
                 </div>
                 
                 {isEditing ? (
-                  <div className="space-y-4">
-                    {/* Editable form fields */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">First Name</label>
-                        <input
-                          type="text"
-                          value={editFormData.firstName || ''}
-                          onChange={(e) => setEditFormData({...editFormData, firstName: e.target.value})}
-                          className="w-full px-3 py-2 border rounded-md text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Last Name</label>
-                        <input
-                          type="text"
-                          value={editFormData.lastName || ''}
-                          onChange={(e) => setEditFormData({...editFormData, lastName: e.target.value})}
-                          className="w-full px-3 py-2 border rounded-md text-sm"
-                        />
-                      </div>
-                    </div>
-                    
+                  <div className="space-y-6">
+                    {/* Personal Information */}
                     <div>
-                      <label className="block text-sm font-medium mb-1">Email</label>
-                      <input
-                        type="email"
-                        value={editFormData.email || ''}
-                        onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
-                        className="w-full px-3 py-2 border rounded-md text-sm"
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Phone</label>
-                        <input
-                          type="text"
-                          value={editFormData.phone || ''}
-                          onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-blue-700">
+                        <Users className="w-4 h-4" />
+                        Personal Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">First Name *</label>
+                          <input
+                            type="text"
+                            value={editFormData.firstName || ''}
+                            onChange={(e) => setEditFormData({...editFormData, firstName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Last Name *</label>
+                          <input
+                            type="text"
+                            value={editFormData.lastName || ''}
+                            onChange={(e) => setEditFormData({...editFormData, lastName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Email *</label>
+                          <input
+                            type="email"
+                            value={editFormData.email || ''}
+                            onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Phone</label>
+                          <input
+                            type="tel"
+                            value={editFormData.phone || ''}
+                            onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Birth Date</label>
+                          <input
+                            type="date"
+                            value={editFormData.birthDate || ''}
+                            onChange={(e) => setEditFormData({...editFormData, birthDate: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Birth Place</label>
+                          <input
+                            type="text"
+                            value={editFormData.birthPlace || ''}
+                            onChange={(e) => setEditFormData({...editFormData, birthPlace: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium mb-1">Position</label>
+                        <textarea
+                          value={editFormData.position || ''}
+                          onChange={(e) => setEditFormData({...editFormData, position: e.target.value})}
                           className="w-full px-3 py-2 border rounded-md text-sm"
+                          rows={2}
+                          placeholder="Job title, role, or position"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Company</label>
-                        <input
-                          type="text"
-                          value={editFormData.company || ''}
-                          onChange={(e) => setEditFormData({...editFormData, company: e.target.value})}
-                          className="w-full px-3 py-2 border rounded-md text-sm"
-                        />
+                    </div>
+
+                    {/* Address Information */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-green-700">
+                        <MapPin className="w-4 h-4" />
+                        Address Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Address</label>
+                          <input
+                            type="text"
+                            value={editFormData.address || ''}
+                            onChange={(e) => setEditFormData({...editFormData, address: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">City</label>
+                          <input
+                            type="text"
+                            value={editFormData.city || ''}
+                            onChange={(e) => setEditFormData({...editFormData, city: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">ZIP Code</label>
+                          <input
+                            type="text"
+                            value={editFormData.postalCode || ''}
+                            onChange={(e) => setEditFormData({...editFormData, postalCode: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Country</label>
+                          <input
+                            type="text"
+                            value={editFormData.country || ''}
+                            onChange={(e) => setEditFormData({...editFormData, country: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Company Information */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-purple-700">
+                        <Building className="w-4 h-4" />
+                        Company Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Company</label>
+                          <input
+                            type="text"
+                            value={editFormData.company || ''}
+                            onChange={(e) => setEditFormData({...editFormData, company: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">VAT Number</label>
+                          <input
+                            type="text"
+                            value={editFormData.vatNumber || ''}
+                            onChange={(e) => setEditFormData({...editFormData, vatNumber: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Banking Information */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-orange-700">
+                        <CreditCard className="w-4 h-4" />
+                        Banking Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Account Name</label>
+                          <input
+                            type="text"
+                            value={editFormData.bankAccountName || ''}
+                            onChange={(e) => setEditFormData({...editFormData, bankAccountName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Account Number</label>
+                          <input
+                            type="text"
+                            value={editFormData.bankAccountNumber || ''}
+                            onChange={(e) => setEditFormData({...editFormData, bankAccountNumber: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Currency</label>
+                          <input
+                            type="text"
+                            value={editFormData.bankAccountCurrency || ''}
+                            onChange={(e) => setEditFormData({...editFormData, bankAccountCurrency: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Bank Name</label>
+                          <input
+                            type="text"
+                            value={editFormData.bankName || ''}
+                            onChange={(e) => setEditFormData({...editFormData, bankName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">SWIFT/BIC</label>
+                          <input
+                            type="text"
+                            value={editFormData.swiftCode || ''}
+                            onChange={(e) => setEditFormData({...editFormData, swiftCode: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">IBAN</label>
+                          <input
+                            type="text"
+                            value={editFormData.iban || ''}
+                            onChange={(e) => setEditFormData({...editFormData, iban: e.target.value})}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="flex space-x-2 pt-4">
+                    <div className="flex space-x-2 pt-4 border-t">
                       <Button 
                         size="sm" 
                         onClick={() => handleSaveSupplier(supplier.id)}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <Save className="w-4 h-4 mr-1" />
-                        Save
+                        Save All Changes
                       </Button>
                       <Button 
                         size="sm" 
@@ -551,11 +718,22 @@ export default function SuppliersPage() {
                       >
                         Cancel
                       </Button>
+                      {supplier.airwallexBeneficiaryId && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {/* TODO: Implement individual sync */}}
+                          className="text-orange-600 hover:text-orange-700"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-1" />
+                          Sync with Airwallex
+                        </Button>
+                      )}
                       <Button 
                         size="sm" 
                         variant="outline"
                         onClick={() => handleDeleteSupplier(supplier.id)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 ml-auto"
                       >
                         <Trash2 className="w-4 h-4 mr-1" />
                         Delete
@@ -563,17 +741,78 @@ export default function SuppliersPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-3 text-sm">
-                    <div><strong>Name:</strong> {supplier.firstName} {supplier.lastName}</div>
-                    <div><strong>Email:</strong> {supplier.email}</div>
-                    <div><strong>Phone:</strong> {supplier.phone || '-'}</div>
-                    <div><strong>Company:</strong> {supplier.company || '-'}</div>
-                    <div><strong>VAT Number:</strong> {supplier.vatNumber || '-'}</div>
-                    <div><strong>Address:</strong> {supplier.address || '-'}</div>
-                    <div><strong>City:</strong> {supplier.city || '-'}</div>
-                    <div><strong>Country:</strong> {supplier.country || '-'}</div>
-                    <div><strong>Status:</strong> {supplier.isActive ? 'Active' : 'Inactive'}</div>
-                    <div><strong>Created:</strong> {new Date(supplier.createdAt).toLocaleString()}</div>
+                  <div className="space-y-6">
+                    {/* Personal Information Section */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-blue-700">
+                        <Users className="w-4 h-4" />
+                        Personal Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><strong>First Name:</strong> {supplier.firstName}</div>
+                        <div><strong>Last Name:</strong> {supplier.lastName}</div>
+                        <div><strong>Email:</strong> {supplier.email}</div>
+                        <div><strong>Phone:</strong> {supplier.phone || '-'}</div>
+                        <div><strong>Birth Date:</strong> {supplier.birthDate || '-'}</div>
+                        <div><strong>Birth Place:</strong> {supplier.birthPlace || '-'}</div>
+                        <div><strong>Position:</strong> {supplier.position || '-'}</div>
+                        <div><strong>Status:</strong> {supplier.isActive ? 'Active' : 'Inactive'}</div>
+                      </div>
+                    </div>
+
+                    {/* Address Information Section */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-green-700">
+                        <MapPin className="w-4 h-4" />
+                        Address Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><strong>Address:</strong> {supplier.address || '-'}</div>
+                        <div><strong>City:</strong> {supplier.city || '-'}</div>
+                        <div><strong>ZIP Code:</strong> {supplier.postalCode || '-'}</div>
+                        <div><strong>Country:</strong> {supplier.country || '-'}</div>
+                      </div>
+                    </div>
+
+                    {/* Company Information Section */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-purple-700">
+                        <Building className="w-4 h-4" />
+                        Company Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><strong>Company:</strong> {supplier.company || '-'}</div>
+                        <div><strong>VAT Number:</strong> {supplier.vatNumber || '-'}</div>
+                      </div>
+                    </div>
+
+                    {/* Banking Information Section */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-orange-700">
+                        <CreditCard className="w-4 h-4" />
+                        Banking Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><strong>Account Name:</strong> {supplier.bankAccountName || '-'}</div>
+                        <div><strong>Account Number:</strong> {supplier.bankAccountNumber || '-'}</div>
+                        <div><strong>Currency:</strong> {supplier.bankAccountCurrency || '-'}</div>
+                        <div><strong>Bank Name:</strong> {supplier.bankName || '-'}</div>
+                        <div><strong>SWIFT/BIC:</strong> {supplier.swiftCode || '-'}</div>
+                        <div><strong>IBAN:</strong> {supplier.iban || '-'}</div>
+                      </div>
+                    </div>
+
+                    {/* System Information Section */}
+                    <div>
+                      <h4 className="flex items-center gap-2 text-md font-semibold mb-3 text-gray-700">
+                        <Database className="w-4 h-4" />
+                        System Information
+                      </h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div><strong>Created:</strong> {new Date(supplier.createdAt).toLocaleString()}</div>
+                        <div><strong>Last Update:</strong> {new Date(supplier.updatedAt).toLocaleString()}</div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
