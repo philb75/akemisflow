@@ -15,8 +15,14 @@
     "src/app/api/upload/route.ts": {
       "maxDuration": 30
     },
+    "src/app/api/documents/upload/route.ts": {
+      "maxDuration": 30
+    },
     "src/app/api/suppliers/route.ts": {
       "maxDuration": 30
+    },
+    "src/app/api/suppliers/sync-airwallex/route.ts": {
+      "maxDuration": 60
     }
   }
 }
