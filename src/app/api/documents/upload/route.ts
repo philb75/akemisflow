@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     // Check upload permission
     const uploadPermission = await checkUploadPermission(
       session.user.id,
-      entityType as 'entity' | 'contractor' | 'invoice',
+      entityType as 'entity' | 'contractor' | 'invoice' | 'supplier',
       entityId
     )
     
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Generate storage path
     const storagePath = generateStoragePath(
-      entityType as 'entity' | 'contractor' | 'invoice',
+      entityType as 'entity' | 'contractor' | 'invoice' | 'supplier',
       entityId,
       file.name
     )
@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
         // Set the appropriate relation based on entity type
         ...(entityType === 'entity' && { contactId: entityId }),
         ...(entityType === 'contractor' && { supplierId: entityId }),
+        ...(entityType === 'supplier' && { supplierId: entityId }),
         ...(entityType === 'invoice' && { invoiceId: entityId })
       }
     })

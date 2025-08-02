@@ -39,6 +39,7 @@ export interface SupplierData {
   
   // Airwallex Integration
   airwallexBeneficiaryId?: string      // ✅ Airwallex: id
+  airwallexContactId?: string          // ✅ Airwallex contact ID stored in AkemisFlow
   airwallexEntityType?: 'COMPANY' | 'PERSONAL'  // ✅ Airwallex: entity_type
   airwallexSyncStatus?: 'NONE' | 'PENDING' | 'SYNCED' | 'ERROR'
   airwallexLastSyncAt?: string

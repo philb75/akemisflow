@@ -65,7 +65,7 @@ interface Document {
 }
 
 interface DocumentListProps {
-  entityType?: 'entity' | 'contractor' | 'invoice'
+  entityType?: 'entity' | 'contractor' | 'invoice' | 'supplier' | 'contact' | 'client'
   entityId?: string
   onDocumentDeleted?: (documentId: string) => void
 }
@@ -106,7 +106,25 @@ export function DocumentList({
   }
 
   const handleDownload = async (documentId: string) => {
-    window.open(`/api/documents/${documentId}/download`, '_blank')
+    try {
+      window.open(`/api/documents/${documentId}/download`, '_blank')
+    } catch (error) {
+      console.error('Error opening document:', error)
+    }
+  }
+
+  const handleView = async (documentId: string) => {
+    try {
+      // Check if document exists first
+      const response = await fetch(`/api/documents/${documentId}`)
+      if (response.ok) {
+        window.open(`/api/documents/${documentId}/download`, '_blank')
+      } else {
+        console.error('Document not found or not accessible')
+      }
+    } catch (error) {
+      console.error('Error viewing document:', error)
+    }
   }
 
   const handleDelete = async () => {
@@ -239,7 +257,7 @@ export function DocumentList({
                         <Download className="mr-2 h-4 w-4" />
                         Download
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => window.open(`/api/documents/${document.id}/download`, '_blank')}>
+                      <DropdownMenuItem onClick={() => handleView(document.id)}>
                         <Eye className="mr-2 h-4 w-4" />
                         View
                       </DropdownMenuItem>

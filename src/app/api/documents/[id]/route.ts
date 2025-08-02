@@ -6,9 +6,9 @@ import { getStorageProvider } from '@/lib/storage'
 import { checkDocumentAccess, checkDeletePermission, checkVerifyPermission } from '@/middleware/document-security'
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 // GET /api/documents/[id] - Get document details
@@ -22,8 +22,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
+    const { id } = await params
+
     const document = await prisma.document.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         uploadedBy: {
           select: {
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check document access permission
-    const accessCheck = await checkDocumentAccess(session.user.id, params.id)
+    const accessCheck = await checkDocumentAccess(session.user.id, id)
     
     if (!accessCheck.allowed) {
       return NextResponse.json(
@@ -80,8 +82,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       )
     }
 
+    const { id } = await params
+
     const document = await prisma.document.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!document) {
@@ -92,7 +96,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check delete permission
-    const deletePermission = await checkDeletePermission(session.user.id, params.id)
+    const deletePermission = await checkDeletePermission(session.user.id, id)
     
     if (!deletePermission.allowed) {
       return NextResponse.json(
@@ -107,7 +111,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     // Soft delete in database
     await prisma.document.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         deletedAt: new Date(),
         isActive: false
@@ -135,11 +139,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       )
     }
 
+    const { id } = await params
+
     const body = await request.json()
     const { description, expiryDate, isVerified, tags } = body
+    
+    const isAdmin = session.user.role === 'ADMINISTRATOR'
 
     const document = await prisma.document.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!document) {
@@ -150,7 +158,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check document access permission
-    const accessCheck = await checkDocumentAccess(session.user.id, params.id)
+    const accessCheck = await checkDocumentAccess(session.user.id, id)
     
     if (!accessCheck.allowed) {
       return NextResponse.json(
@@ -161,7 +169,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Check verify permission if trying to verify
     if (isVerified !== undefined) {
-      const verifyPermission = await checkVerifyPermission(session.user.id, params.id)
+      const verifyPermission = await checkVerifyPermission(session.user.id, id)
       
       if (!verifyPermission.allowed) {
         return NextResponse.json(
@@ -173,7 +181,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Update document
     const updatedDocument = await prisma.document.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(description !== undefined && { description }),
         ...(expiryDate !== undefined && { expiryDate: expiryDate ? new Date(expiryDate) : null }),

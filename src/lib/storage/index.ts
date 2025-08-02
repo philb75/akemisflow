@@ -94,7 +94,7 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
 }
 
 export function generateStoragePath(
-  type: 'entity' | 'contractor' | 'invoice',
+  type: 'entity' | 'contractor' | 'invoice' | 'supplier',
   id: string,
   filename: string
 ): string {
@@ -108,6 +108,8 @@ export function generateStoragePath(
       return `contractors/${id}/${timestamp}-${sanitizedFilename}`
     case 'invoice':
       return `invoices/${id}/${timestamp}-${sanitizedFilename}`
+    case 'supplier':
+      return `suppliers/${id}/${timestamp}-${sanitizedFilename}`
     default:
       return `misc/${timestamp}-${sanitizedFilename}`
   }

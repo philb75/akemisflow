@@ -1,0 +1,228 @@
+import { PrismaClient } from '@prisma/client'
+import { readFileSync } from 'fs'
+import { join } from 'path'
+import { formatSupplierNames } from '../src/lib/name-formatter'
+
+const prisma = new PrismaClient()
+
+interface BackupSupplier {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  company?: string
+  address?: string
+  city?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  countryCode?: string
+  beneficiaryId?: string
+  entityType?: string
+  lastSyncAt?: string
+  payerEntityType?: string
+  paymentMethods?: string
+  rawData?: any
+  syncError?: string
+  syncStatus?: string
+  bankAccountCurrency?: string
+  bankAccountName?: string
+  bankAccountNumber?: string
+  bankCountryCode?: string
+  bankName?: string
+  iban?: string
+  swiftCode?: string
+  localClearingSystem?: string
+  businessRegistrationNumber?: string
+  businessRegistrationType?: string
+  legalRepFirstName?: string
+  legalRepLastName?: string
+  legalRepEmail?: string
+  legalRepMobileNumber?: string
+  legalRepAddress?: string
+  legalRepCity?: string
+  legalRepState?: string
+  legalRepPostalCode?: string
+  legalRepCountryCode?: string
+  legalRepNationality?: string
+  legalRepOccupation?: string
+  legalRepIdType?: string
+  personalEmail?: string
+  personalIdNumber?: string
+  personalNationality?: string
+  personalOccupation?: string
+  personalFirstNameChinese?: string
+  personalLastNameChinese?: string
+}
+
+interface BackupData {
+  timestamp: string
+  totalSuppliers: number
+  suppliers: BackupSupplier[]
+}
+
+async function restoreAirwallexData() {
+  console.log('🔄 Starting Airwallex data restoration...')
+  
+  try {
+    // Read backup file
+    const backupPath = join(process.cwd(), 'airwallex-data-backup.json')
+    const backupContent = readFileSync(backupPath, 'utf-8')
+    const backupData: BackupData = JSON.parse(backupContent)
+    
+    console.log(`📁 Loaded backup from: ${backupPath}`)
+    console.log(`📊 Backup timestamp: ${backupData.timestamp}`)
+    console.log(`📦 Found ${backupData.suppliers.length} suppliers to restore`)
+    
+    let restoredCount = 0
+    let errorCount = 0
+    let skippedCount = 0
+    
+    for (const supplier of backupData.suppliers) {
+      try {
+        // Skip if no beneficiary ID
+        if (!supplier.beneficiaryId) {
+          console.log(`⏭️  Skipping ${supplier.firstName} ${supplier.lastName} - no beneficiary ID`)
+          skippedCount++
+          continue
+        }
+        
+        // Check if this supplier still exists in the main table
+        const supplierExists = await prisma.supplier.findUnique({
+          where: { id: supplier.id }
+        })
+        
+        if (!supplierExists) {
+          console.log(`⚠️  Supplier ${supplier.firstName} ${supplier.lastName} no longer exists in main table`)
+          skippedCount++
+          continue
+        }
+        
+        // Check if already restored
+        const existingAirwallex = await prisma.airwallexSupplier.findUnique({
+          where: { beneficiaryId: supplier.beneficiaryId }
+        })
+        
+        if (existingAirwallex) {
+          console.log(`⏭️  Already exists: ${supplier.firstName} ${supplier.lastName}`)
+          skippedCount++
+          continue
+        }
+        
+        console.log(`📦 Restoring supplier: ${supplier.firstName} ${supplier.lastName} (${supplier.email})`)
+        
+        // Apply name formatting
+        const formattedNames = formatSupplierNames({
+          firstName: supplier.firstName,
+          lastName: supplier.lastName
+        })
+        
+        // Create AirwallexSupplier record
+        await prisma.airwallexSupplier.create({
+          data: {
+            beneficiaryId: supplier.beneficiaryId,
+            entityType: supplier.entityType || 'individual',
+            
+            // Personal information
+            firstName: formattedNames.firstName,
+            lastName: formattedNames.lastName,
+            email: supplier.email,
+            phone: supplier.phone,
+            company: supplier.company,
+            
+            // Address fields
+            address: supplier.address,
+            city: supplier.city,
+            state: supplier.state,
+            postalCode: supplier.postalCode,
+            countryCode: supplier.countryCode,
+            
+            // Banking fields
+            bankAccountName: supplier.bankAccountName,
+            bankAccountNumber: supplier.bankAccountNumber,
+            bankName: supplier.bankName,
+            bankCountryCode: supplier.bankCountryCode,
+            currency: supplier.bankAccountCurrency,
+            iban: supplier.iban,
+            swiftCode: supplier.swiftCode,
+            localClearingSystem: supplier.localClearingSystem,
+            
+            // Business registration
+            businessRegistrationNumber: supplier.businessRegistrationNumber,
+            businessRegistrationType: supplier.businessRegistrationType,
+            
+            // Legal representative
+            legalRepFirstName: supplier.legalRepFirstName,
+            legalRepLastName: supplier.legalRepLastName,
+            legalRepEmail: supplier.legalRepEmail,
+            legalRepMobileNumber: supplier.legalRepMobileNumber,
+            legalRepAddress: supplier.legalRepAddress,
+            legalRepCity: supplier.legalRepCity,
+            legalRepState: supplier.legalRepState,
+            legalRepPostalCode: supplier.legalRepPostalCode,
+            legalRepCountryCode: supplier.legalRepCountryCode,
+            legalRepNationality: supplier.legalRepNationality,
+            legalRepOccupation: supplier.legalRepOccupation,
+            legalRepIdType: supplier.legalRepIdType,
+            
+            // Personal fields
+            personalEmail: supplier.personalEmail,
+            personalIdNumber: supplier.personalIdNumber,
+            personalNationality: supplier.personalNationality,
+            personalOccupation: supplier.personalOccupation,
+            personalFirstNameChinese: supplier.personalFirstNameChinese,
+            personalLastNameChinese: supplier.personalLastNameChinese,
+            
+            // Airwallex specific
+            paymentMethods: supplier.paymentMethods,
+            payerEntityType: supplier.payerEntityType,
+            status: supplier.syncStatus || 'ACTIVE',
+            rawData: supplier.rawData,
+            syncError: supplier.syncError,
+            
+            // Link to the original supplier
+            linkedSupplierId: supplier.id,
+            
+            // Set lastFetchedAt to the last sync time if available
+            lastFetchedAt: supplier.lastSyncAt ? new Date(supplier.lastSyncAt) : new Date(),
+          }
+        })
+        
+        restoredCount++
+        console.log(`✅ Successfully restored supplier ${supplier.firstName} ${supplier.lastName}`)
+        
+      } catch (error) {
+        errorCount++
+        console.error(`❌ Error restoring supplier ${supplier.firstName} ${supplier.lastName}:`, error)
+      }
+    }
+    
+    console.log(`\n📈 Restoration Summary:`)
+    console.log(`✅ Successfully restored: ${restoredCount} suppliers`)
+    console.log(`⏭️  Skipped: ${skippedCount} suppliers`)
+    console.log(`❌ Errors: ${errorCount} suppliers`)
+    
+    if (restoredCount > 0) {
+      console.log(`\n🎉 Restoration completed successfully!`)
+      console.log(`   The new separate table architecture is now in place.`)
+      console.log(`   You can now use the side-by-side comparison view.`)
+    }
+    
+  } catch (error) {
+    console.error('💥 Restoration failed:', error)
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
+// Main execution
+async function main() {
+  await restoreAirwallexData()
+}
+
+if (require.main === module) {
+  main().catch(console.error)
+}
+
+export { restoreAirwallexData }

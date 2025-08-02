@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Upload, X, File, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -19,7 +19,7 @@ import { DocumentType } from '@prisma/client'
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE } from '@/lib/storage'
 
 interface DocumentUploadProps {
-  entityType: 'entity' | 'contractor' | 'invoice'
+  entityType: 'entity' | 'contractor' | 'invoice' | 'supplier'
   entityId: string
   onSuccess?: (document: any) => void
   onError?: (error: string) => void
@@ -44,7 +44,17 @@ export function DocumentUpload({
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Cleanup preview URL on unmount or file change
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -62,8 +72,20 @@ export function DocumentUpload({
       return
     }
 
+    // Cleanup previous preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
     setFile(selectedFile)
     setError(null)
+    
+    // Create preview URL for images
+    if (selectedFile.type.startsWith('image/')) {
+      setPreviewUrl(URL.createObjectURL(selectedFile))
+    } else {
+      setPreviewUrl(null)
+    }
   }
 
   const handleUpload = async () => {
@@ -113,6 +135,10 @@ export function DocumentUpload({
       setDescription('')
       setExpiryDate('')
       setUploadProgress(0)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -189,6 +215,10 @@ export function DocumentUpload({
                 size="sm"
                 onClick={() => {
                   setFile(null)
+                  if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl)
+                    setPreviewUrl(null)
+                  }
                   if (fileInputRef.current) {
                     fileInputRef.current.value = ''
                   }
@@ -199,6 +229,22 @@ export function DocumentUpload({
               </Button>
             </div>
           )}
+          
+          {/* File preview for images */}
+          {file && file.type.startsWith('image/') && previewUrl && (
+            <div className="mt-2">
+              <img 
+                src={previewUrl} 
+                alt="Preview" 
+                className="max-w-xs max-h-48 rounded border"
+              />
+            </div>
+          )}
+          
+          {/* Allowed file types info */}
+          <div className="text-xs text-muted-foreground mt-1">
+            Allowed: PDF, Images (JPEG, PNG, GIF), Word, Excel, CSV • Max: 10MB
+          </div>
         </div>
       </div>
 

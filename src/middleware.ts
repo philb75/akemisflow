@@ -20,8 +20,9 @@ export async function middleware(req: NextRequest) {
   response.headers.set('X-DNS-Prefetch-Control', 'off')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
 
-  // Allow public paths (but NOT the root path)
+  // Allow public paths
   if (
+    pathname === '/' ||
     pathname.startsWith('/auth') || 
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/db-setup') ||

@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
 
     // Filter by entity
     if (entityType && entityId) {
-      if (entityType === 'entity') {
+      if (entityType === 'entity' || entityType === 'contact' || entityType === 'client') {
         where.contactId = entityId
-      } else if (entityType === 'contractor') {
+      } else if (entityType === 'contractor' || entityType === 'supplier') {
         where.supplierId = entityId
       } else if (entityType === 'invoice') {
         where.invoiceId = entityId

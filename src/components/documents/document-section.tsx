@@ -5,7 +5,7 @@ import { DocumentUpload } from './document-upload'
 import { DocumentList } from './document-list'
 
 interface DocumentSectionProps {
-  entityType: 'entity' | 'contractor' | 'invoice'
+  entityType: 'entity' | 'contractor' | 'invoice' | 'supplier'
   entityId: string
 }
 

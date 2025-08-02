@@ -229,7 +229,7 @@ export default async function SupplierDetailPage({ params }: SupplierDetailPageP
             </CardHeader>
             <CardContent className="space-y-6">
               <DocumentSection
-                entityType="contractor" 
+                entityType="supplier" 
                 entityId={supplier.id}
               />
             </CardContent>

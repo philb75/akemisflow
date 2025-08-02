@@ -303,71 +303,134 @@ model PartnerProfitShare {
 }
 
 model Supplier {
-  id                         String         @id @default(uuid()) @db.Uuid
-  firstName                  String         @map("first_name") @db.VarChar(100)
-  lastName                   String         @map("last_name") @db.VarChar(100)
-  email                      String         @unique @db.VarChar(255)
-  phone                      String?        @db.VarChar(50)
-  company                    String?        @db.VarChar(255)
-  vatNumber                  String?        @map("vat_number") @db.VarChar(100)
+  id                         String           @id @default(uuid()) @db.Uuid
+  firstName                  String           @map("first_name") @db.VarChar(100)
+  lastName                   String           @map("last_name") @db.VarChar(100)
+  email                      String           @unique @db.VarChar(255)
+  phone                      String?          @db.VarChar(50)
+  company                    String?          @db.VarChar(255)
+  vatNumber                  String?          @map("vat_number") @db.VarChar(100)
   address                    String?
-  city                       String?        @db.VarChar(100)
-  postalCode                 String?        @map("postal_code") @db.VarChar(20)
-  country                    String?        @db.VarChar(100)
-  proofOfAddressUrl          String?        @map("proof_of_address_url") @db.VarChar(500)
-  proofOfAddressName         String?        @map("proof_of_address_name") @db.VarChar(255)
-  proofOfAddressType         String?        @map("proof_of_address_type") @db.VarChar(50)
-  proofOfAddressSize         Int?           @map("proof_of_address_size")
-  idDocumentUrl              String?        @map("id_document_url") @db.VarChar(500)
-  idDocumentName             String?        @map("id_document_name") @db.VarChar(255)
-  idDocumentType             String?        @map("id_document_type") @db.VarChar(50)
-  idDocumentSize             Int?           @map("id_document_size")
-  status                     SupplierStatus @default(ACTIVE)
-  isActive                   Boolean        @default(true) @map("is_active")
-  createdAt                  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                  DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
-  addressCountryCode         String?        @map("address_country_code") @db.VarChar(2)
-  addressState               String?        @map("address_state") @db.VarChar(100)
-  airwallexBeneficiaryId     String?        @unique @map("airwallex_beneficiary_id") @db.VarChar(255)
-  airwallexEntityType        String?        @map("airwallex_entity_type") @db.VarChar(20)
-  airwallexLastSyncAt        DateTime?      @map("airwallex_last_sync_at") @db.Timestamptz(6)
-  airwallexPayerEntityType   String?        @map("airwallex_payer_entity_type") @db.VarChar(20)
-  airwallexPaymentMethods    String?        @map("airwallex_payment_methods") @db.VarChar(500)
-  airwallexRawData           Json?          @map("airwallex_raw_data")
-  airwallexSyncError         String?        @map("airwallex_sync_error")
-  airwallexSyncStatus        String?        @default("NONE") @map("airwallex_sync_status") @db.VarChar(20)
-  bankAccountCurrency        String?        @map("bank_account_currency") @db.VarChar(3)
-  bankAccountName            String?        @map("bank_account_name") @db.VarChar(255)
-  bankAccountNumber          String?        @map("bank_account_number") @db.VarChar(100)
-  bankCountryCode            String?        @map("bank_country_code") @db.VarChar(2)
-  bankName                   String?        @map("bank_name") @db.VarChar(255)
-  businessRegistrationNumber String?        @map("business_registration_number") @db.VarChar(100)
-  businessRegistrationType   String?        @map("business_registration_type") @db.VarChar(100)
-  iban                       String?        @db.VarChar(34)
-  legalRepAddress            String?        @map("legal_rep_address")
-  legalRepCity               String?        @map("legal_rep_city") @db.VarChar(100)
-  legalRepCountryCode        String?        @map("legal_rep_country_code") @db.VarChar(2)
-  legalRepEmail              String?        @map("legal_rep_email") @db.VarChar(255)
-  legalRepFirstName          String?        @map("legal_rep_first_name") @db.VarChar(100)
-  legalRepIdType             String?        @map("legal_rep_id_type") @db.VarChar(50)
-  legalRepLastName           String?        @map("legal_rep_last_name") @db.VarChar(100)
-  legalRepMobileNumber       String?        @map("legal_rep_mobile_number") @db.VarChar(50)
-  legalRepNationality        String?        @map("legal_rep_nationality") @db.VarChar(100)
-  legalRepOccupation         String?        @map("legal_rep_occupation") @db.VarChar(255)
-  legalRepPostalCode         String?        @map("legal_rep_postal_code") @db.VarChar(20)
-  legalRepState              String?        @map("legal_rep_state") @db.VarChar(100)
-  localClearingSystem        String?        @map("local_clearing_system") @db.VarChar(100)
-  personalEmail              String?        @map("personal_email") @db.VarChar(255)
-  personalFirstNameChinese   String?        @map("personal_first_name_chinese") @db.VarChar(100)
-  personalIdNumber           String?        @map("personal_id_number") @db.VarChar(100)
-  personalLastNameChinese    String?        @map("personal_last_name_chinese") @db.VarChar(100)
-  personalNationality        String?        @map("personal_nationality") @db.VarChar(100)
-  personalOccupation         String?        @map("personal_occupation") @db.VarChar(255)
-  preferredCurrency          String?        @default("EUR") @map("preferred_currency") @db.VarChar(3)
-  swiftCode                  String?        @map("swift_code") @db.VarChar(20)
+  city                       String?          @db.VarChar(100)
+  postalCode                 String?          @map("postal_code") @db.VarChar(20)
+  country                    String?          @db.VarChar(100)
+  addressCountryCode         String?          @map("address_country_code") @db.VarChar(2)
+  addressState               String?          @map("address_state") @db.VarChar(100)
+  
+  // New comprehensive fields
+  birthDate                  DateTime?        @map("birth_date") @db.Date
+  birthPlace                 String?          @map("birth_place") @db.VarChar(255)
+  position                   String?          @db.VarChar(255)
+  nationality                String?          @db.VarChar(100)
+  
+  // Banking information (AkemisFlow specific)
+  bankAccountName            String?          @map("bank_account_name") @db.VarChar(255)
+  bankAccountNumber          String?          @map("bank_account_number") @db.VarChar(100)
+  bankName                   String?          @map("bank_name") @db.VarChar(255)
+  bankCountryCode            String?          @map("bank_country_code") @db.VarChar(2)
+  bankAccountCurrency        String?          @map("bank_account_currency") @db.VarChar(3)
+  iban                       String?          @db.VarChar(34)
+  swiftCode                  String?          @map("swift_code") @db.VarChar(20)
+  
+  // Document fields
+  proofOfAddressUrl          String?          @map("proof_of_address_url") @db.VarChar(500)
+  proofOfAddressName         String?          @map("proof_of_address_name") @db.VarChar(255)
+  proofOfAddressType         String?          @map("proof_of_address_type") @db.VarChar(50)
+  proofOfAddressSize         Int?             @map("proof_of_address_size")
+  idDocumentUrl              String?          @map("id_document_url") @db.VarChar(500)
+  idDocumentName             String?          @map("id_document_name") @db.VarChar(255)
+  idDocumentType             String?          @map("id_document_type") @db.VarChar(50)
+  idDocumentSize             Int?             @map("id_document_size")
+  
+  // Airwallex integration
+  airwallexContactId         String?          @map("airwallex_contact_id") @db.VarChar(255)
+  
+  // Status and metadata
+  status                     SupplierStatus   @default(ACTIVE)
+  isActive                   Boolean          @default(true) @map("is_active")
+  preferredCurrency          String?          @default("EUR") @map("preferred_currency") @db.VarChar(3)
+  createdAt                  DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relationships
   documents                  Document[]
+  airwallexSuppliers         AirwallexSupplier[]
 
   @@map("suppliers")
+}
+
+model AirwallexSupplier {
+  id                    String    @id @default(uuid()) @db.Uuid
+  beneficiaryId         String    @unique @map("beneficiary_id") @db.VarChar(255)
+  entityType            String?   @map("entity_type") @db.VarChar(20)
+  
+  // Personal information
+  firstName             String    @map("first_name") @db.VarChar(100)
+  lastName              String    @map("last_name") @db.VarChar(100)
+  email                 String    @db.VarChar(255)
+  phone                 String?   @db.VarChar(50)
+  company               String?   @db.VarChar(255)
+  
+  // Address fields
+  address               String?
+  city                  String?   @db.VarChar(100)
+  state                 String?   @db.VarChar(100)
+  postalCode            String?   @map("postal_code") @db.VarChar(20)
+  countryCode           String?   @map("country_code") @db.VarChar(2)
+  
+  // Banking fields
+  bankAccountName       String?   @map("bank_account_name") @db.VarChar(255)
+  bankAccountNumber     String?   @map("bank_account_number") @db.VarChar(100)
+  bankName              String?   @map("bank_name") @db.VarChar(255)
+  bankCountryCode       String?   @map("bank_country_code") @db.VarChar(2)
+  currency              String?   @db.VarChar(3)
+  iban                  String?   @db.VarChar(34)
+  swiftCode             String?   @map("swift_code") @db.VarChar(20)
+  localClearingSystem   String?   @map("local_clearing_system") @db.VarChar(100)
+  
+  // Business registration (for company entities)
+  businessRegistrationNumber String? @map("business_registration_number") @db.VarChar(100)
+  businessRegistrationType   String? @map("business_registration_type") @db.VarChar(100)
+  
+  // Legal representative (for company entities)
+  legalRepFirstName     String?   @map("legal_rep_first_name") @db.VarChar(100)
+  legalRepLastName      String?   @map("legal_rep_last_name") @db.VarChar(100)
+  legalRepEmail         String?   @map("legal_rep_email") @db.VarChar(255)
+  legalRepMobileNumber  String?   @map("legal_rep_mobile_number") @db.VarChar(50)
+  legalRepAddress       String?   @map("legal_rep_address")
+  legalRepCity          String?   @map("legal_rep_city") @db.VarChar(100)
+  legalRepState         String?   @map("legal_rep_state") @db.VarChar(100)
+  legalRepPostalCode    String?   @map("legal_rep_postal_code") @db.VarChar(20)
+  legalRepCountryCode   String?   @map("legal_rep_country_code") @db.VarChar(2)
+  legalRepNationality   String?   @map("legal_rep_nationality") @db.VarChar(100)
+  legalRepOccupation    String?   @map("legal_rep_occupation") @db.VarChar(255)
+  legalRepIdType        String?   @map("legal_rep_id_type") @db.VarChar(50)
+  
+  // Personal fields (for individual entities)
+  personalEmail         String?   @map("personal_email") @db.VarChar(255)
+  personalIdNumber      String?   @map("personal_id_number") @db.VarChar(100)
+  personalNationality   String?   @map("personal_nationality") @db.VarChar(100)
+  personalOccupation    String?   @map("personal_occupation") @db.VarChar(255)
+  personalFirstNameChinese String? @map("personal_first_name_chinese") @db.VarChar(100)
+  personalLastNameChinese  String? @map("personal_last_name_chinese") @db.VarChar(100)
+  
+  // Airwallex specific fields
+  paymentMethods        String?   @map("payment_methods") @db.VarChar(500)
+  capabilities          String?   @db.VarChar(500)
+  payerEntityType       String?   @map("payer_entity_type") @db.VarChar(20)
+  status                String    @db.VarChar(20)
+  rawData               Json?     @map("raw_data")
+  
+  // Sync tracking
+  lastFetchedAt         DateTime  @updatedAt @map("last_fetched_at") @db.Timestamptz(6)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  syncError             String?   @map("sync_error")
+  
+  // Relationship to AkemisFlow supplier
+  linkedSupplierId      String?   @map("linked_supplier_id") @db.Uuid
+  linkedSupplier        Supplier? @relation(fields: [linkedSupplierId], references: [id])
+  
+  @@map("airwallex_suppliers")
 }
 
 model ExchangeRate {

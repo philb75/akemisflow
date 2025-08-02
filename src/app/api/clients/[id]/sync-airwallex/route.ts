@@ -4,7 +4,7 @@ import { airwallexClientSync } from '@/lib/airwallex-client-sync'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,10 +13,12 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    console.log(`🔄 Starting Airwallex sync for client ${params.id}...`)
+    const { id } = await params
+
+    console.log(`🔄 Starting Airwallex sync for client ${id}...`)
     
     // Sync the individual client
-    const result = await airwallexClientSync.syncSingleClient(params.id)
+    const result = await airwallexClientSync.syncSingleClient(id)
     
     const response = {
       success: true,
@@ -30,7 +32,7 @@ export async function POST(
 
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    console.error(`❌ Client sync failed for ${params.id}:`, error)
+    console.error(`❌ Client sync failed for ${id}:`, error)
     
     return NextResponse.json({
       success: false,

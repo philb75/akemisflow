@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
         updatedAt: supplier.updated_at,
         // Airwallex fields
         airwallexBeneficiaryId: supplier.airwallex_beneficiary_id,
+        airwallexContactId: supplier.airwallex_contact_id,
         airwallexEntityType: supplier.airwallex_entity_type,
         airwallexLastSyncAt: supplier.airwallex_last_sync_at,
         airwallexSyncStatus: supplier.airwallex_sync_status,

@@ -1,0 +1,1614 @@
+{
+  "timestamp": "2025-08-01T19:22:55.713Z",
+  "totalSuppliers": 30,
+  "suppliers": [
+    {
+      "id": "afc9ef4a-9ded-40da-810e-35a06da6628a",
+      "firstName": "ADIL",
+      "lastName": "LOUSKI",
+      "email": "alouski@yahoo.fr",
+      "phone": null,
+      "company": null,
+      "address": "SIDI BELYOUT",
+      "city": "CASABLANCA",
+      "country": "Morocco",
+      "beneficiaryId": "18c85036-e698-49bb-933f-33d76011524a",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.104Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "CASABLANCA",
+            "postcode": "20000",
+            "country_code": "MA",
+            "street_address": "SIDI BELYOUT"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "CIH BANK",
+            "account_name": "ADIL LOUSKI",
+            "account_number": "230780312006421100180048",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "230"
+          },
+          "additional_info": {
+            "personal_email": "alouski@yahoo.fr"
+          }
+        },
+        "beneficiary_id": "18c85036-e698-49bb-933f-33d76011524a",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "ADIL LOUSKI",
+      "bankAccountNumber": "230780312006421100180048",
+      "bankCountryCode": "MA",
+      "bankName": "CIH BANK",
+      "iban": null,
+      "personalEmail": "alouski@yahoo.fr"
+    },
+    {
+      "id": "2d44fb7d-9976-494c-92c4-fe41034b81bf",
+      "firstName": "KABRAOUI",
+      "lastName": "YOUSSEF",
+      "email": "Youcef.kabraoui@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "HAY OULAD CHRIFA N 3",
+      "city": "TIFLET",
+      "country": "Morocco",
+      "beneficiaryId": "5148a0b7-d67f-4ef5-9dda-f0bf2feffaea",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.062Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "TIFLET",
+            "postcode": "15400",
+            "country_code": "MA",
+            "street_address": "HAY OULAD CHRIFA N 3"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "SGMB",
+            "account_name": "KABRAOUI YOUSSEF",
+            "account_number": "022815000335002780551363",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "022"
+          },
+          "additional_info": {
+            "personal_email": "Youcef.kabraoui@gmail.com"
+          }
+        },
+        "beneficiary_id": "5148a0b7-d67f-4ef5-9dda-f0bf2feffaea",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "KABRAOUI YOUSSEF",
+      "bankAccountNumber": "022815000335002780551363",
+      "bankCountryCode": "MA",
+      "bankName": "SGMB",
+      "iban": null,
+      "personalEmail": "Youcef.kabraoui@gmail.com"
+    },
+    {
+      "id": "9f1e8ce4-e1f5-4211-b258-8efc8661b921",
+      "firstName": "Ouyang",
+      "lastName": "Feiyun",
+      "email": "7d5c2f96-1e3b-455d-b06c-5ea571771c41@airwallex.placeholder",
+      "phone": null,
+      "company": null,
+      "address": "Building 3, Room 204, Dening Yuan Road",
+      "city": "Shanghai",
+      "country": "China",
+      "beneficiaryId": "7d5c2f96-1e3b-455d-b06c-5ea571771c41",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.085Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "nickname": "Denis Parshin",
+        "beneficiary": {
+          "address": {
+            "city": "Shanghai",
+            "state": "CN-SH",
+            "postcode": "201601",
+            "country_code": "CN",
+            "street_address": "Building 3, Room 204, Dening Yuan Road"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "The Hongkong and Shanghai Banking Corporation Limited",
+            "swift_code": "HSBCHKHH",
+            "account_name": "Ouyang Feiyun",
+            "account_number": "138856612833",
+            "account_currency": "USD",
+            "bank_country_code": "HK",
+            "local_clearing_system": "RTGS"
+          }
+        },
+        "beneficiary_id": "7d5c2f96-1e3b-455d-b06c-5ea571771c41",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "USD",
+      "bankAccountName": "Ouyang Feiyun",
+      "bankAccountNumber": "138856612833",
+      "bankCountryCode": "HK",
+      "bankName": "The Hongkong and Shanghai Banking Corporation Limited",
+      "iban": null,
+      "swiftCode": "HSBCHKHH",
+      "localClearingSystem": "RTGS"
+    },
+    {
+      "id": "48477f19-df22-40b6-a8b2-5742d4f546de",
+      "firstName": "Unknown",
+      "lastName": "COMIN'IT",
+      "email": "contact@cominav.com",
+      "phone": null,
+      "company": null,
+      "address": "101 BOULEVARD ZERKTOUNI",
+      "city": "CASABLANCA",
+      "country": "Morocco",
+      "beneficiaryId": "15a81a91-0d20-4d71-a05f-26de554a5f08",
+      "entityType": "COMPANY",
+      "lastSyncAt": "2025-07-31T08:46:26.091Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"SWIFT\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "CASABLANCA",
+            "postcode": "20100",
+            "country_code": "MA",
+            "street_address": "101 BOULEVARD ZERKTOUNI"
+          },
+          "entity_type": "COMPANY",
+          "bank_details": {
+            "bank_name": "BANQUE POPULAIRE AL HOCEIMA",
+            "swift_code": "BCPOMAMC",
+            "account_name": "COMIN'IT",
+            "account_number": "MA64190170212118014763710201",
+            "account_currency": "EUR",
+            "bank_country_code": "MA"
+          },
+          "additional_info": {
+            "personal_email": "contact@cominav.com"
+          }
+        },
+        "beneficiary_id": "15a81a91-0d20-4d71-a05f-26de554a5f08",
+        "payment_methods": [
+          "SWIFT"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "EUR",
+      "bankAccountName": "COMIN'IT",
+      "bankAccountNumber": "MA64190170212118014763710201",
+      "bankCountryCode": "MA",
+      "bankName": "BANQUE POPULAIRE AL HOCEIMA",
+      "iban": null,
+      "swiftCode": "BCPOMAMC",
+      "personalEmail": "contact@cominav.com"
+    },
+    {
+      "id": "284ef538-5ac6-4685-80b4-0f5f6fe17793",
+      "firstName": "MOSTAFA",
+      "lastName": "EL ALLIOUI",
+      "email": "mustaelallioui@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "LOT 3, RTE IMMOUZZER AIT SKATTO",
+      "city": "FES",
+      "country": "Morocco",
+      "beneficiaryId": "07bd4c1b-a2c2-4f2f-86c4-d75f4189e371",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.098Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "FES",
+            "postcode": "30090",
+            "country_code": "MA",
+            "street_address": "LOT 3, RTE IMMOUZZER AIT SKATTO"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "CIH BANK",
+            "account_name": "MOSTAFA EL ALLIOUI",
+            "account_number": "230270896224821100710001",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "230"
+          },
+          "additional_info": {
+            "personal_email": "mustaelallioui@gmail.com"
+          }
+        },
+        "beneficiary_id": "07bd4c1b-a2c2-4f2f-86c4-d75f4189e371",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MOSTAFA EL ALLIOUI",
+      "bankAccountNumber": "230270896224821100710001",
+      "bankCountryCode": "MA",
+      "bankName": "CIH BANK",
+      "iban": null,
+      "personalEmail": "mustaelallioui@gmail.com"
+    },
+    {
+      "id": "cb340874-6894-476a-bd3b-da865b7a010c",
+      "firstName": "Mademoiselle",
+      "lastName": "WADE NDEYE FATOU",
+      "email": "ndeyefatouwade@hotmail.com",
+      "phone": null,
+      "company": null,
+      "address": "11 Avenue Allary",
+      "city": "Limeil-Brévannes",
+      "country": "France",
+      "beneficiaryId": "a7c3de59-b5d9-4ab7-9ddf-9ded87cb9097",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.110Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"SWIFT\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Limeil-Brévannes",
+            "postcode": "94450",
+            "country_code": "FR",
+            "street_address": "11 Avenue Allary"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE DE DAKAR SA",
+            "swift_code": "BDKRSNDA",
+            "account_name": "Mademoiselle WADE NDEYE FATOU",
+            "account_number": "SN1910100300250152580168",
+            "account_currency": "EUR",
+            "bank_country_code": "SN"
+          },
+          "additional_info": {
+            "personal_email": "ndeyefatouwade@hotmail.com"
+          }
+        },
+        "beneficiary_id": "a7c3de59-b5d9-4ab7-9ddf-9ded87cb9097",
+        "payment_methods": [
+          "SWIFT"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "EUR",
+      "bankAccountName": "Mademoiselle WADE NDEYE FATOU",
+      "bankAccountNumber": "SN1910100300250152580168",
+      "bankCountryCode": "SN",
+      "bankName": "BANQUE DE DAKAR SA",
+      "iban": null,
+      "swiftCode": "BDKRSNDA",
+      "personalEmail": "ndeyefatouwade@hotmail.com"
+    },
+    {
+      "id": "98c332ad-c028-4432-965f-138c01d5d4ef",
+      "firstName": "MOHAMED",
+      "lastName": "JOUAHER",
+      "email": "mohamedjouaher@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "94-96 BD MOHAMED V",
+      "city": "BENI MELLAL",
+      "country": "Morocco",
+      "beneficiaryId": "73db6ed4-37da-4c63-b206-09847648df29",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.151Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "BENI MELLAL",
+            "postcode": "23020",
+            "country_code": "MA",
+            "street_address": "94-96 BD MOHAMED V"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "CIH BANK",
+            "account_name": "MOHAMED JOUAHER",
+            "account_number": "230090614760921402200031",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "230"
+          },
+          "additional_info": {
+            "personal_email": "mohamedjouaher@gmail.com"
+          }
+        },
+        "beneficiary_id": "73db6ed4-37da-4c63-b206-09847648df29",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MOHAMED JOUAHER",
+      "bankAccountNumber": "230090614760921402200031",
+      "bankCountryCode": "MA",
+      "bankName": "CIH BANK",
+      "iban": null,
+      "personalEmail": "mohamedjouaher@gmail.com"
+    },
+    {
+      "id": "652af4b3-1fb7-45ae-8877-d0c8ecc830b8",
+      "firstName": "Mary",
+      "lastName": "Hope E Sarrosa",
+      "email": "hopesarrosa@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Town and Country",
+      "city": "Talisay",
+      "country": "Philippines",
+      "beneficiaryId": "c30277e0-093d-4f55-bc8c-0f6d63d6a609",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.167Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "nickname": "HS BPI",
+        "beneficiary": {
+          "address": {
+            "city": "Talisay",
+            "postcode": "6115",
+            "country_code": "PH",
+            "street_address": "Town and Country"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BPI",
+            "swift_code": "BOPIPHMM",
+            "account_name": "Mary Hope E Sarrosa",
+            "account_number": "1770006909",
+            "account_currency": "PHP",
+            "bank_country_code": "PH"
+          },
+          "additional_info": {
+            "personal_email": "hopesarrosa@gmail.com"
+          }
+        },
+        "beneficiary_id": "c30277e0-093d-4f55-bc8c-0f6d63d6a609",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "PHP",
+      "bankAccountName": "Mary Hope E Sarrosa",
+      "bankAccountNumber": "1770006909",
+      "bankCountryCode": "PH",
+      "bankName": "BPI",
+      "iban": null,
+      "swiftCode": "BOPIPHMM",
+      "personalEmail": "hopesarrosa@gmail.com"
+    },
+    {
+      "id": "c40633b7-ca16-4ef2-8b8e-87efe42d4ef7",
+      "firstName": "ADNANE",
+      "lastName": "FARHANE",
+      "email": "Adnane.frm@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "50 Al Muqarrab St, Al Reem Island, 47817",
+      "city": "ABU DHABI",
+      "country": "AE",
+      "beneficiaryId": "b1458093-ec35-4a50-8371-63fe5af137e8",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.067Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "ABU DHABI",
+            "country_code": "AE",
+            "street_address": "50 Al Muqarrab St, Al Reem Island, 47817"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "iban": "AE400500000000018857509",
+            "bank_name": "Abu Dhabi Islamic Bank",
+            "swift_code": "ABDIAEAD",
+            "account_name": "ADNANE FARHANE",
+            "account_currency": "AED",
+            "bank_country_code": "AE"
+          },
+          "additional_info": {
+            "personal_email": "Adnane.frm@gmail.com"
+          }
+        },
+        "beneficiary_id": "b1458093-ec35-4a50-8371-63fe5af137e8",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "AED",
+      "bankAccountName": "ADNANE FARHANE",
+      "bankCountryCode": "AE",
+      "bankName": "Abu Dhabi Islamic Bank",
+      "iban": "AE400500000000018857509",
+      "swiftCode": "ABDIAEAD",
+      "personalEmail": "Adnane.frm@gmail.com"
+    },
+    {
+      "id": "40a4cc70-0ce5-4e49-b667-cc51b5a39a56",
+      "firstName": "MR",
+      "lastName": "DKHISSI KAMAL",
+      "email": "dkhissi.kamal@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Boulevard Idriss Al Akbar",
+      "city": "Oujda",
+      "country": "Morocco",
+      "beneficiaryId": "c13a043f-57e8-48f8-9ac5-8c67ce6a2c6e",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.133Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Oujda",
+            "postcode": "60000",
+            "country_code": "MA",
+            "street_address": "Boulevard Idriss Al Akbar"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE POPULAIRE TANGER TETOUAN",
+            "account_name": "MR DKHISSI KAMAL",
+            "account_number": "164720211113041366000948",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "164"
+          },
+          "additional_info": {
+            "personal_email": "dkhissi.kamal@gmail.com"
+          }
+        },
+        "beneficiary_id": "c13a043f-57e8-48f8-9ac5-8c67ce6a2c6e",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MR DKHISSI KAMAL",
+      "bankAccountNumber": "164720211113041366000948",
+      "bankCountryCode": "MA",
+      "bankName": "BANQUE POPULAIRE TANGER TETOUAN",
+      "iban": null,
+      "personalEmail": "dkhissi.kamal@gmail.com"
+    },
+    {
+      "id": "c2740099-d3bd-480b-9b88-ee4e9ef33b4c",
+      "firstName": "Ousmane",
+      "lastName": "Mazou",
+      "email": "ousmanemazou@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Avenue de la Mairie",
+      "city": "Niamey",
+      "country": "Niger",
+      "beneficiaryId": "fa755914-f46b-4cd5-a4f0-5837ae4524e1",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.140Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Niamey",
+            "postcode": "8001",
+            "country_code": "NE",
+            "street_address": "Avenue de la Mairie"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE INTERNATIONALE POUR L'AFRIQUE AU NIGER",
+            "swift_code": "BIANNENIXXX",
+            "account_name": "Ousmane Mazou",
+            "account_number": "NE0400100906295032000689",
+            "account_currency": "XOF",
+            "bank_country_code": "NE"
+          },
+          "additional_info": {
+            "personal_email": "ousmanemazou@gmail.com"
+          }
+        },
+        "beneficiary_id": "fa755914-f46b-4cd5-a4f0-5837ae4524e1",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "XOF",
+      "bankAccountName": "Ousmane Mazou",
+      "bankAccountNumber": "NE0400100906295032000689",
+      "bankCountryCode": "NE",
+      "bankName": "BANQUE INTERNATIONALE POUR L'AFRIQUE AU NIGER",
+      "iban": null,
+      "swiftCode": "BIANNENIXXX",
+      "personalEmail": "ousmanemazou@gmail.com"
+    },
+    {
+      "id": "c40caff3-6d4f-4a67-b250-650072e3bd75",
+      "firstName": "MOUSSA",
+      "lastName": "GARBA",
+      "email": "moussagarba@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Angle Boulevard de la Liberte et Rue des Batisseurs",
+      "city": "NIAMEY",
+      "country": "Niger",
+      "beneficiaryId": "26ee238c-62df-42eb-a2f7-1946c4ebb989",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.161Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "NIAMEY",
+            "postcode": "8001",
+            "country_code": "NE",
+            "street_address": "Angle Boulevard de la Liberte et Rue des Batisseurs"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "ECOBANK NIGER ECN",
+            "swift_code": "ECOCNENIXXX",
+            "account_name": "MOUSSA GARBA",
+            "account_number": "NE0950100111161012280116",
+            "account_currency": "XOF",
+            "bank_country_code": "NE"
+          },
+          "additional_info": {
+            "personal_email": "moussagarba@gmail.com"
+          }
+        },
+        "beneficiary_id": "26ee238c-62df-42eb-a2f7-1946c4ebb989",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "XOF",
+      "bankAccountName": "MOUSSA GARBA",
+      "bankAccountNumber": "NE0950100111161012280116",
+      "bankCountryCode": "NE",
+      "bankName": "ECOBANK NIGER ECN",
+      "iban": null,
+      "swiftCode": "ECOCNENIXXX",
+      "personalEmail": "moussagarba@gmail.com"
+    },
+    {
+      "id": "cf309ed6-9352-48a3-83c1-a273133a0a48",
+      "firstName": "M",
+      "lastName": "RIFAI ADAM",
+      "email": "rifai.adamm@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "BD ZERKTOUNI IMM 8 APP 5 MOHAMMEDIA",
+      "city": "MOHAMMEDIA",
+      "country": "Morocco",
+      "beneficiaryId": "f66dbebe-e090-4e02-930b-66952207709d",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.013Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "MOHAMMEDIA",
+            "postcode": "28830",
+            "country_code": "MA",
+            "street_address": "BD ZERKTOUNI IMM 8 APP 5 MOHAMMEDIA"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "AWB",
+            "account_name": "M RIFAI ADAM",
+            "account_number": "007787001533504003100155",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "007"
+          },
+          "additional_info": {
+            "personal_email": "rifai.adamm@gmail.com"
+          }
+        },
+        "beneficiary_id": "f66dbebe-e090-4e02-930b-66952207709d",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "M RIFAI ADAM",
+      "bankAccountNumber": "007787001533504003100155",
+      "bankCountryCode": "MA",
+      "bankName": "AWB",
+      "iban": null,
+      "personalEmail": "rifai.adamm@gmail.com"
+    },
+    {
+      "id": "e899e837-fd7a-452f-b82d-353f030aae12",
+      "firstName": "Company",
+      "lastName": "Akemis Limited",
+      "email": "61921c80-bd7f-4de5-a93e-0254a07c22a4@airwallex.placeholder",
+      "phone": "",
+      "company": "Akemis Limited",
+      "address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road",
+      "city": "Yau Ma Tei",
+      "country": "Hong Kong",
+      "beneficiaryId": "61921c80-bd7f-4de5-a93e-0254a07c22a4",
+      "entityType": "COMPANY",
+      "lastSyncAt": "2025-07-31T08:46:26.344Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Yau Ma Tei",
+            "country_code": "HK",
+            "street_address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road"
+          },
+          "entity_type": "COMPANY",
+          "bank_details": {
+            "bank_name": "HONGKONG AND SHANGHAI BANKING CORPORATION LIMITED, THE",
+            "swift_code": "HSBCHKHHHKH",
+            "account_name": "Akemis Limited",
+            "account_number": "004502269855838",
+            "account_currency": "USD",
+            "bank_country_code": "HK",
+            "account_routing_type1": "bank_code",
+            "local_clearing_system": "RTGS",
+            "account_routing_value1": "004"
+          },
+          "company_name": "Akemis Limited",
+          "additional_info": {
+            "legal_rep_email": "",
+            "legal_rep_address": {
+              "city": "Yau Ma Tei",
+              "country_code": "HK",
+              "street_address": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road"
+            },
+            "legal_rep_id_type": "",
+            "personal_id_number": "",
+            "personal_occupation": "",
+            "legal_rep_occupation": "",
+            "personal_nationality": "HK",
+            "legal_rep_nationality": "",
+            "legal_rep_mobile_number": "",
+            "business_registration_type": "ENTITY_TAX_ID"
+          }
+        },
+        "beneficiary_id": "61921c80-bd7f-4de5-a93e-0254a07c22a4",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "USD",
+      "bankAccountName": "Akemis Limited",
+      "bankAccountNumber": "004502269855838",
+      "bankCountryCode": "HK",
+      "bankName": "HONGKONG AND SHANGHAI BANKING CORPORATION LIMITED, THE",
+      "iban": null,
+      "swiftCode": "HSBCHKHHHKH",
+      "localClearingSystem": "RTGS",
+      "businessRegistrationType": "ENTITY_TAX_ID",
+      "legalRepAddress": "Unit B & C, 20th Floor, Full Win Center, 573 Nathan Road",
+      "legalRepCity": "Yau Ma Tei",
+      "legalRepCountryCode": "HK",
+      "personalNationality": "HK"
+    },
+    {
+      "id": "022982ff-8d17-4cac-9561-53ef9223c268",
+      "firstName": "NGO",
+      "lastName": "YANGA CORRINE",
+      "email": "ngo.yanga@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Quartier Bastos",
+      "city": "Yaoundé",
+      "country": "CM",
+      "beneficiaryId": "a5fe20d4-674d-4e4d-8cc1-41128e2e7144",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.042Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Yaoundé",
+            "country_code": "CM",
+            "street_address": "Quartier Bastos"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "AFRILAND FIRST BANK",
+            "swift_code": "CCEICMCX",
+            "account_name": "NGO YANGA CORRINE",
+            "account_number": "10005000010950757105177",
+            "account_currency": "XAF",
+            "bank_country_code": "CM"
+          },
+          "additional_info": {
+            "personal_email": "ngo.yanga@gmail.com"
+          }
+        },
+        "beneficiary_id": "a5fe20d4-674d-4e4d-8cc1-41128e2e7144",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "XAF",
+      "bankAccountName": "NGO YANGA CORRINE",
+      "bankAccountNumber": "10005000010950757105177",
+      "bankCountryCode": "CM",
+      "bankName": "AFRILAND FIRST BANK",
+      "iban": null,
+      "swiftCode": "CCEICMCX",
+      "personalEmail": "ngo.yanga@gmail.com"
+    },
+    {
+      "id": "9d965d31-6e27-4be8-943f-24aca45fd26b",
+      "firstName": "MAMOUH",
+      "lastName": "KARIM",
+      "email": "karim.mamouh@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Immeuble Amina-B APP 01",
+      "city": "AL HOCEIMA",
+      "country": "Morocco",
+      "beneficiaryId": "ad7ea9d1-6524-4f9d-976a-6f4f2dc6a0c5",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.046Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "AL HOCEIMA",
+            "postcode": "32000",
+            "country_code": "MA",
+            "street_address": "Immeuble Amina-B APP 01"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "AWB",
+            "account_name": "MAMOUH KARIM",
+            "account_number": "007050000067500031012030",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "007"
+          },
+          "additional_info": {
+            "personal_email": "karim.mamouh@gmail.com"
+          }
+        },
+        "beneficiary_id": "ad7ea9d1-6524-4f9d-976a-6f4f2dc6a0c5",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MAMOUH KARIM",
+      "bankAccountNumber": "007050000067500031012030",
+      "bankCountryCode": "MA",
+      "bankName": "AWB",
+      "iban": null,
+      "personalEmail": "karim.mamouh@gmail.com"
+    },
+    {
+      "id": "e819b5a1-375a-4fe3-acf7-44edd3776360",
+      "firstName": "MR",
+      "lastName": "OULKFIF MOHAMED",
+      "email": "mohamedoulkfif@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Lycée Lala Amina VN VILLA N8",
+      "city": "MEKNES",
+      "country": "Morocco",
+      "beneficiaryId": "b05d0b94-26e5-4e4e-a2af-8091134d6959",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.050Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "MEKNES",
+            "postcode": "50000",
+            "country_code": "MA",
+            "street_address": "Lycée Lala Amina VN VILLA N8"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE POPULAIRE FES TAZA",
+            "account_name": "MR OULKFIF MOHAMED",
+            "account_number": "127480211113438127000757",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "127"
+          },
+          "additional_info": {
+            "personal_email": "mohamedoulkfif@gmail.com"
+          }
+        },
+        "beneficiary_id": "b05d0b94-26e5-4e4e-a2af-8091134d6959",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MR OULKFIF MOHAMED",
+      "bankAccountNumber": "127480211113438127000757",
+      "bankCountryCode": "MA",
+      "bankName": "BANQUE POPULAIRE FES TAZA",
+      "iban": null,
+      "personalEmail": "mohamedoulkfif@gmail.com"
+    },
+    {
+      "id": "24e7d3b0-770f-4aae-b20b-c949fd5d72eb",
+      "firstName": "MLLE",
+      "lastName": "MBAYE NDEYE NGONE",
+      "email": "ngome.mbaye@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "SACRE COEUR 3 DAKAR",
+      "city": "DAKAR",
+      "country": "Senegal",
+      "beneficiaryId": "99ad351b-f4ea-43ce-8064-2d9401f9ff94",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.054Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "DAKAR",
+            "postcode": "11500",
+            "country_code": "SN",
+            "street_address": "SACRE COEUR 3 DAKAR"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "CORIS BANK INTERNATIONAL SENEGAL SA",
+            "swift_code": "CORISNDA",
+            "account_name": "MLLE MBAYE NDEYE NGONE",
+            "account_number": "SN2130100100636332400120",
+            "account_currency": "XOF",
+            "bank_country_code": "SN"
+          },
+          "additional_info": {
+            "personal_email": "ngome.mbaye@gmail.com"
+          }
+        },
+        "beneficiary_id": "99ad351b-f4ea-43ce-8064-2d9401f9ff94",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "XOF",
+      "bankAccountName": "MLLE MBAYE NDEYE NGONE",
+      "bankAccountNumber": "SN2130100100636332400120",
+      "bankCountryCode": "SN",
+      "bankName": "CORIS BANK INTERNATIONAL SENEGAL SA",
+      "iban": null,
+      "swiftCode": "CORISNDA",
+      "personalEmail": "ngome.mbaye@gmail.com"
+    },
+    {
+      "id": "7c38ffbf-de7c-476a-a97e-7886c74b11d0",
+      "firstName": "GAMPENE",
+      "lastName": "PHILIPPE",
+      "email": "philippe.Gampene@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Rue 16-17, Secteur 17",
+      "city": "Bobo-Dioulasso",
+      "country": "BF",
+      "beneficiaryId": "34bc3a72-4809-4582-94f1-d4c5989bf30c",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.033Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Bobo-Dioulasso",
+            "country_code": "BF",
+            "street_address": "Rue 16-17, Secteur 17"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "UBA BURKINA",
+            "swift_code": "BIBUBFBF",
+            "account_name": "GAMPENE PHILIPPE",
+            "account_number": "260220224140501001797580",
+            "account_currency": "XOF",
+            "bank_country_code": "BF"
+          },
+          "additional_info": {
+            "personal_email": "philippe.Gampene@gmail.com"
+          }
+        },
+        "beneficiary_id": "34bc3a72-4809-4582-94f1-d4c5989bf30c",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "XOF",
+      "bankAccountName": "GAMPENE PHILIPPE",
+      "bankAccountNumber": "260220224140501001797580",
+      "bankCountryCode": "BF",
+      "bankName": "UBA BURKINA",
+      "iban": null,
+      "swiftCode": "BIBUBFBF",
+      "personalEmail": "philippe.Gampene@gmail.com"
+    },
+    {
+      "id": "b001d031-ade0-4bbe-aeef-326d0ce5b323",
+      "firstName": "NOURA",
+      "lastName": "ESSOUFI",
+      "email": "noura.essoufi@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "6 LT ANNASR ESC OD ETG RC APPT 2 TR11 - RCE4 OULED SALA",
+      "city": "CASABLANCA",
+      "country": "Morocco",
+      "beneficiaryId": "9d1ddc6b-7bfb-4227-8a08-bf651e64a196",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.038Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "CASABLANCA",
+            "postcode": "27182",
+            "country_code": "MA",
+            "street_address": "6 LT ANNASR ESC OD ETG RC APPT 2 TR11 - RCE4 OULED SALA"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BCP",
+            "account_name": "NOURA ESSOUFI",
+            "account_number": "190780211111482207000074",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "190"
+          },
+          "additional_info": {
+            "personal_email": "noura.essoufi@gmail.com"
+          }
+        },
+        "beneficiary_id": "9d1ddc6b-7bfb-4227-8a08-bf651e64a196",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "NOURA ESSOUFI",
+      "bankAccountNumber": "190780211111482207000074",
+      "bankCountryCode": "MA",
+      "bankName": "BCP",
+      "iban": null,
+      "personalEmail": "noura.essoufi@gmail.com"
+    },
+    {
+      "id": "29ec971d-5d6b-4cba-b92c-d6ea8d508d0e",
+      "firstName": "Mr",
+      "lastName": "BEN AMOR WAEL",
+      "email": "wael.benamor@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Angle Avenue Hédi Chaker et Rue 8 Juillet 1884",
+      "city": "Le Kef",
+      "country": "Tunisia",
+      "beneficiaryId": "07c2c572-9572-4c77-9d9e-87e4f8cecae8",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.125Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"SWIFT\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Le Kef",
+            "postcode": "7100",
+            "country_code": "TN",
+            "street_address": "Angle Avenue Hédi Chaker et Rue 8 Juillet 1884"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "iban": "TN5908802000325100492648",
+            "bank_name": "Banque Internationale Arabe de Tunisie (BIAT)",
+            "swift_code": "BIATTNTT",
+            "account_name": "Mr BEN AMOR WAEL",
+            "account_currency": "EUR",
+            "bank_country_code": "TN"
+          },
+          "additional_info": {
+            "personal_email": "wael.benamor@gmail.com"
+          }
+        },
+        "beneficiary_id": "07c2c572-9572-4c77-9d9e-87e4f8cecae8",
+        "payment_methods": [
+          "SWIFT"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "EUR",
+      "bankAccountName": "Mr BEN AMOR WAEL",
+      "bankCountryCode": "TN",
+      "bankName": "Banque Internationale Arabe de Tunisie (BIAT)",
+      "iban": "TN5908802000325100492648",
+      "swiftCode": "BIATTNTT",
+      "personalEmail": "wael.benamor@gmail.com"
+    },
+    {
+      "id": "4013c58e-14f7-4358-be5a-3179085fbae6",
+      "firstName": "Alejandro",
+      "lastName": "Goicoechea Bercedo",
+      "email": "goikotobal@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Address. Calle Real compañía Guipuzcoana de Caracas n. 2. 3 B",
+      "city": "San Sebastian",
+      "country": "Spain",
+      "beneficiaryId": "c81f704b-774d-4642-b9f5-16801025515a",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.337Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "San Sebastian",
+            "state": "ES-SS",
+            "postcode": "20011",
+            "country_code": "ES",
+            "street_address": "Address. Calle Real compañía Guipuzcoana de Caracas n. 2. 3 B"
+          },
+          "last_name": "Goicoechea Bercedo",
+          "first_name": "Alejandro",
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "iban": "ES1701825297260200386789",
+            "bank_name": "BANCO BILBAO VIZCAYA ARGENTARIA, S.A.",
+            "swift_code": "BBVAESMMXXX",
+            "account_name": "Alejandro Goicoechea Bercedo",
+            "account_currency": "EUR",
+            "bank_country_code": "ES"
+          },
+          "additional_info": {
+            "personal_email": "goikotobal@gmail.com",
+            "personal_last_name_in_chinese": "Goicoechea Bercedo",
+            "personal_first_name_in_chinese": "Alejandro"
+          }
+        },
+        "beneficiary_id": "c81f704b-774d-4642-b9f5-16801025515a",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "EUR",
+      "bankAccountName": "Alejandro Goicoechea Bercedo",
+      "bankCountryCode": "ES",
+      "bankName": "BANCO BILBAO VIZCAYA ARGENTARIA, S.A.",
+      "iban": "ES1701825297260200386789",
+      "swiftCode": "BBVAESMMXXX",
+      "personalEmail": "goikotobal@gmail.com",
+      "personalFirstNameChinese": "Alejandro",
+      "personalLastNameChinese": "Goicoechea Bercedo"
+    },
+    {
+      "id": "c108d558-6390-47e1-a1b2-84ad3b16624c",
+      "firstName": "Hasni",
+      "lastName": "Alaoui Zineb",
+      "email": "a54eb6fb-f359-4af0-bb05-1217df3c8d0f@airwallex.placeholder",
+      "phone": null,
+      "company": null,
+      "address": "17, Cit AL OSRA COPERATIVE SAHAR IMB R apt 04, (736) Centre Ville Hsain",
+      "city": "Sala Al Jadida",
+      "country": "Morocco",
+      "beneficiaryId": "a54eb6fb-f359-4af0-bb05-1217df3c8d0f",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.078Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Sala Al Jadida",
+            "postcode": "11100",
+            "country_code": "MA",
+            "street_address": "17, Cit AL OSRA COPERATIVE SAHAR IMB R apt 04, (736) Centre Ville Hsain"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "AWB",
+            "account_name": "Hasni Alaoui Zineb",
+            "account_number": "007815000544800030681460",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "007"
+          }
+        },
+        "beneficiary_id": "a54eb6fb-f359-4af0-bb05-1217df3c8d0f",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "Hasni Alaoui Zineb",
+      "bankAccountNumber": "007815000544800030681460",
+      "bankCountryCode": "MA",
+      "bankName": "AWB",
+      "iban": null
+    },
+    {
+      "id": "b3965f67-7b77-48a5-b2c3-c1120a92e3d0",
+      "firstName": "Mehdi",
+      "lastName": "Benchekroun",
+      "email": "mehdibenchekroun@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "13 Sect 6 Bloc J No. 13 Rue Al Kotn Hay Ria Rabat Agdal Ryad",
+      "city": "Rabat",
+      "country": "Morocco",
+      "beneficiaryId": "407ad95a-23f4-4a57-94e8-0c8e256477fe",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.118Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"SWIFT\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Rabat",
+            "postcode": "10106",
+            "country_code": "MA",
+            "street_address": "13 Sect 6 Bloc J No. 13 Rue Al Kotn Hay Ria Rabat Agdal Ryad"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "CREDIT AGRICOLE DU MAROC",
+            "swift_code": "CNCAMAMR",
+            "account_name": "Mehdi Benchekroun",
+            "account_number": "225810079500859635010115",
+            "account_currency": "EUR",
+            "bank_country_code": "MA"
+          },
+          "additional_info": {
+            "personal_email": "mehdibenchekroun@gmail.com"
+          }
+        },
+        "beneficiary_id": "407ad95a-23f4-4a57-94e8-0c8e256477fe",
+        "payment_methods": [
+          "SWIFT"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "EUR",
+      "bankAccountName": "Mehdi Benchekroun",
+      "bankAccountNumber": "225810079500859635010115",
+      "bankCountryCode": "MA",
+      "bankName": "CREDIT AGRICOLE DU MAROC",
+      "iban": null,
+      "swiftCode": "CNCAMAMR",
+      "personalEmail": "mehdibenchekroun@gmail.com"
+    },
+    {
+      "id": "73e4052e-8f79-4948-b31c-0e5ec7f8ebcf",
+      "firstName": "Unknown",
+      "lastName": "NVPC CONSULTING FZE",
+      "email": "Nouaman.elh@hotmail.fr",
+      "phone": null,
+      "company": null,
+      "address": "Entrance No. 2, Ground Floor, Al Zahia Area - Sheikh Mohammed Bin Zayed Rd",
+      "city": "Sharjah",
+      "country": "AE",
+      "beneficiaryId": "0f298331-3fa0-463f-a2fc-4c2f0fc2686a",
+      "entityType": "COMPANY",
+      "lastSyncAt": "2025-07-31T08:46:26.020Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Sharjah",
+            "country_code": "AE",
+            "street_address": "Entrance No. 2, Ground Floor, Al Zahia Area - Sheikh Mohammed Bin Zayed Rd"
+          },
+          "entity_type": "COMPANY",
+          "bank_details": {
+            "iban": "AE980400000253578415002",
+            "bank_name": "National Bank of Ras Al-Khaimah",
+            "swift_code": "NRAKAEAK",
+            "account_name": "NVPC CONSULTING FZE",
+            "account_currency": "AED",
+            "bank_country_code": "AE"
+          },
+          "additional_info": {
+            "personal_email": "Nouaman.elh@hotmail.fr"
+          }
+        },
+        "beneficiary_id": "0f298331-3fa0-463f-a2fc-4c2f0fc2686a",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "AED",
+      "bankAccountName": "NVPC CONSULTING FZE",
+      "bankCountryCode": "AE",
+      "bankName": "National Bank of Ras Al-Khaimah",
+      "iban": "AE980400000253578415002",
+      "swiftCode": "NRAKAEAK",
+      "personalEmail": "Nouaman.elh@hotmail.fr"
+    },
+    {
+      "id": "8f5b0d87-9448-46e4-b106-99b0fc843c4b",
+      "firstName": "Mr",
+      "lastName": "Jendoubi Maher",
+      "email": "maher_jendoubi@hotmail.fr",
+      "phone": null,
+      "company": null,
+      "address": "Avenue de Hédi Nouira",
+      "city": "TUNIS",
+      "country": "Tunisia",
+      "beneficiaryId": "c9b59cd3-2555-4050-808b-07c49746e35e",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.026Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"SWIFT\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "TUNIS",
+            "postcode": "2080",
+            "country_code": "TN",
+            "street_address": "Avenue de Hédi Nouira"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "iban": "TN5908102000735100527571",
+            "bank_name": "Banque Internationale Arabe de Tunisie (BIAT)",
+            "swift_code": "BIATTNTT",
+            "account_name": "Mr Jendoubi Maher",
+            "account_currency": "TND",
+            "bank_country_code": "TN",
+            "intermediary_bank_name": "BANQUE INTERNATIONALE ARABE DE TUNISIE",
+            "intermediary_bank_swift_code": "BIATTNTT"
+          },
+          "additional_info": {
+            "personal_email": "maher_jendoubi@hotmail.fr"
+          }
+        },
+        "beneficiary_id": "c9b59cd3-2555-4050-808b-07c49746e35e",
+        "payment_methods": [
+          "SWIFT"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "TND",
+      "bankAccountName": "Mr Jendoubi Maher",
+      "bankCountryCode": "TN",
+      "bankName": "Banque Internationale Arabe de Tunisie (BIAT)",
+      "iban": "TN5908102000735100527571",
+      "swiftCode": "BIATTNTT",
+      "personalEmail": "maher_jendoubi@hotmail.fr"
+    },
+    {
+      "id": "76e6b9ad-5273-4413-bc07-3cbe50fb3803",
+      "firstName": "MME",
+      "lastName": "SANAA OUHALOU",
+      "email": "sa.ouiazzane@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "Lot n° 64, Quartier Essaad",
+      "city": "Berrechid",
+      "country": "Morocco",
+      "beneficiaryId": "8a02ca37-4e61-45ba-9d67-4c26a7ddb43b",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.073Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Berrechid",
+            "postcode": "26300",
+            "country_code": "MA",
+            "street_address": "Lot n° 64, Quartier Essaad"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BMCE",
+            "account_name": "MME SANAA OUHALOU",
+            "account_number": "011793000064200000220532",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "011"
+          },
+          "additional_info": {
+            "personal_email": "sa.ouiazzane@gmail.com"
+          }
+        },
+        "beneficiary_id": "8a02ca37-4e61-45ba-9d67-4c26a7ddb43b",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "MME SANAA OUHALOU",
+      "bankAccountNumber": "011793000064200000220532",
+      "bankCountryCode": "MA",
+      "bankName": "BMCE",
+      "iban": null,
+      "personalEmail": "sa.ouiazzane@gmail.com"
+    },
+    {
+      "id": "82eeda13-4eb3-408d-a0af-fe4fa0128393",
+      "firstName": "Mme",
+      "lastName": " MOULAGBA JEMAA",
+      "email": "khalid.atlassi@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "85, Bloc B, Boulevard Hassan II",
+      "city": "Beni Mellal",
+      "country": "Morocco",
+      "beneficiaryId": "73c6395d-215c-48d0-b696-97436f7e7f35",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.145Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Beni Mellal",
+            "postcode": "23000",
+            "country_code": "MA",
+            "street_address": "85, Bloc B, Boulevard Hassan II"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE POPULAIRE MARRAKESH BENI MELLAL",
+            "account_name": "Mme  MOULAGBA JEMAA",
+            "account_number": "145090211111413027000369",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "145"
+          },
+          "additional_info": {
+            "personal_email": "khalid.atlassi@gmail.com"
+          }
+        },
+        "beneficiary_id": "73c6395d-215c-48d0-b696-97436f7e7f35",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "Mme  MOULAGBA JEMAA",
+      "bankAccountNumber": "145090211111413027000369",
+      "bankCountryCode": "MA",
+      "bankName": "BANQUE POPULAIRE MARRAKESH BENI MELLAL",
+      "iban": null,
+      "personalEmail": "khalid.atlassi@gmail.com"
+    },
+    {
+      "id": "2a55d56b-bd49-45c0-a19d-041fa13ff5e0",
+      "firstName": "Mme",
+      "lastName": "ELHSSAINI HALIMA",
+      "email": "h.abaoubida@gmail.com",
+      "phone": null,
+      "company": null,
+      "address": "66 Derb El Cadi, Bab Ailane",
+      "city": "Marrakech",
+      "country": "Morocco",
+      "beneficiaryId": "12a81b89-703e-4cb7-a4b9-07b0c40d56f7",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:25.997Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "Marrakech",
+            "postcode": "40000",
+            "country_code": "MA",
+            "street_address": "66 Derb El Cadi, Bab Ailane"
+          },
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANQUE POPULAIRE MARRAKESH BENI MELLAL",
+            "account_name": "Mme ELHSSAINI HALIMA",
+            "account_number": "145450211116055006000218",
+            "account_currency": "MAD",
+            "bank_country_code": "MA",
+            "account_routing_type1": "bank_code",
+            "account_routing_value1": "145"
+          },
+          "additional_info": {
+            "personal_email": "h.abaoubida@gmail.com"
+          }
+        },
+        "beneficiary_id": "12a81b89-703e-4cb7-a4b9-07b0c40d56f7",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "MAD",
+      "bankAccountName": "Mme ELHSSAINI HALIMA",
+      "bankAccountNumber": "145450211116055006000218",
+      "bankCountryCode": "MA",
+      "bankName": "BANQUE POPULAIRE MARRAKESH BENI MELLAL",
+      "iban": null,
+      "personalEmail": "h.abaoubida@gmail.com"
+    },
+    {
+      "id": "2a416793-3f4f-4e4a-9e0c-381f7f79d998",
+      "firstName": "Philippe",
+      "lastName": "Barthelemy",
+      "email": "philb75@gmail.com",
+      "phone": "",
+      "company": null,
+      "address": "Town & Country",
+      "city": "City Of Talisay",
+      "country": "Philippines",
+      "beneficiaryId": "c8a026ce-fc4b-4aac-9ffc-cb4dd1bf7147",
+      "entityType": "PERSONAL",
+      "lastSyncAt": "2025-07-31T08:46:26.348Z",
+      "payerEntityType": "COMPANY",
+      "paymentMethods": "[\"LOCAL\"]",
+      "rawData": {
+        "beneficiary": {
+          "address": {
+            "city": "City Of Talisay",
+            "postcode": "6115",
+            "country_code": "PH",
+            "street_address": "Town & Country"
+          },
+          "last_name": "Barthelemy",
+          "first_name": "Philippe",
+          "entity_type": "PERSONAL",
+          "bank_details": {
+            "bank_name": "BANK OF THE PHILIPPINE ISLANDS",
+            "swift_code": "BOPIPHMM",
+            "account_name": "Philippe Barthelemy",
+            "account_number": "1040008167",
+            "account_currency": "PHP",
+            "bank_country_code": "PH"
+          },
+          "additional_info": {
+            "personal_email": "philb75@gmail.com",
+            "legal_rep_email": "",
+            "legal_rep_address": {
+              "city": "City Of Talisay",
+              "postcode": "6115",
+              "country_code": "PH",
+              "street_address": "Town & Country"
+            },
+            "legal_rep_id_type": "",
+            "legal_rep_last_name": "Barthelemy",
+            "personal_occupation": "",
+            "legal_rep_first_name": "Philippe",
+            "legal_rep_occupation": "",
+            "personal_nationality": "PH",
+            "legal_rep_nationality": "",
+            "legal_rep_mobile_number": "",
+            "business_registration_type": "",
+            "business_registration_number": "",
+            "personal_last_name_in_chinese": "Barthelemy",
+            "personal_first_name_in_chinese": "Philippe"
+          }
+        },
+        "beneficiary_id": "c8a026ce-fc4b-4aac-9ffc-cb4dd1bf7147",
+        "payment_methods": [
+          "LOCAL"
+        ],
+        "payer_entity_type": "COMPANY"
+      },
+      "syncStatus": "SYNCED",
+      "bankAccountCurrency": "PHP",
+      "bankAccountName": "Philippe Barthelemy",
+      "bankAccountNumber": "1040008167",
+      "bankCountryCode": "PH",
+      "bankName": "BANK OF THE PHILIPPINE ISLANDS",
+      "iban": null,
+      "swiftCode": "BOPIPHMM",
+      "legalRepFirstName": "Philippe",
+      "legalRepLastName": "Barthelemy",
+      "legalRepAddress": "Town & Country",
+      "legalRepCity": "City Of Talisay",
+      "legalRepPostalCode": "6115",
+      "legalRepCountryCode": "PH",
+      "personalEmail": "philb75@gmail.com",
+      "personalNationality": "PH",
+      "personalFirstNameChinese": "Philippe",
+      "personalLastNameChinese": "Barthelemy"
+    }
+  ]
+}

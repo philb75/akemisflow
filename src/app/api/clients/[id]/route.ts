@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -15,9 +15,11 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     const client = await prisma.contact.findUnique({
       where: { 
-        id: params.id,
+        id: id,
         contactType: {
           in: ['CLIENT_COMPANY', 'CLIENT_CONTACT']
         }
@@ -64,8 +66,9 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const session = await auth()
     
@@ -100,7 +103,7 @@ export async function PUT(
     // Check if client exists and is a client type
     const existingClient = await prisma.contact.findUnique({
       where: { 
-        id: params.id,
+        id: id,
         contactType: {
           in: ['CLIENT_COMPANY', 'CLIENT_CONTACT']
         }
@@ -112,7 +115,7 @@ export async function PUT(
     }
 
     const updatedClient = await prisma.contact.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(name && { name }),
         ...(email !== undefined && { email: email || null }),
@@ -168,7 +171,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -177,10 +180,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Check if client exists and is a client type
     const existingClient = await prisma.contact.findUnique({
       where: { 
-        id: params.id,
+        id: id,
         contactType: {
           in: ['CLIENT_COMPANY', 'CLIENT_CONTACT']
         }
@@ -211,7 +216,7 @@ export async function DELETE(
     }
 
     await prisma.contact.delete({
-      where: { id: params.id }
+      where: { id: id }
     })
 
     return NextResponse.json({ message: "Client deleted successfully" })

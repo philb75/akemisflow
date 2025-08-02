@@ -1,0 +1,183 @@
+import { PrismaClient } from '@prisma/client'
+import { writeFileSync } from 'fs'
+import { join } from 'path'
+
+const prisma = new PrismaClient()
+
+interface OldSupplierData {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  company?: string
+  address?: string
+  city?: string
+  addressState?: string
+  postalCode?: string
+  country?: string
+  addressCountryCode?: string
+  airwallexBeneficiaryId?: string
+  airwallexEntityType?: string
+  airwallexLastSyncAt?: Date
+  airwallexPayerEntityType?: string
+  airwallexPaymentMethods?: string
+  airwallexRawData?: any
+  airwallexSyncError?: string
+  airwallexSyncStatus?: string
+  bankAccountCurrency?: string
+  bankAccountName?: string
+  bankAccountNumber?: string
+  bankCountryCode?: string
+  bankName?: string
+  businessRegistrationNumber?: string
+  businessRegistrationType?: string
+  iban?: string
+  legalRepAddress?: string
+  legalRepCity?: string
+  legalRepCountryCode?: string
+  legalRepEmail?: string
+  legalRepFirstName?: string
+  legalRepIdType?: string
+  legalRepLastName?: string
+  legalRepMobileNumber?: string
+  legalRepNationality?: string
+  legalRepOccupation?: string
+  legalRepPostalCode?: string
+  legalRepState?: string
+  localClearingSystem?: string
+  personalEmail?: string
+  personalFirstNameChinese?: string
+  personalIdNumber?: string
+  personalLastNameChinese?: string
+  personalNationality?: string
+  personalOccupation?: string
+  swiftCode?: string
+}
+
+async function backupAirwallexData() {
+  console.log('🔄 Starting Airwallex data backup...')
+  
+  try {
+    // Get all suppliers that have Airwallex data
+    const suppliersWithAirwallex = await prisma.$queryRaw<OldSupplierData[]>`
+      SELECT * FROM suppliers 
+      WHERE airwallex_beneficiary_id IS NOT NULL
+    `
+    
+    console.log(`📊 Found ${suppliersWithAirwallex.length} suppliers with Airwallex data`)
+    
+    if (suppliersWithAirwallex.length === 0) {
+      console.log('✅ No Airwallex data to backup')
+      return
+    }
+    
+    // Create backup data
+    const backupData = {
+      timestamp: new Date().toISOString(),
+      totalSuppliers: suppliersWithAirwallex.length,
+      suppliers: suppliersWithAirwallex.map(supplier => ({
+        // Basic supplier info
+        id: supplier.id,
+        firstName: supplier.first_name || supplier.firstName || 'Unknown',
+        lastName: supplier.last_name || supplier.lastName || 'Unknown',
+        email: supplier.email,
+        phone: supplier.phone,
+        company: supplier.company,
+        
+        // Address
+        address: supplier.address,
+        city: supplier.city,
+        state: supplier.addressState,
+        postalCode: supplier.postalCode,
+        country: supplier.country,
+        countryCode: supplier.addressCountryCode,
+        
+        // Airwallex data
+        beneficiaryId: supplier.airwallex_beneficiary_id || supplier.airwallexBeneficiaryId,
+        entityType: supplier.airwallex_entity_type || supplier.airwallexEntityType,
+        lastSyncAt: supplier.airwallex_last_sync_at || supplier.airwallexLastSyncAt,
+        payerEntityType: supplier.airwallex_payer_entity_type || supplier.airwallexPayerEntityType,
+        paymentMethods: supplier.airwallex_payment_methods || supplier.airwallexPaymentMethods,
+        rawData: supplier.airwallex_raw_data || supplier.airwallexRawData,
+        syncError: supplier.airwallex_sync_error || supplier.airwallexSyncError,
+        syncStatus: supplier.airwallex_sync_status || supplier.airwallexSyncStatus,
+        
+        // Banking
+        bankAccountCurrency: supplier.bank_account_currency || supplier.bankAccountCurrency,
+        bankAccountName: supplier.bank_account_name || supplier.bankAccountName,
+        bankAccountNumber: supplier.bank_account_number || supplier.bankAccountNumber,
+        bankCountryCode: supplier.bank_country_code || supplier.bankCountryCode,
+        bankName: supplier.bank_name || supplier.bankName,
+        iban: supplier.iban,
+        swiftCode: supplier.swift_code || supplier.swiftCode,
+        localClearingSystem: supplier.local_clearing_system || supplier.localClearingSystem,
+        
+        // Business
+        businessRegistrationNumber: supplier.business_registration_number || supplier.businessRegistrationNumber,
+        businessRegistrationType: supplier.business_registration_type || supplier.businessRegistrationType,
+        
+        // Legal representative
+        legalRepFirstName: supplier.legal_rep_first_name || supplier.legalRepFirstName,
+        legalRepLastName: supplier.legal_rep_last_name || supplier.legalRepLastName,
+        legalRepEmail: supplier.legal_rep_email || supplier.legalRepEmail,
+        legalRepMobileNumber: supplier.legal_rep_mobile_number || supplier.legalRepMobileNumber,
+        legalRepAddress: supplier.legal_rep_address || supplier.legalRepAddress,
+        legalRepCity: supplier.legal_rep_city || supplier.legalRepCity,
+        legalRepState: supplier.legal_rep_state || supplier.legalRepState,
+        legalRepPostalCode: supplier.legal_rep_postal_code || supplier.legalRepPostalCode,
+        legalRepCountryCode: supplier.legal_rep_country_code || supplier.legalRepCountryCode,
+        legalRepNationality: supplier.legal_rep_nationality || supplier.legalRepNationality,
+        legalRepOccupation: supplier.legal_rep_occupation || supplier.legalRepOccupation,
+        legalRepIdType: supplier.legal_rep_id_type || supplier.legalRepIdType,
+        
+        // Personal
+        personalEmail: supplier.personal_email || supplier.personalEmail,
+        personalIdNumber: supplier.personal_id_number || supplier.personalIdNumber,
+        personalNationality: supplier.personal_nationality || supplier.personalNationality,
+        personalOccupation: supplier.personal_occupation || supplier.personalOccupation,
+        personalFirstNameChinese: supplier.personal_first_name_chinese || supplier.personalFirstNameChinese,
+        personalLastNameChinese: supplier.personal_last_name_chinese || supplier.personalLastNameChinese,
+      }))
+    }
+    
+    // Write backup to file
+    const backupPath = join(process.cwd(), 'airwallex-data-backup.json')
+    writeFileSync(backupPath, JSON.stringify(backupData, null, 2))
+    
+    console.log(`✅ Backup completed successfully!`)
+    console.log(`📁 Backup saved to: ${backupPath}`)
+    console.log(`📊 Backed up ${backupData.suppliers.length} suppliers with Airwallex data`)
+    
+    // Show summary of what was backed up
+    const summary = backupData.suppliers.reduce((acc, supplier) => {
+      if (supplier.beneficiaryId) acc.withBeneficiaryId++
+      if (supplier.bankAccountName) acc.withBankInfo++
+      if (supplier.legalRepFirstName) acc.withLegalRep++
+      return acc
+    }, { withBeneficiaryId: 0, withBankInfo: 0, withLegalRep: 0 })
+    
+    console.log(`\n📈 Backup Summary:`)
+    console.log(`✅ Suppliers with Beneficiary ID: ${summary.withBeneficiaryId}`)
+    console.log(`✅ Suppliers with Bank Info: ${summary.withBankInfo}`)
+    console.log(`✅ Suppliers with Legal Rep: ${summary.withLegalRep}`)
+    console.log(`\n⚠️  Next step: Apply schema changes with 'npx prisma db push'`)
+    console.log(`   Then restore data with the backup file if needed.`)
+    
+  } catch (error) {
+    console.error('💥 Backup failed:', error)
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
+// Main execution
+async function main() {
+  await backupAirwallexData()
+}
+
+if (require.main === module) {
+  main().catch(console.error)
+}
+
+export { backupAirwallexData }

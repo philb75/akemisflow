@@ -33,6 +33,8 @@ import {
   ArrowRight
 } from 'lucide-react'
 import Link from 'next/link'
+import { SupplierComparison } from '@/components/supplier-comparison'
+import { DocumentManager } from '@/components/document-manager'
 
 interface Supplier {
   id: string
@@ -54,6 +56,7 @@ interface Supplier {
   
   // Airwallex fields
   airwallexBeneficiaryId?: string
+  airwallexContactId?: string
   airwallexEntityType?: string
   airwallexPaymentMethods?: string
   airwallexPayerEntityType?: string
@@ -236,10 +239,14 @@ export default function SuppliersPage() {
         await fetchSuppliers()
         await fetchSyncStats()
         
+        const newCount = result.data.sync_results?.new_airwallex_suppliers || 0
+        const updatedCount = result.data.sync_results?.updated_airwallex_suppliers || 0
+        const errorCount = result.data.sync_results?.errors || 0
+        
         alert(`Sync completed! 
-          New suppliers: ${result.data.sync_results.new_suppliers}
-          Updated suppliers: ${result.data.sync_results.updated_suppliers}
-          Conflicts: ${result.data.sync_results.conflicts}`)
+          New suppliers: ${newCount || 'none'}
+          Updated suppliers: ${updatedCount || 'none'}
+          Errors: ${errorCount || 'none'}`)
       } else {
         const error = await response.json()
         if (response.status === 503 && error.error?.includes('environment variables')) {
@@ -462,7 +469,7 @@ export default function SuppliersPage() {
               <div>
                 <div className="flex items-center space-x-2 mb-4">
                   <Database className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold">Database Information</h3>
+                  <h3 className="text-lg font-semibold">Supplier Information</h3>
                   {!isEditing && (
                     <>
                       <Button 
@@ -813,65 +820,21 @@ export default function SuppliersPage() {
                         <div><strong>Last Update:</strong> {new Date(supplier.updatedAt).toLocaleString()}</div>
                       </div>
                     </div>
+                    
+                    {/* Document Management */}
+                    <DocumentManager 
+                      entityId={supplier.id}
+                      entityType="supplier"
+                    />
                   </div>
                 )}
               </div>
 
-              {/* Airwallex Section */}
+              {/* Side-by-Side Comparison */}
               <div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <ExternalLink className="w-5 h-5 text-orange-600" />
-                  <h3 className="text-lg font-semibold">Airwallex Information</h3>
-                  {supplier.airwallexBeneficiaryId && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {/* Implement sync logic */}}
-                    >
-                      <RefreshCw className="w-4 h-4 mr-1" />
-                      Sync
-                    </Button>
-                  )}
-                </div>
-                
-                {supplier.airwallexBeneficiaryId ? (
-                  <div className="grid grid-cols-1 gap-3 text-sm">
-                    <div><strong>Beneficiary ID:</strong> {supplier.airwallexBeneficiaryId}</div>
-                    <div><strong>Entity Type:</strong> {supplier.airwallexEntityType || '-'}</div>
-                    <div><strong>Sync Status:</strong> {supplier.airwallexSyncStatus || 'NONE'}</div>
-                    <div><strong>Last Sync:</strong> {supplier.airwallexLastSyncAt ? new Date(supplier.airwallexLastSyncAt).toLocaleString() : '-'}</div>
-                    
-                    {/* Bank Details */}
-                    <div className="pt-2 border-t">
-                      <strong>Bank Details:</strong>
-                      <div className="ml-4 mt-1 space-y-1">
-                        <div>Account Name: {supplier.bankAccountName || '-'}</div>
-                        <div>Account Number: {supplier.bankAccountNumber || '-'}</div>
-                        <div>Currency: {supplier.bankAccountCurrency || '-'}</div>
-                        <div>Bank Name: {supplier.bankName || '-'}</div>
-                        <div>SWIFT: {supplier.swiftCode || '-'}</div>
-                        <div>IBAN: {supplier.iban || '-'}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Legal Representative (if exists) */}
-                    {supplier.legalRepFirstName && (
-                      <div className="pt-2 border-t">
-                        <strong>Legal Representative:</strong>
-                        <div className="ml-4 mt-1 space-y-1">
-                          <div>Name: {supplier.legalRepFirstName} {supplier.legalRepLastName}</div>
-                          <div>Email: {supplier.legalRepEmail || '-'}</div>
-                          <div>Phone: {supplier.legalRepMobileNumber || '-'}</div>
-                          <div>Nationality: {supplier.legalRepNationality || '-'}</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 italic">
-                    Not linked to Airwallex. Use the sync function to link this supplier with Airwallex beneficiaries.
-                  </div>
-                )}
+                <SupplierComparison 
+                  supplierId={supplier.id}
+                />
               </div>
             </div>
           </div>

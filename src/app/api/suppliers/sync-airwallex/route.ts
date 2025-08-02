@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { AirwallexClientStandalone } from '@/lib/airwallex-client-standalone'
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseClient } from '@/lib/supabase'
 import { prisma } from '@/lib/db'
 import { formatSupplierNames } from '@/lib/name-formatter'
 
@@ -9,16 +9,7 @@ import { formatSupplierNames } from '@/lib/name-formatter'
 // Use Supabase if we have the URL configured (production), otherwise use Prisma (local)
 const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
 
-// Initialize Supabase client for production
-let supabase: any = null
-if (useSupabase) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  supabase = createClient(supabaseUrl, supabaseServiceKey)
-  console.log('🔵 Using Supabase database client')
-} else {
-  console.log('🟡 Using Prisma database client')
-}
+console.log(useSupabase ? '🔵 Using Supabase database client' : '🟡 Using Prisma database client')
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +31,7 @@ export async function POST(request: NextRequest) {
       }, { status: 503 })
     }
 
-    console.log('🔄 Starting Airwallex supplier sync...')
+    console.log('🔄 Starting Airwallex supplier sync (New Architecture)...')
     console.log(`🗄️  Environment: ${useSupabase ? 'Production (Supabase)' : 'Local (Prisma)'}`)
     
     // Initialize Airwallex client
@@ -55,141 +46,240 @@ export async function POST(request: NextRequest) {
     let updated = 0
     let errors = 0
     const errorDetails: any[] = []
-    const syncedSuppliers: any[] = []
+    const syncedAirwallexSuppliers: any[] = []
+    
+    const supabase = useSupabase ? createSupabaseClient() : null
     
     for (const beneficiary of beneficiaries) {
       try {
-        // Check if supplier exists (environment-aware)
-        let existingSupplier: any = null
+        // Apply name formatting rules
+        const formattedNames = formatSupplierNames({
+          firstName: beneficiary.first_name || '',
+          lastName: beneficiary.last_name || ''
+        })
+        
+        // Prepare Airwallex supplier data
+        const airwallexSupplierData = {
+          beneficiaryId: beneficiary.id,
+          entityType: beneficiary.entity_type,
+          firstName: formattedNames.firstName,
+          lastName: formattedNames.lastName,
+          email: beneficiary.email,
+          phone: beneficiary.phone_number,
+          company: beneficiary.company_name,
+          
+          // Address fields
+          address: beneficiary.address?.street_address,
+          city: beneficiary.address?.city,
+          state: beneficiary.address?.state,
+          postalCode: beneficiary.address?.postcode,
+          countryCode: beneficiary.address?.country_code,
+          
+          // Banking fields
+          bankAccountName: beneficiary.bank_details?.account_name,
+          bankAccountNumber: beneficiary.bank_details?.account_number,
+          bankName: beneficiary.bank_details?.bank_name,
+          bankCountryCode: beneficiary.bank_details?.bank_country_code,
+          currency: beneficiary.bank_details?.currency,
+          iban: beneficiary.bank_details?.iban,
+          swiftCode: beneficiary.bank_details?.swift_code,
+          localClearingSystem: beneficiary.bank_details?.local_clearing_system,
+          
+          // Business registration (if applicable)
+          businessRegistrationNumber: beneficiary.business_registration?.registration_number,
+          businessRegistrationType: beneficiary.business_registration?.registration_type,
+          
+          // Legal representative (if applicable)
+          legalRepFirstName: beneficiary.legal_representative?.first_name,
+          legalRepLastName: beneficiary.legal_representative?.last_name,
+          legalRepEmail: beneficiary.legal_representative?.email,
+          legalRepMobileNumber: beneficiary.legal_representative?.mobile_number,
+          legalRepAddress: beneficiary.legal_representative?.address?.street_address,
+          legalRepCity: beneficiary.legal_representative?.address?.city,
+          legalRepState: beneficiary.legal_representative?.address?.state,
+          legalRepPostalCode: beneficiary.legal_representative?.address?.postcode,
+          legalRepCountryCode: beneficiary.legal_representative?.address?.country_code,
+          legalRepNationality: beneficiary.legal_representative?.nationality,
+          legalRepOccupation: beneficiary.legal_representative?.occupation,
+          legalRepIdType: beneficiary.legal_representative?.id_type,
+          
+          // Personal fields (if individual)
+          personalEmail: beneficiary.personal_details?.email,
+          personalIdNumber: beneficiary.personal_details?.id_number,
+          personalNationality: beneficiary.personal_details?.nationality,
+          personalOccupation: beneficiary.personal_details?.occupation,
+          personalFirstNameChinese: beneficiary.personal_details?.first_name_chinese,
+          personalLastNameChinese: beneficiary.personal_details?.last_name_chinese,
+          
+          // Airwallex specific
+          paymentMethods: Array.isArray(beneficiary.payment_methods) 
+            ? beneficiary.payment_methods.join(',') 
+            : beneficiary.payment_methods,
+          capabilities: Array.isArray(beneficiary.capabilities) 
+            ? beneficiary.capabilities.join(',') 
+            : beneficiary.capabilities,
+          payerEntityType: beneficiary.payer_entity_type,
+          status: beneficiary.status || 'ACTIVE',
+          rawData: beneficiary,
+          
+          lastFetchedAt: new Date()
+        }
+        
+        // Check if Airwallex supplier already exists
+        let existingAirwallexSupplier: any = null
         
         if (useSupabase) {
-          const { data, error: lookupError } = await supabase
-            .from('suppliers')
-            .select('id, airwallex_beneficiary_id')
-            .eq('email', beneficiary.email)
+          const { data, error: lookupError } = await supabase!
+            .from('airwallex_suppliers')
+            .select('*')
+            .eq('beneficiary_id', beneficiary.id)
             .single()
           
           if (lookupError && lookupError.code !== 'PGRST116') {
-            console.error(`❌ Error looking up supplier ${beneficiary.email}:`, lookupError)
+            console.error(`❌ Error looking up Airwallex supplier ${beneficiary.id}:`, lookupError)
           }
-          existingSupplier = data
+          existingAirwallexSupplier = data
         } else {
-          existingSupplier = await prisma.supplier.findFirst({
-            where: { email: beneficiary.email },
-            select: { id: true, airwallexBeneficiaryId: true }
+          existingAirwallexSupplier = await prisma.airwallexSupplier.findUnique({
+            where: { beneficiaryId: beneficiary.id }
           })
         }
         
-        // Create supplier data with environment-aware field names
-        const baseSupplierData = useSupabase ? {
-          // Supabase uses snake_case - only include fields that exist in schema
-          first_name: beneficiary.first_name || '',
-          last_name: beneficiary.last_name || '',
-          email: beneficiary.email,
-          phone: beneficiary.phone_number || null,
-          company: beneficiary.company_name || null,
-          // NOTE: 'address' column doesn't exist in Supabase schema, so removed
-          city: beneficiary.address?.city || null,
-          country: beneficiary.address?.country || null,
-          postal_code: beneficiary.address?.postcode || null,
-          bank_account_name: beneficiary.bank_details?.account_name || null,
-          bank_account_number: beneficiary.bank_details?.account_number || null,
-          bank_name: beneficiary.bank_details?.bank_name || null,
-          swift_code: beneficiary.bank_details?.swift_code || null,
-          airwallex_beneficiary_id: beneficiary.id,
-          status: 'ACTIVE' as const,
-          is_active: true,
-          airwallex_sync_status: 'SYNCED',
-          airwallex_last_sync_at: new Date().toISOString(),
-          airwallex_raw_data: {
-            beneficiaryId: beneficiary.id,
-            entityType: beneficiary.entity_type,
-            paymentMethods: beneficiary.payment_methods,
-            lastSynced: new Date().toISOString(),
-            // Store address in raw_data instead since column doesn't exist
-            address: beneficiary.address?.street_address || null
-          }
-        } : {
-          // Prisma uses camelCase
-          firstName: beneficiary.first_name || '',
-          lastName: beneficiary.last_name || '',
-          companyName: beneficiary.company_name || null,
-          email: beneficiary.email,
-          phone: beneficiary.phone_number || null,
-          address: beneficiary.address?.street_address || null,
-          city: beneficiary.address?.city || null,
-          state: beneficiary.address?.state || null,
-          country: beneficiary.address?.country || null,
-          postalCode: beneficiary.address?.postcode || null,
-          accountNumber: beneficiary.bank_details?.account_number || null,
-          accountName: beneficiary.bank_details?.account_name || null,
-          bankName: beneficiary.bank_details?.bank_name || null,
-          swiftCode: beneficiary.bank_details?.swift_code || null,
-          airwallexBeneficiaryId: beneficiary.id,
-          status: 'ACTIVE' as const,
-          isActive: true,
-          metadata: {
-            airwallex: {
-              beneficiaryId: beneficiary.id,
-              entityType: beneficiary.entity_type,
-              paymentMethods: beneficiary.payment_methods,
-              lastSynced: new Date().toISOString()
-            }
-          }
-        }
-        
-        // Apply name formatting rules
-        const supplierData = formatSupplierNames(baseSupplierData)
-        
-        if (existingSupplier) {
-          // Update existing supplier (environment-aware)
+        if (existingAirwallexSupplier) {
+          // Update existing Airwallex supplier
           if (useSupabase) {
-            console.log(`🔄 Updating existing supplier: ${beneficiary.email} (ID: ${existingSupplier.id})`)
+            const updateData = {
+              entity_type: airwallexSupplierData.entityType,
+              first_name: airwallexSupplierData.firstName,
+              last_name: airwallexSupplierData.lastName,
+              email: airwallexSupplierData.email,
+              phone: airwallexSupplierData.phone,
+              company: airwallexSupplierData.company,
+              address: airwallexSupplierData.address,
+              city: airwallexSupplierData.city,
+              state: airwallexSupplierData.state,
+              postal_code: airwallexSupplierData.postalCode,
+              country_code: airwallexSupplierData.countryCode,
+              bank_account_name: airwallexSupplierData.bankAccountName,
+              bank_account_number: airwallexSupplierData.bankAccountNumber,
+              bank_name: airwallexSupplierData.bankName,
+              bank_country_code: airwallexSupplierData.bankCountryCode,
+              currency: airwallexSupplierData.currency,
+              iban: airwallexSupplierData.iban,
+              swift_code: airwallexSupplierData.swiftCode,
+              local_clearing_system: airwallexSupplierData.localClearingSystem,
+              business_registration_number: airwallexSupplierData.businessRegistrationNumber,
+              business_registration_type: airwallexSupplierData.businessRegistrationType,
+              legal_rep_first_name: airwallexSupplierData.legalRepFirstName,
+              legal_rep_last_name: airwallexSupplierData.legalRepLastName,
+              legal_rep_email: airwallexSupplierData.legalRepEmail,
+              legal_rep_mobile_number: airwallexSupplierData.legalRepMobileNumber,
+              legal_rep_address: airwallexSupplierData.legalRepAddress,
+              legal_rep_city: airwallexSupplierData.legalRepCity,
+              legal_rep_state: airwallexSupplierData.legalRepState,
+              legal_rep_postal_code: airwallexSupplierData.legalRepPostalCode,
+              legal_rep_country_code: airwallexSupplierData.legalRepCountryCode,
+              legal_rep_nationality: airwallexSupplierData.legalRepNationality,
+              legal_rep_occupation: airwallexSupplierData.legalRepOccupation,
+              legal_rep_id_type: airwallexSupplierData.legalRepIdType,
+              personal_email: airwallexSupplierData.personalEmail,
+              personal_id_number: airwallexSupplierData.personalIdNumber,
+              personal_nationality: airwallexSupplierData.personalNationality,
+              personal_occupation: airwallexSupplierData.personalOccupation,
+              personal_first_name_chinese: airwallexSupplierData.personalFirstNameChinese,
+              personal_last_name_chinese: airwallexSupplierData.personalLastNameChinese,
+              payment_methods: airwallexSupplierData.paymentMethods,
+              capabilities: airwallexSupplierData.capabilities,
+              payer_entity_type: airwallexSupplierData.payerEntityType,
+              status: airwallexSupplierData.status,
+              raw_data: airwallexSupplierData.rawData,
+              last_fetched_at: new Date().toISOString(),
+              sync_error: null
+            }
             
-            const { data: updatedSupplier, error: updateError } = await supabase
-              .from('suppliers')
-              .update(supplierData)
-              .eq('id', existingSupplier.id)
+            const { data: updatedSupplier, error: updateError } = await supabase!
+              .from('airwallex_suppliers')
+              .update(updateData)
+              .eq('beneficiary_id', beneficiary.id)
               .select()
               .single()
             
             if (updateError) {
-              console.error(`❌ Update error for ${beneficiary.email}:`, updateError)
+              console.error(`❌ Update error for Airwallex supplier ${beneficiary.id}:`, updateError)
               throw updateError
             }
             
-            console.log(`✅ Successfully updated supplier: ${updatedSupplier.id}`)
             updated++
-            syncedSuppliers.push(updatedSupplier)
+            syncedAirwallexSuppliers.push(updatedSupplier)
           } else {
-            const updatedSupplier = await prisma.supplier.update({
-              where: { id: existingSupplier.id },
-              data: supplierData
+            const updatedSupplier = await prisma.airwallexSupplier.update({
+              where: { beneficiaryId: beneficiary.id },
+              data: { ...airwallexSupplierData, syncError: null }
             })
             updated++
-            syncedSuppliers.push(updatedSupplier)
+            syncedAirwallexSuppliers.push(updatedSupplier)
           }
-          console.log(`✓ Updated supplier: ${beneficiary.email}`)
+          console.log(`✓ Updated Airwallex supplier: ${beneficiary.email}`)
         } else {
-          // Create new supplier (environment-aware)
+          // Create new Airwallex supplier
           if (useSupabase) {
-            console.log(`🚀 Attempting to create supplier: ${beneficiary.email}`)
-            console.log(`📝 Data to insert:`, {
-              first_name: supplierData.first_name,
-              last_name: supplierData.last_name,
-              email: supplierData.email,
-              status: supplierData.status,
-              is_active: supplierData.is_active
-            })
+            const insertData = {
+              beneficiary_id: airwallexSupplierData.beneficiaryId,
+              entity_type: airwallexSupplierData.entityType,
+              first_name: airwallexSupplierData.firstName,
+              last_name: airwallexSupplierData.lastName,
+              email: airwallexSupplierData.email,
+              phone: airwallexSupplierData.phone,
+              company: airwallexSupplierData.company,
+              address: airwallexSupplierData.address,
+              city: airwallexSupplierData.city,
+              state: airwallexSupplierData.state,
+              postal_code: airwallexSupplierData.postalCode,
+              country_code: airwallexSupplierData.countryCode,
+              bank_account_name: airwallexSupplierData.bankAccountName,
+              bank_account_number: airwallexSupplierData.bankAccountNumber,
+              bank_name: airwallexSupplierData.bankName,
+              bank_country_code: airwallexSupplierData.bankCountryCode,
+              currency: airwallexSupplierData.currency,
+              iban: airwallexSupplierData.iban,
+              swift_code: airwallexSupplierData.swiftCode,
+              local_clearing_system: airwallexSupplierData.localClearingSystem,
+              business_registration_number: airwallexSupplierData.businessRegistrationNumber,
+              business_registration_type: airwallexSupplierData.businessRegistrationType,
+              legal_rep_first_name: airwallexSupplierData.legalRepFirstName,
+              legal_rep_last_name: airwallexSupplierData.legalRepLastName,
+              legal_rep_email: airwallexSupplierData.legalRepEmail,
+              legal_rep_mobile_number: airwallexSupplierData.legalRepMobileNumber,
+              legal_rep_address: airwallexSupplierData.legalRepAddress,
+              legal_rep_city: airwallexSupplierData.legalRepCity,
+              legal_rep_state: airwallexSupplierData.legalRepState,
+              legal_rep_postal_code: airwallexSupplierData.legalRepPostalCode,
+              legal_rep_country_code: airwallexSupplierData.legalRepCountryCode,
+              legal_rep_nationality: airwallexSupplierData.legalRepNationality,
+              legal_rep_occupation: airwallexSupplierData.legalRepOccupation,
+              legal_rep_id_type: airwallexSupplierData.legalRepIdType,
+              personal_email: airwallexSupplierData.personalEmail,
+              personal_id_number: airwallexSupplierData.personalIdNumber,
+              personal_nationality: airwallexSupplierData.personalNationality,
+              personal_occupation: airwallexSupplierData.personalOccupation,
+              personal_first_name_chinese: airwallexSupplierData.personalFirstNameChinese,
+              personal_last_name_chinese: airwallexSupplierData.personalLastNameChinese,
+              payment_methods: airwallexSupplierData.paymentMethods,
+              capabilities: airwallexSupplierData.capabilities,
+              payer_entity_type: airwallexSupplierData.payerEntityType,
+              status: airwallexSupplierData.status,
+              raw_data: airwallexSupplierData.rawData,
+              last_fetched_at: new Date().toISOString()
+            }
             
-            const { data: newSupplier, error: insertError } = await supabase
-              .from('suppliers')
-              .insert(supplierData)
+            const { data: newSupplier, error: insertError } = await supabase!
+              .from('airwallex_suppliers')
+              .insert(insertData)
               .select()
               .single()
             
             if (insertError) {
-              console.error(`❌ Insert error for ${beneficiary.email}:`, {
+              console.error(`❌ Insert error for Airwallex supplier ${beneficiary.id}:`, {
                 message: insertError.message,
                 code: insertError.code,
                 hint: insertError.hint,
@@ -198,17 +288,16 @@ export async function POST(request: NextRequest) {
               throw insertError
             }
             
-            console.log(`✅ Successfully created supplier: ${newSupplier.id}`)
             created++
-            syncedSuppliers.push(newSupplier)
+            syncedAirwallexSuppliers.push(newSupplier)
           } else {
-            const newSupplier = await prisma.supplier.create({
-              data: supplierData
+            const newSupplier = await prisma.airwallexSupplier.create({
+              data: airwallexSupplierData
             })
             created++
-            syncedSuppliers.push(newSupplier)
+            syncedAirwallexSuppliers.push(newSupplier)
           }
-          console.log(`✓ Created supplier: ${beneficiary.email}`)
+          console.log(`✓ Created Airwallex supplier: ${beneficiary.email}`)
         }
         
       } catch (error: any) {
@@ -229,30 +318,30 @@ export async function POST(request: NextRequest) {
     
     const response = {
       success: true,
-      message: 'Supplier sync completed',
+      message: 'Airwallex supplier sync completed (New Architecture)',
       data: {
         sync_results: {
           total_beneficiaries: beneficiaries.length,
-          new_suppliers: created,
-          updated_suppliers: updated,
+          new_airwallex_suppliers: created,
+          updated_airwallex_suppliers: updated,
           errors: errors,
-          suppliers_processed: syncedSuppliers.length
+          airwallex_suppliers_processed: syncedAirwallexSuppliers.length
         },
-        synced_suppliers: syncedSuppliers,
+        synced_airwallex_suppliers: syncedAirwallexSuppliers,
         error_details: errors > 0 ? errorDetails : undefined
       }
     }
     
-    console.log('✅ Supplier sync completed')
+    console.log('✅ Airwallex supplier sync completed')
     console.log(`📊 Summary: ${created} new, ${updated} updated, ${errors} errors`)
     
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    console.error('❌ Supplier sync failed:', error)
+    console.error('❌ Airwallex supplier sync failed:', error)
     
     return NextResponse.json({
       success: false,
-      message: 'Supplier sync failed',
+      message: 'Airwallex supplier sync failed',
       error: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
@@ -269,70 +358,108 @@ export async function GET(request: NextRequest) {
     // Check if Airwallex is configured
     const isConfigured = process.env.AIRWALLEX_CLIENT_ID && process.env.AIRWALLEX_API_KEY
     
-    // Get supplier statistics (environment-aware)
+    const supabase = useSupabase ? createSupabaseClient() : null
+    
+    // Get statistics (environment-aware)
     let totalSuppliers = 0
-    let syncedSuppliers = 0
+    let totalAirwallexSuppliers = 0
+    let linkedSuppliers = 0
     let airwallexSuppliers: any[] = []
     
     if (useSupabase) {
-      const { count: total } = await supabase
+      // Get total suppliers
+      const { count: total } = await supabase!
         .from('suppliers')
         .select('*', { count: 'exact', head: true })
       
-      const { count: synced } = await supabase
-        .from('suppliers')
+      // Get total Airwallex suppliers
+      const { count: airwallexTotal } = await supabase!
+        .from('airwallex_suppliers')
         .select('*', { count: 'exact', head: true })
-        .not('airwallex_beneficiary_id', 'is', null)
       
-      const { data: suppliers } = await supabase
-        .from('suppliers')
-        .select('id, first_name, last_name, email, airwallex_beneficiary_id, status, updated_at')
-        .not('airwallex_beneficiary_id', 'is', null)
-        .order('updated_at', { ascending: false })
+      // Get linked suppliers
+      const { count: linked } = await supabase!
+        .from('airwallex_suppliers')
+        .select('*', { count: 'exact', head: true })
+        .not('linked_supplier_id', 'is', null)
+      
+      // Get recent Airwallex suppliers
+      const { data: suppliers } = await supabase!
+        .from('airwallex_suppliers')
+        .select(`
+          id, 
+          beneficiary_id, 
+          first_name, 
+          last_name, 
+          email, 
+          status, 
+          last_fetched_at,
+          linked_supplier_id,
+          linked_supplier:suppliers(id, first_name, last_name)
+        `)
+        .order('last_fetched_at', { ascending: false })
         .limit(10)
       
       totalSuppliers = total || 0
-      syncedSuppliers = synced || 0
+      totalAirwallexSuppliers = airwallexTotal || 0
+      linkedSuppliers = linked || 0
       airwallexSuppliers = suppliers || []
     } else {
       totalSuppliers = await prisma.supplier.count()
-      syncedSuppliers = await prisma.supplier.count({
-        where: { airwallexBeneficiaryId: { not: null } }
+      totalAirwallexSuppliers = await prisma.airwallexSupplier.count()
+      linkedSuppliers = await prisma.airwallexSupplier.count({
+        where: { linkedSupplierId: { not: null } }
       })
-      airwallexSuppliers = await prisma.supplier.findMany({
-        where: { airwallexBeneficiaryId: { not: null } },
+      
+      airwallexSuppliers = await prisma.airwallexSupplier.findMany({
         select: {
           id: true,
+          beneficiaryId: true,
           firstName: true,
           lastName: true,
           email: true,
-          airwallexBeneficiaryId: true,
           status: true,
-          updatedAt: true
+          lastFetchedAt: true,
+          linkedSupplierId: true,
+          linkedSupplier: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true
+            }
+          }
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { lastFetchedAt: 'desc' },
         take: 10
       })
     }
     
     return NextResponse.json({
       success: true,
-      message: 'Supplier sync summary retrieved',
+      message: 'Supplier sync summary retrieved (New Architecture)',
       configured: isConfigured,
       data: {
         database_summary: {
           totalSuppliers: totalSuppliers || 0,
-          syncedSuppliers: syncedSuppliers || 0,
-          pendingSuppliers: (totalSuppliers || 0) - (syncedSuppliers || 0),
+          totalAirwallexSuppliers: totalAirwallexSuppliers || 0,
+          linkedSuppliers: linkedSuppliers || 0,
+          unlinkedAirwallexSuppliers: (totalAirwallexSuppliers || 0) - (linkedSuppliers || 0),
           notConfigured: !isConfigured
         },
-        recent_synced_suppliers: (airwallexSuppliers || []).map(supplier => ({
+        recent_airwallex_suppliers: (airwallexSuppliers || []).map(supplier => ({
           id: supplier.id,
+          beneficiaryId: useSupabase ? supplier.beneficiary_id : supplier.beneficiaryId,
           name: useSupabase ? `${supplier.first_name} ${supplier.last_name}` : `${supplier.firstName} ${supplier.lastName}`,
           email: supplier.email,
-          airwallexBeneficiaryId: useSupabase ? supplier.airwallex_beneficiary_id : supplier.airwallexBeneficiaryId,
           status: supplier.status,
-          lastSyncAt: useSupabase ? supplier.updated_at : supplier.updatedAt
+          lastSyncAt: useSupabase ? supplier.last_fetched_at : supplier.lastFetchedAt,
+          isLinked: useSupabase ? !!supplier.linked_supplier_id : !!supplier.linkedSupplierId,
+          linkedSupplier: supplier.linked_supplier ? {
+            id: supplier.linked_supplier.id,
+            name: useSupabase 
+              ? `${supplier.linked_supplier.first_name} ${supplier.linked_supplier.last_name}`
+              : `${supplier.linked_supplier.firstName} ${supplier.linked_supplier.lastName}`
+          } : null
         }))
       }
     }, { status: 200 })

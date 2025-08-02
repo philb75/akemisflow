@@ -17,7 +17,7 @@ if (useSupabase) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -26,13 +26,15 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Get supplier (environment-aware)
     let supplier
     if (useSupabase) {
       const { data, error } = await supabase
         .from('suppliers')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
       
       if (error) {
@@ -63,13 +65,14 @@ export async function GET(
         createdAt: data.created_at,
         updatedAt: data.updated_at,
         airwallexBeneficiaryId: data.airwallex_beneficiary_id,
+        airwallexContactId: data.airwallex_contact_id,
         airwallexSyncStatus: data.airwallex_sync_status,
         airwallexLastSyncAt: data.airwallex_last_sync_at
       }
     } else {
       supplier = await prisma.supplier.findUnique({
         where: {
-          id: params.id
+          id: id
         }
       })
     }
@@ -93,7 +96,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -101,6 +104,8 @@ export async function PUT(
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    const { id } = await params
 
     const body = await req.json()
     const {
@@ -175,7 +180,7 @@ export async function PUT(
       const { data, error } = await supabase
         .from('suppliers')
         .update(updateData)
-        .eq('id', params.id)
+        .eq('id', id)
         .select()
         .single()
       
@@ -184,7 +189,7 @@ export async function PUT(
     } else {
       supplier = await prisma.supplier.update({
         where: {
-          id: params.id
+          id: id
         },
         data: updateData
       })
@@ -217,7 +222,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -226,18 +231,20 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Delete supplier (environment-aware)
     if (useSupabase) {
       const { error } = await supabase
         .from('suppliers')
         .delete()
-        .eq('id', params.id)
+        .eq('id', id)
       
       if (error) throw error
     } else {
       await prisma.supplier.delete({
         where: {
-          id: params.id
+          id: id
         }
       })
     }

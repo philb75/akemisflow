@@ -110,7 +110,7 @@ export async function checkDocumentAccess(
  */
 export async function checkUploadPermission(
   userId: string,
-  entityType: 'entity' | 'contractor' | 'invoice',
+  entityType: 'entity' | 'contractor' | 'invoice' | 'supplier',
   entityId: string
 ): Promise<{ allowed: boolean; reason?: string }> {
   try {
@@ -147,6 +147,7 @@ export async function checkUploadPermission(
         break
 
       case 'contractor':
+      case 'supplier':
         const supplier = await prisma.supplier.findUnique({
           where: { id: entityId },
           select: { id: true, email: true }
