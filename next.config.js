@@ -1,14 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // Skip type checking during build for deployment
-    ignoreBuildErrors: true,
+    // Only ignore build errors in production builds, not development
+    ignoreBuildErrors: process.env.NODE_ENV === 'production',
   },
   eslint: {
-    // Skip ESLint during builds
-    ignoreDuringBuilds: true,
+    // Only ignore ESLint during production builds
+    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
   serverExternalPackages: ['@prisma/client', 'bcryptjs'],
+  // Remove experimental runtime config as it's not valid
+  output: 'standalone',
   webpack: (config, { isServer, webpack }) => {
     const path = require('path');
     
