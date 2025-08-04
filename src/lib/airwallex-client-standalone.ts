@@ -31,6 +31,12 @@ interface AirwallexBeneficiary {
   metadata?: any
 }
 
+interface AirwallexBeneficiariesResponse {
+  items: AirwallexBeneficiary[]
+  has_more?: boolean
+  next_cursor?: string
+}
+
 export class AirwallexClientStandalone {
   private accessToken: string = ''
   private tokenExpiry: Date = new Date()
@@ -85,12 +91,17 @@ export class AirwallexClientStandalone {
     }
   }
 
-  async getBeneficiaries(limit: number = 100): Promise<AirwallexBeneficiary[]> {
+  // Get a single page of beneficiaries
+  private async getBeneficiariesPage(cursor?: string, limit: number = 100): Promise<AirwallexBeneficiariesResponse> {
     await this.ensureAuthenticated()
 
     try {
-      const url = `${this.baseUrl}/api/v1/beneficiaries?limit=${limit}`
-      console.log(`Fetching beneficiaries from: /api/v1/beneficiaries?limit=${limit}`)
+      let url = `${this.baseUrl}/api/v1/beneficiaries?limit=${limit}`
+      if (cursor) {
+        url += `&cursor=${encodeURIComponent(cursor)}`
+      }
+      
+      console.log(`Fetching beneficiaries page from: /api/v1/beneficiaries${cursor ? ` with cursor=${cursor}` : ''}`)
 
       const response = await fetch(url, {
         method: 'GET',
@@ -106,14 +117,52 @@ export class AirwallexClientStandalone {
       }
 
       const data = await response.json()
-      const beneficiaries = data.items || []
-      
-      console.log(`Found ${beneficiaries.length} beneficiaries in Airwallex`)
-      return beneficiaries
+      return {
+        items: data.items || [],
+        has_more: data.has_more,
+        next_cursor: data.next_cursor
+      }
     } catch (error) {
-      console.error('[Airwallex] Error fetching beneficiaries:', error)
+      console.error('[Airwallex] Error fetching beneficiaries page:', error)
       throw error
     }
+  }
+
+  // Get all beneficiaries with pagination
+  async getAllBeneficiaries(): Promise<AirwallexBeneficiary[]> {
+    const allBeneficiaries: AirwallexBeneficiary[] = []
+    let cursor: string | undefined
+    let hasMore = true
+    let pageCount = 0
+
+    console.log('[Airwallex] Starting to fetch all beneficiaries with pagination...')
+
+    while (hasMore) {
+      pageCount++
+      const response = await this.getBeneficiariesPage(cursor)
+      
+      allBeneficiaries.push(...response.items)
+      
+      console.log(`[Airwallex] Page ${pageCount}: fetched ${response.items.length} beneficiaries (total so far: ${allBeneficiaries.length})`)
+      
+      hasMore = response.has_more || false
+      cursor = response.next_cursor
+      
+      if (!hasMore || !cursor) {
+        console.log(`[Airwallex] No more pages. Pagination complete.`)
+        break
+      }
+    }
+    
+    console.log(`[Airwallex] ✅ Total beneficiaries fetched: ${allBeneficiaries.length}`)
+    return allBeneficiaries
+  }
+
+  // Legacy method for backward compatibility - gets first page only
+  async getBeneficiaries(limit: number = 100): Promise<AirwallexBeneficiary[]> {
+    console.log('[Airwallex] WARNING: getBeneficiaries() only returns first page. Use getAllBeneficiaries() for complete list.')
+    const response = await this.getBeneficiariesPage(undefined, limit)
+    return response.items
   }
 
   async getBeneficiary(beneficiaryId: string): Promise<AirwallexBeneficiary | null> {

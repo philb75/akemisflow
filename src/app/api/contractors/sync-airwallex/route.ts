@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     const airwallex = new AirwallexClientStandalone()
     await airwallex.initialize()
     
-    // Fetch beneficiaries from Airwallex
-    const allBeneficiaries = await airwallex.getBeneficiaries()
-    console.log(`📋 Found ${allBeneficiaries.length} total beneficiaries in Airwallex`)
+    // Fetch ALL beneficiaries from Airwallex with pagination
+    const allBeneficiaries = await airwallex.getAllBeneficiaries()
+    console.log(`📋 Found ${allBeneficiaries.length} total beneficiaries in Airwallex (after pagination)`)
     
     // TEMPORARY: Show all beneficiaries for debugging (remove filtering)
     console.log('🔍 DEBUG: Showing all beneficiaries to identify filtering issues...')
