@@ -1,17 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { createSupabaseClient } from '@/lib/supabase'
+
+// Environment-aware database client
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 export async function DELETE(request: NextRequest) {
   try {
     console.log('🗑️ Starting complete contact cleanup...')
+    console.log(useSupabase ? '🔵 Using Supabase database client' : '🟡 Using Prisma database client')
     
-    // Delete all Airwallex contractors
-    const airwallexDeleteResult = await prisma.airwallexContractor.deleteMany({})
-    console.log(`✅ Deleted ${airwallexDeleteResult.count} Airwallex contractors`)
+    let airwallexDeleteResult: any = { count: 0 }
+    let contractorDeleteResult: any = { count: 0 }
     
-    // Delete all contractors (optional - comment out if you want to keep contractor records)
-    const contractorDeleteResult = await prisma.contractor.deleteMany({})
-    console.log(`✅ Deleted ${contractorDeleteResult.count} contractors`)
+    if (useSupabase) {
+      const supabase = createSupabaseClient()
+      
+      // Get initial counts
+      const { count: airwallexInitialCount } = await supabase
+        .from('airwallex_contractors')
+        .select('*', { count: 'exact', head: true })
+      
+      const { count: contractorInitialCount } = await supabase
+        .from('contractors')
+        .select('*', { count: 'exact', head: true })
+      
+      // Delete all Airwallex contractors
+      const { error: airwallexError } = await supabase
+        .from('airwallex_contractors')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all (Supabase requires a condition)
+      
+      if (airwallexError) {
+        throw new Error(`Failed to delete Airwallex contractors: ${airwallexError.message}`)
+      }
+      
+      airwallexDeleteResult.count = airwallexInitialCount || 0
+      console.log(`✅ Deleted ${airwallexDeleteResult.count} Airwallex contractors`)
+      
+      // Delete all contractors
+      const { error: contractorError } = await supabase
+        .from('contractors')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all (Supabase requires a condition)
+      
+      if (contractorError) {
+        throw new Error(`Failed to delete contractors: ${contractorError.message}`)
+      }
+      
+      contractorDeleteResult.count = contractorInitialCount || 0
+      console.log(`✅ Deleted ${contractorDeleteResult.count} contractors`)
+    } else {
+      // Delete all Airwallex contractors
+      airwallexDeleteResult = await prisma.airwallexContractor.deleteMany({})
+      console.log(`✅ Deleted ${airwallexDeleteResult.count} Airwallex contractors`)
+      
+      // Delete all contractors
+      contractorDeleteResult = await prisma.contractor.deleteMany({})
+      console.log(`✅ Deleted ${contractorDeleteResult.count} contractors`)
+    }
     
     // Also delete any Contact table records if they exist
     try {
@@ -42,9 +89,26 @@ export async function DELETE(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Return current counts
-    const airwallexCount = await prisma.airwallexContractor.count()
-    const contractorCount = await prisma.contractor.count()
+    let airwallexCount = 0
+    let contractorCount = 0
+    
+    if (useSupabase) {
+      const supabase = createSupabaseClient()
+      
+      const { count: airwallex } = await supabase
+        .from('airwallex_contractors')
+        .select('*', { count: 'exact', head: true })
+      
+      const { count: contractor } = await supabase
+        .from('contractors')
+        .select('*', { count: 'exact', head: true })
+      
+      airwallexCount = airwallex || 0
+      contractorCount = contractor || 0
+    } else {
+      airwallexCount = await prisma.airwallexContractor.count()
+      contractorCount = await prisma.contractor.count()
+    }
     
     let contactCount = 0
     try {

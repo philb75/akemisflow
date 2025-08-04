@@ -7,8 +7,7 @@ import { formatContractorNames } from '@/lib/name-formatter'
 
 // Environment-aware database client
 // Use Supabase if we have the URL configured (production), otherwise use Prisma (local)
-// TEMPORARY: Force use of Prisma for debugging
-const useSupabase = false // !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 console.log(useSupabase ? '🔵 Using Supabase database client' : '🟡 Using Prisma database client')
 

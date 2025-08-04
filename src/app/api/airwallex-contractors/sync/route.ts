@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { createSupabaseClient } from '@/lib/supabase'
+
+// Environment-aware database client
+const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -11,9 +15,31 @@ export async function DELETE(request: NextRequest) {
     }
 
     console.log('🗑️ Deleting all Airwallex contractors...')
+    console.log(useSupabase ? '🔵 Using Supabase database client' : '🟡 Using Prisma database client')
     
     // Delete all Airwallex contractors
-    const deleteResult = await prisma.airwallexContractor.deleteMany({})
+    let deleteResult: any = { count: 0 }
+    
+    if (useSupabase) {
+      const supabase = createSupabaseClient()
+      const { error } = await supabase
+        .from('airwallex_contractors')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all (Supabase requires a condition)
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+      
+      // Get count of remaining records to calculate deleted count
+      const { count } = await supabase
+        .from('airwallex_contractors')
+        .select('*', { count: 'exact', head: true })
+      
+      deleteResult.count = 'all' // We don't have the exact count but all were deleted
+    } else {
+      deleteResult = await prisma.airwallexContractor.deleteMany({})
+    }
     
     console.log(`✅ Deleted ${deleteResult.count} Airwallex contractors`)
     
