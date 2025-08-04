@@ -305,9 +305,9 @@ model PartnerProfitShare {
 
 model Contractor {
   id                         String           @id @default(uuid()) @db.Uuid
-  firstName                  String           @map("first_name") @db.VarChar(100)
-  lastName                   String           @map("last_name") @db.VarChar(100)
-  email                      String           @unique @db.VarChar(255)
+  firstName                  String?          @map("first_name") @db.VarChar(100)
+  lastName                   String?          @map("last_name") @db.VarChar(100)
+  email                      String?          @db.VarChar(255)
   phone                      String?          @db.VarChar(50)
   company                    String?          @db.VarChar(255)
   vatNumber                  String?          @map("vat_number") @db.VarChar(100)
@@ -375,9 +375,9 @@ model AirwallexContractor {
   entityType            String?   @map("entity_type") @db.VarChar(20)
   
   // Personal information
-  firstName             String    @map("first_name") @db.VarChar(100)
-  lastName              String    @map("last_name") @db.VarChar(100)
-  email                 String    @db.VarChar(255)
+  firstName             String?   @map("first_name") @db.VarChar(100)
+  lastName              String?   @map("last_name") @db.VarChar(100)
+  email                 String?   @db.VarChar(255)
   phone                 String?   @db.VarChar(50)
   company               String?   @db.VarChar(255)
   
