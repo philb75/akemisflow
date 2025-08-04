@@ -1,0 +1,71 @@
+=== AkemisFlow Startup Diagnosis Report ===
+Generated: 2025-08-03T09:38:57.922Z
+
+=== Issues Found ===
+1. Previous Next.js processes may be running
+2. Missing environment variable: DATABASE_URL
+3. Database connection failed
+4. HTTP server not responding properly
+
+=== Recommended Fixes ===
+1. Kill existing processes: pkill -f "next dev"
+2. Add DATABASE_URL to .env
+3. Check DATABASE_URL and ensure PostgreSQL is running
+4. Check if the server process is actually listening on the port
+
+=== Detailed Logs ===
+[2025-08-03T09:38:54.262Z] INFO: Checking for running processes...
+[2025-08-03T09:38:54.304Z] WARN: Found running processes:
+philippebarthelemy  4279   0.0  0.0 427015680  14224   ??  S    10:51AM   0:00.24 /System/Library/PrivateFrameworks/DeviceCheckInternal.framework/devicecheckd
+philippebarthelemy  3921   0.0  0.1 411805280  63328 s001  S+   10:51AM   0:00.09 node /Users/philippebarthelemy/dev/n8n/mcp-database-server/dist/index.js
+_fpsd             1306   0.0  0.0 427053936  27184   ??  Ss   10:50AM   0:01.79 /usr/libexec/fairplaydeviceidentityd
+philippebarthelemy  1240   0.0  0.0 427019840  25568   ??  S    10:49AM   0:00.23 /System/Library/PrivateFrameworks/OnDeviceStorage.framework/Support/amsondevicestoraged
+philippebarthelemy   936   0.0  0.1 412551472  41984   ??  S    10:49AM   0:00.30 /Applications/Docker.app/Contents/MacOS/com.docker.virtualization --kernel /Applications/Docker.app/Contents/Resources/linuxkit/kernel --cmdline init=/init loglevel=1 root=/dev/vdb rootfstype=erofs ro vsyscall=emulate panic=0 eth0.dhcp eth1.dhcp linuxkit.unified_cgroup_hierarchy=1 console=hvc0   virtio_net.disable_csum=1 vpnkit.connect=connect://2/1999 --boot /Applications/Docker.app/Contents/Resources/linuxkit/boot.img --disk /Users/philippebarthelemy/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw --networkType gvisor --cpus 16 --memoryMiB 8092 --console-log /Users/philippebarthelemy/Library/Containers/com.docker.docker/Data/log/vm/console.log --watchdog --virtiofs /Users --virtiofs /Volumes --virtiofs /private --virtiofs /tmp --virtiofs /var/folders --rosetta
+philippebarthelemy   928   0.0  0.0 411860128  15600   ??  S    10:49AM   0:00.02 /Applications/Docker.app/Contents/MacOS/com.docker.dev-envs -watchdog
+philippebarthelemy   649   0.0  0.0 426981824  12992   ??  S    10:49AM   0:00.05 /usr/libexec/findmydevice-user-agent
+root               584   0.0  0.0 427016816  15568   ??  Ss   10:49AM   0:00.05 /usr/libexec/findmydeviced
+philippebarthelemy 22827   0.0  0.0 410350352   2400   ??  Ss   11:38AM   0:00.01 /bin/zsh -c -l source /Users/philippebarthelemy/.claude/shell-snapshots/snapshot-zsh-1754211084025-y1jdqu.sh && eval 'node diagnose-startup.js' \< /dev/null && pwd -P >| /var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/claude-c2e8-cwd
+philippebarthelemy 12822   0.0  0.4 1622356176 251936   ??  S    11:14AM   0:09.60 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/131.0.6778.204/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer) --type=renderer --string-annotations --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO --disable-background-timer-throttling --disable-breakpad --enable-automation --force-color-profile=srgb --remote-debugging-port=0 --allow-pre-commit-input --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=6 --time-ticks-at-unix-epoch=-1754210936403372 --launch-time-ticks=1540956104 --shared-files --metrics-shmem-handle=1752395122,r,15076915607048306557,18267662488695229916,2097152 --field-trial-handle=1718379636,r,3557530160222482855,8698576842253538862,262144 --enable-features=PdfOopif --disable-features=AcceptCHFrame,IsolateSandboxedIframes,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,Translate --variations-seed-version --seatbelt-client=79
+philippebarthelemy 12821   0.0  0.1 1622038128  74864   ??  S    11:14AM   0:00.06 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/131.0.6778.204/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer) --type=renderer --string-annotations --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO --disable-background-timer-throttling --disable-breakpad --enable-automation --force-color-profile=srgb --remote-debugging-port=0 --allow-pre-commit-input --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1754210936403372 --launch-time-ticks=1540950329 --shared-files --metrics-shmem-handle=1752395122,r,13376778300988830601,15041948600804044732,2097152 --field-trial-handle=1718379636,r,3557530160222482855,8698576842253538862,262144 --enable-features=PdfOopif --disable-features=AcceptCHFrame,IsolateSandboxedIframes,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,Translate --variations-seed-version --seatbelt-client=79
+philippebarthelemy 12819   0.0  0.1 444198208  62176   ??  S    11:14AM   0:00.06 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/131.0.6778.204/Helpers/Google Chrome for Testing Helper.app/Contents/MacOS/Google Chrome for Testing Helper --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=service --string-annotations --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO --shared-files --metrics-shmem-handle=1752395122,r,6306153290487188261,11914897435633465819,524288 --field-trial-handle=1718379636,r,3557530160222482855,8698576842253538862,262144 --enable-features=PdfOopif --disable-features=AcceptCHFrame,IsolateSandboxedIframes,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,Translate --variations-seed-version --seatbelt-client=42
+philippebarthelemy 12818   0.0  0.1 444398640  86880   ??  S    11:14AM   0:01.27 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/131.0.6778.204/Helpers/Google Chrome for Testing Helper.app/Contents/MacOS/Google Chrome for Testing Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=network --string-annotations --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO --start-stack-profiler --shared-files --metrics-shmem-handle=1752395122,r,9559261743531254137,18073190329784683401,524288 --field-trial-handle=1718379636,r,3557530160222482855,8698576842253538862,262144 --enable-features=PdfOopif --disable-features=AcceptCHFrame,IsolateSandboxedIframes,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,Translate --variations-seed-version --seatbelt-client=30
+philippebarthelemy 12817   0.0  0.2 444911936 159840   ??  S    11:14AM   0:11.56 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/131.0.6778.204/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU) --type=gpu-process --disable-breakpad --string-annotations --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO --start-stack-profiler --gpu-preferences=UAAAAAAAAAAgAAAEAAAAAAAAAAAAAAAAAABgAAMAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA --shared-files --metrics-shmem-handle=1752395122,r,9615619500794697340,14875637514685976619,262144 --field-trial-handle=1718379636,r,3557530160222482855,8698576842253538862,262144 --enable-features=PdfOopif --disable-features=AcceptCHFrame,IsolateSandboxedIframes,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,Translate --variations-seed-version --seatbelt-client=26
+philippebarthelemy 12809   0.0  0.3 444728416 192080   ??  Ss   11:14AM   0:04.31 /Users/philippebarthelemy/.cache/puppeteer/chrome/mac_arm-131.0.6778.204/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing --allow-pre-commit-input --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-crash-reporter --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-hang-monitor --disable-infobars --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-search-engine-choice-screen --disable-sync --enable-automation --export-tagged-pdf --force-color-profile=srgb --generate-pdf-document-outline --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,IsolateSandboxedIframes --enable-features=PdfOopif about:blank --remote-debugging-port=0 --user-data-dir=/var/folders/5p/bn01020x28d9pr8s_rk_04nr0000gn/T/puppeteer_dev_chrome_profile-XtvGvO
+
+[2025-08-03T09:38:54.304Z] WARN: Issue identified: Previous Next.js processes may be running
+[2025-08-03T09:38:54.304Z] INFO: Suggested fix: Kill existing processes: pkill -f "next dev"
+[2025-08-03T09:38:54.304Z] INFO: Checking port availability...
+[2025-08-03T09:38:54.305Z] SUCCESS: Port 3000 is available
+[2025-08-03T09:38:54.305Z] SUCCESS: Port 3001 is available
+[2025-08-03T09:38:54.305Z] SUCCESS: Port 3002 is available
+[2025-08-03T09:38:54.305Z] INFO: Checking Docker services...
+[2025-08-03T09:38:54.347Z] SUCCESS: PostgreSQL container is running
+[2025-08-03T09:38:54.347Z] SUCCESS: Redis container is running
+[2025-08-03T09:38:54.348Z] INFO: Checking environment configuration...
+[2025-08-03T09:38:54.348Z] SUCCESS: Found .env.local
+[2025-08-03T09:38:54.348Z] SUCCESS: DATABASE_URL is configured
+[2025-08-03T09:38:54.348Z] SUCCESS: NEXTAUTH_SECRET is configured
+[2025-08-03T09:38:54.348Z] SUCCESS: NEXTAUTH_URL is configured
+[2025-08-03T09:38:54.348Z] SUCCESS: Found .env
+[2025-08-03T09:38:54.348Z] WARN: Issue identified: Missing environment variable: DATABASE_URL
+[2025-08-03T09:38:54.348Z] INFO: Suggested fix: Add DATABASE_URL to .env
+[2025-08-03T09:38:54.348Z] SUCCESS: NEXTAUTH_SECRET is configured
+[2025-08-03T09:38:54.348Z] SUCCESS: NEXTAUTH_URL is configured
+[2025-08-03T09:38:54.348Z] INFO: Testing database connection...
+[2025-08-03T09:38:54.368Z] WARN: Issue identified: Database connection failed
+[2025-08-03T09:38:54.368Z] INFO: Suggested fix: Check DATABASE_URL and ensure PostgreSQL is running
+[2025-08-03T09:38:54.368Z] ERROR: Database error: 
+[2025-08-03T09:38:54.368Z] INFO: Checking file permissions...
+[2025-08-03T09:38:54.369Z] SUCCESS: uploads/ directory is writable
+[2025-08-03T09:38:54.369Z] SUCCESS: logs/ directory is writable
+[2025-08-03T09:38:54.369Z] SUCCESS: .next/ directory is writable
+[2025-08-03T09:38:54.369Z] INFO: Checking node modules...
+[2025-08-03T09:38:54.369Z] SUCCESS: next is installed
+[2025-08-03T09:38:54.369Z] SUCCESS: @prisma/client is installed
+[2025-08-03T09:38:54.369Z] SUCCESS: prisma is installed
+[2025-08-03T09:38:54.369Z] INFO: Testing Next.js startup process...
+[2025-08-03T09:38:55.646Z] SUCCESS: Next.js startup completed successfully
+[2025-08-03T09:38:57.648Z] INFO: Testing HTTP connectivity on port 3001...
+[2025-08-03T09:38:57.922Z] WARN: Issue identified: HTTP server not responding properly
+[2025-08-03T09:38:57.922Z] INFO: Suggested fix: Check if the server process is actually listening on the port
+[2025-08-03T09:38:57.922Z] WARN: Found 4 issue(s) that may prevent proper startup:

@@ -62,3 +62,28 @@ export async function GET(request: NextRequest) {
     }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    console.log('🗑️ Deleting existing Airwallex contacts...')
+    
+    // Delete all Airwallex contacts from the Contact table
+    const deleteResult = await airwallexContactSync.deleteAllAirwallexContacts()
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Airwallex contacts deleted successfully',
+      data: {
+        deletedCount: deleteResult
+      }
+    }, { status: 200 })
+  } catch (error) {
+    console.error('❌ Failed to delete Airwallex contacts:', error)
+    
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to delete Airwallex contacts',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
+  }
+}

@@ -4,7 +4,7 @@ export default function ContractsPage() {
   return (
     <PlaceholderPage 
       title="Contracts"
-      description="Manage client and supplier contracts, agreements, and legal documents"
+      description="Manage client and contractor contracts, agreements, and legal documents"
     />
   )
 }

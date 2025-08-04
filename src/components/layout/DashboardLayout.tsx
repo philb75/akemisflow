@@ -27,7 +27,7 @@ const navigationItems = [
     ),
     submenu: [
       { name: 'Clients', href: '/entities/clients' },
-      { name: 'Suppliers', href: '/entities/suppliers' },
+      { name: 'Contractors', href: '/entities/contractors' },
       { name: 'Bank Accounts', href: '/entities/bank-accounts' },
     ]
   },
@@ -56,7 +56,7 @@ const navigationItems = [
     ),
     submenu: [
       { name: 'Client Contracts', href: '/contracts/clients' },
-      { name: 'Supplier Contracts', href: '/contracts/suppliers' },
+      { name: 'Contractor Contracts', href: '/contracts/contractors' },
     ]
   },
   {
@@ -69,7 +69,7 @@ const navigationItems = [
     ),
     submenu: [
       { name: 'Client Statements', href: '/reporting/client-statements' },
-      { name: 'Supplier Statements', href: '/reporting/supplier-statements' },
+      { name: 'Contractor Statements', href: '/reporting/contractor-statements' },
       { name: 'Financial Statements', href: '/reporting/financial-statements' },
       { name: 'Profit-Share Statements', href: '/reporting/profit-share-statements' },
     ]
@@ -273,7 +273,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">AkemisFlow</h1>
-              <span className="text-sm text-gray-500">Financial Management System</span>
+              <span className="text-sm text-red-600 font-medium">Local Server | PostgreSQL</span>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">

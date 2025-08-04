@@ -1,0 +1,48 @@
+{
+  "requestId": "06619cccd71def70",
+  "timestamp": "2025-08-04T18:10:14.355Z",
+  "summary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "passRate": "50.0%"
+  },
+  "tests": [
+    {
+      "id": "T1",
+      "name": "UI Layout Test for R1",
+      "requirement": "R1",
+      "status": "fail",
+      "duration": 824,
+      "details": {
+        "reason": "Comment field not properly aligned",
+        "expected": "Comment field aligned with Account Name field",
+        "actual": "Elements not found",
+        "measurements": {
+          "found": false
+        }
+      }
+    },
+    {
+      "id": "T1",
+      "name": "Database Test for R2",
+      "requirement": "R2",
+      "status": "pass",
+      "duration": 563,
+      "details": {
+        "message": "Database schema correctly updated"
+      }
+    }
+  ],
+  "changeManifest": {
+    "requestId": "06619cccd71def70",
+    "timestamp": "2025-08-04T18:09:41.286Z",
+    "model": "opus",
+    "attempt": 3,
+    "changes": [],
+    "summary": {
+      "filesModified": 1,
+      "requirementsImplemented": 4
+    }
+  }
+}

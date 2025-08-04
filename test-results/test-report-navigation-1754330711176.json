@@ -1,0 +1,201 @@
+{
+  "testType": "navigation",
+  "status": "passed",
+  "startTime": "2025-08-04T18:04:48.449Z",
+  "endTime": "2025-08-04T18:05:11.176Z",
+  "duration": 22727,
+  "screenshots": [],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T18:04:50.682Z"
+    }
+  ],
+  "serverLogExcerpts": [
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:51.011Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:52.009Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:53.015Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:54.012Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:55.016Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:56.017Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:57.019Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:58.014Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:04:59.014Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:00.021Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:01.025Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:02.018Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:03.019Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:04.019Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:05.025Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:06.025Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:07.021Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:08.022Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:09.028Z"
+    },
+    {
+      "content": "e,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:50.186Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:51.627Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n[2025-08-04T18:04:57.634Z] INFO [DATABASE]: Prisma database connected successfully\n  Metadata: {\n  \"mode\": \"local-prisma\"\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T18:05:10.024Z"
+    }
+  ],
+  "performanceMetrics": {
+    "breadcrumbs": [],
+    "directNavigation": {
+      "results": [
+        {
+          "page": "Home",
+          "path": "/",
+          "status": "not-found",
+          "loadTime": 1165,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Dashboard",
+          "path": "/dashboard",
+          "status": "not-found",
+          "loadTime": 1139,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Entities",
+          "path": "/entities",
+          "status": "not-found",
+          "loadTime": 1139,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Contractors",
+          "path": "/entities/contractors",
+          "status": "not-found",
+          "loadTime": 1145,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Clients",
+          "path": "/entities/clients",
+          "status": "not-found",
+          "loadTime": 1143,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Finance",
+          "path": "/finance",
+          "status": "not-found",
+          "loadTime": 1140,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Reporting",
+          "path": "/reporting",
+          "status": "not-found",
+          "loadTime": 1141,
+          "details": "Page not found (404)"
+        },
+        {
+          "page": "Admin",
+          "path": "/admin",
+          "status": "not-found",
+          "loadTime": 1130,
+          "details": "Page not found (404)"
+        }
+      ],
+      "successRate": 0,
+      "averageLoadTime": 1142.75
+    }
+  },
+  "stepResults": [
+    {
+      "name": "Test Main Navigation",
+      "success": true,
+      "duration": 1593,
+      "details": "Found 0 navigation links"
+    },
+    {
+      "name": "Test Breadcrumbs",
+      "success": true,
+      "duration": 2276,
+      "details": "No breadcrumbs found"
+    },
+    {
+      "name": "Test Back Navigation",
+      "success": false,
+      "duration": 3737,
+      "details": "Back navigation issues detected"
+    },
+    {
+      "name": "Test Direct Navigation",
+      "success": false,
+      "duration": 10102,
+      "details": "0/8 pages loaded successfully"
+    },
+    {
+      "name": "Test Responsive Navigation",
+      "success": false,
+      "duration": 3285,
+      "error": "SyntaxError: Failed to execute 'querySelector' on 'Document': '.hamburger, .menu-toggle, [aria-label=\"Menu\"], button:has-text(\"Menu\")' is not a valid selector."
+    }
+  ],
+  "summary": "Navigation test completed successfully",
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T18:05:11.176Z",
+    "environment": "development"
+  }
+}

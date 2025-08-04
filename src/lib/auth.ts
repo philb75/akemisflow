@@ -1,12 +1,12 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma as db } from "@/lib/db"
+import environmentDetector from "@/lib/environment"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(db) as any,
+  adapter: environmentDetector.canUsePrisma() && db ? PrismaAdapter(db) as any : undefined,
   session: {
     strategy: "jwt",
   },
@@ -15,10 +15,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/auth/error",
   },
   providers: [
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -27,6 +23,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          return null
+        }
+
+        // Only use Prisma if available
+        if (!environmentDetector.canUsePrisma() || !db) {
+          // For Supabase environments, we would need to implement Supabase auth
+          // For now, return null to fall back to other auth methods
           return null
         }
 
@@ -85,8 +88,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   events: {
     async signIn({ user, account, profile }) {
-      // Update last login for OAuth users
-      if (account?.provider !== "credentials") {
+      // Update last login for OAuth users (only if Prisma is available)
+      if (account?.provider !== "credentials" && environmentDetector.canUsePrisma() && db) {
         await db.user.update({
           where: { id: user.id! },
           data: { lastLoginAt: new Date() }

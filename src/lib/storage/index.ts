@@ -1,62 +1,41 @@
-import { LocalStorageProvider } from './local-storage'
-import { SupabaseStorageProvider } from './supabase-storage'
-import { StorageProvider, StorageConfig } from './types'
+// Environment-aware storage client export
+// This file determines which storage client to use based on AKEMIS_ENV
 
-let storageProvider: StorageProvider | null = null
+const environment = process.env.AKEMIS_ENV || process.env.NODE_ENV;
+const useSupabase = environment === 'remote' || environment === 'production' || 
+                   !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-export function initializeStorage(config: StorageConfig): StorageProvider {
-  if (config.provider === 'local') {
-    if (!config.localPath || !config.publicUrl) {
-      throw new Error('Local storage requires localPath and publicUrl')
-    }
-    storageProvider = new LocalStorageProvider(config.localPath, config.publicUrl)
-  } else if (config.provider === 'supabase') {
-    if (!config.supabaseUrl || !config.supabaseKey || !config.bucket) {
-      throw new Error('Supabase storage requires supabaseUrl, supabaseKey, and bucket')
-    }
-    storageProvider = new SupabaseStorageProvider(
-      config.supabaseUrl,
-      config.supabaseKey,
-      config.bucket
-    )
-  } else {
-    throw new Error(`Unknown storage provider: ${config.provider}`)
-  }
+let storage: any;
+let storageType: string;
+let isSupabase: boolean;
+let isLocal: boolean;
 
-  return storageProvider
+if (useSupabase) {
+  // Use Supabase storage for remote testing and production
+  console.log('🔵 Using Supabase storage client');
+  
+  const supabaseStorage = require('./supabase-storage');
+  storage = supabaseStorage.storage;
+  storageType = supabaseStorage.storageType;
+  isSupabase = true;
+  isLocal = false;
+} else {
+  // Use local storage for development
+  console.log('🟢 Using Local file storage client');
+  
+  const localStorage = require('./local-storage');
+  storage = localStorage.storage;
+  storageType = localStorage.storageType;
+  isSupabase = false;
+  isLocal = true;
 }
 
-export function getStorageProvider(): StorageProvider {
-  if (!storageProvider) {
-    // Initialize with environment variables
-    const config: StorageConfig = {
-      provider: (process.env.STORAGE_PROVIDER as 'local' | 'supabase') || 'local',
-      localPath: process.env.STORAGE_PATH || './uploads',
-      publicUrl: process.env.STORAGE_PUBLIC_URL || 'http://localhost:3000/uploads',
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_ANON_KEY,
-      bucket: process.env.SUPABASE_STORAGE_BUCKET || 'documents'
-    }
+// Export the active storage configuration
+export { storage, storageType, isSupabase, isLocal };
 
-    return initializeStorage(config)
-  }
-
-  return storageProvider
-}
-
-// Export types
-export * from './types'
-
-// Helper functions
-export function getStorageConfig(): StorageConfig {
-  return {
-    provider: (process.env.STORAGE_PROVIDER as 'local' | 'supabase') || 'local',
-    localPath: process.env.STORAGE_PATH || './uploads',
-    publicUrl: process.env.STORAGE_PUBLIC_URL || 'http://localhost:3000/uploads',
-    supabaseUrl: process.env.SUPABASE_URL,
-    supabaseKey: process.env.SUPABASE_ANON_KEY,
-    bucket: process.env.SUPABASE_STORAGE_BUCKET || 'documents'
-  }
+// Legacy compatibility function
+export function getStorageProvider() {
+  return storage;
 }
 
 // Utility functions for file validation

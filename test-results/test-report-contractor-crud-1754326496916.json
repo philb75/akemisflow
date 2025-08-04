@@ -1,0 +1,67 @@
+{
+  "testType": "contractor-crud",
+  "status": "failed",
+  "startTime": "2025-08-04T16:54:52.379Z",
+  "endTime": "2025-08-04T16:54:56.916Z",
+  "duration": 4537,
+  "screenshots": [
+    {
+      "name": "test-failure",
+      "filename": "test-failure-2025-08-04T16-54-56-591Z.png",
+      "filepath": "test-screenshots/test-failure-2025-08-04T16-54-56-591Z.png",
+      "timestamp": "2025-08-04T16:54:56.753Z"
+    }
+  ],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-08-04T16:54:54.458Z"
+    },
+    {
+      "type": "pageerror",
+      "message": "ModuleBuildError: Module build failed (from ./node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):\nError:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2685:1]\n 2682 |               )}\n 2683 |             </div>\n 2684 |           </div>\n 2685 |         )}\n      :          ^\n 2686 |       </div>\n 2687 |     )\n 2688 |   }\n      `----\n  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2842:1]\n 2839 |       </Card>\n 2840 |     </div>\n 2841 |   )\n 2842 | }\n      : ^\n 2843 | \n      `----\n  x Unexpected eof\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2843:2]\n 2841 |   )\n 2842 | }\n 2843 | \n      `----\n\n\nCaused by:\n    Syntax Error\nprocessResult (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)\n<unknown> (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)\n<unknown> (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)",
+      "timestamp": "2025-08-04T16:54:54.673Z"
+    },
+    {
+      "type": "error",
+      "text": "./src/app/entities/contractors/page.tsx\nError:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2685:1]\n 2682 |               )}\n 2683 |             </div>\n 2684 |           </div>\n 2685 |         )}\n      :          ^\n 2686 |       </div>\n 2687 |     )\n 2688 |   }\n      `----\n  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2842:1]\n 2839 |       </Card>\n 2840 |     </div>\n 2841 |   )\n 2842 | }\n      : ^\n 2843 | \n      `----\n  x Unexpected eof\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2843:2]\n 2841 |   )\n 2842 | }\n 2843 | \n      `----\n\nCaused by:\n    Syntax Error",
+      "timestamp": "2025-08-04T16:54:54.677Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T16:54:54.682Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "timestamp": "2025-08-04T16:54:54.788Z"
+    },
+    {
+      "type": "pageerror",
+      "message": "ModuleBuildError: Module build failed (from ./node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):\nError:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2685:1]\n 2682 |               )}\n 2683 |             </div>\n 2684 |           </div>\n 2685 |         )}\n      :          ^\n 2686 |       </div>\n 2687 |     )\n 2688 |   }\n      `----\n  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2842:1]\n 2839 |       </Card>\n 2840 |     </div>\n 2841 |   )\n 2842 | }\n      : ^\n 2843 | \n      `----\n  x Unexpected eof\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2843:2]\n 2841 |   )\n 2842 | }\n 2843 | \n      `----\n\n\nCaused by:\n    Syntax Error\nprocessResult (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/webpack/bundle5.js:29:407086)\n<unknown> (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/webpack/bundle5.js:29:408881)\n<unknown> (file:///Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/next@15.4.4_@babel+core@7.27.4_@playwright+test@1.53.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)",
+      "timestamp": "2025-08-04T16:54:54.887Z"
+    },
+    {
+      "type": "error",
+      "text": "./src/app/entities/contractors/page.tsx\nError:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2685:1]\n 2682 |               )}\n 2683 |             </div>\n 2684 |           </div>\n 2685 |         )}\n      :          ^\n 2686 |       </div>\n 2687 |     )\n 2688 |   }\n      `----\n  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2842:1]\n 2839 |       </Card>\n 2840 |     </div>\n 2841 |   )\n 2842 | }\n      : ^\n 2843 | \n      `----\n  x Unexpected eof\n      ,-[/Users/philippebarthelemy/dev/akemis/akemisflow/src/app/entities/contractors/page.tsx:2843:2]\n 2841 |   )\n 2842 | }\n 2843 | \n      `----\n\nCaused by:\n    Syntax Error",
+      "timestamp": "2025-08-04T16:54:54.888Z"
+    },
+    {
+      "message": "Could not find add contractor button",
+      "stack": "Error: Could not find add contractor button\n    at ContractorCrudTest.step2_CreateContractor (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/contractor-crud.js:142:15)\n    at async ContractorCrudTest.execute (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/contractor-crud.js:30:7)\n    at async AkemisFlowTestAgent.runTest (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:102:27)\n    at async AkemisFlowTestAgent.main (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:377:24)",
+      "timestamp": "2025-08-04T16:54:56.591Z"
+    }
+  ],
+  "serverLogExcerpts": [],
+  "performanceMetrics": {},
+  "stepResults": [],
+  "summary": null,
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T16:54:56.916Z",
+    "environment": "development"
+  }
+}

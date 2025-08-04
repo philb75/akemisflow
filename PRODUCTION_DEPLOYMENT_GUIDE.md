@@ -44,7 +44,7 @@
    - Verify dashboard access and data display
 
 3. **Functionality Tests**
-   - Test client/supplier listings
+   - Test client/contractor listings
    - Verify Airwallex integration status
    - Check transaction import functionality
 

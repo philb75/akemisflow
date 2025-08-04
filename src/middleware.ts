@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { auth } from "@/lib/auth"
+import logger from "@/lib/logger-adaptive"
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -20,16 +21,11 @@ export async function middleware(req: NextRequest) {
   response.headers.set('X-DNS-Prefetch-Control', 'off')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
 
-  // Allow public paths
+  // Allow public paths and all API routes (API routes handle their own auth)
   if (
     pathname === '/' ||
     pathname.startsWith('/auth') || 
-    pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/api/db-setup') ||
-    pathname.startsWith('/api/db-test') ||
-    pathname.startsWith('/api/wake-db') ||
-    pathname.startsWith('/api/setup-admin') ||
-    pathname.startsWith('/api/debug-auth') ||
+    pathname.startsWith('/api/') ||
     pathname.startsWith('/pending') ||
     pathname.startsWith('/admin-init') ||
     pathname.startsWith('/_next') ||
@@ -43,27 +39,67 @@ export async function middleware(req: NextRequest) {
     return response
   }
 
-  // Get the session
-  const session = await auth()
+  try {
+    // Get the session using simplified auth
+    const session = await auth()
 
-  // Check if user is authenticated
-  if (!session) {
+    // Check if user is authenticated
+    if (!session) {
+      logger.warn('Unauthenticated access attempt', {
+        category: 'AUTH',
+        metadata: { 
+          path: pathname,
+          userAgent: req.headers.get('user-agent'),
+          ip: req.ip || req.headers.get('x-forwarded-for') || 'unknown'
+        }
+      })
+      
+      const signInUrl = new URL('/auth/signin', req.url)
+      signInUrl.searchParams.set('callbackUrl', req.url)
+      return NextResponse.redirect(signInUrl)
+    }
+
+    // Check if user has UNASSIGNED role - redirect to pending page
+    if (session.user?.role === 'UNASSIGNED' && !pathname.startsWith('/pending')) {
+      logger.info('Unassigned user redirected to pending', {
+        category: 'AUTH',
+        metadata: { 
+          userId: session.user.id,
+          path: pathname 
+        }
+      })
+      return NextResponse.redirect(new URL('/pending', req.url))
+    }
+
+    // Check role-based access
+    if (pathname.startsWith('/admin') && session.user?.role !== 'ADMINISTRATOR') {
+      logger.warn('Unauthorized admin access attempt', {
+        category: 'AUTH',
+        metadata: { 
+          userId: session.user.id,
+          role: session.user.role,
+          path: pathname 
+        }
+      })
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
+
+    return response
+  } catch (error) {
+    logger.error('Middleware auth error', {
+      category: 'AUTH',
+      error: error as Error,
+      metadata: { 
+        path: pathname,
+        userAgent: req.headers.get('user-agent')
+      }
+    })
+    
+    // On auth error, redirect to signin
     const signInUrl = new URL('/auth/signin', req.url)
     signInUrl.searchParams.set('callbackUrl', req.url)
     return NextResponse.redirect(signInUrl)
   }
-
-  // Check if user has UNASSIGNED role - redirect to pending page
-  if (session.user?.role === 'UNASSIGNED' && !pathname.startsWith('/pending')) {
-    return NextResponse.redirect(new URL('/pending', req.url))
-  }
-
-  // Check role-based access
-  if (pathname.startsWith('/admin') && session.user?.role !== 'ADMINISTRATOR') {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
-  }
-
-  return response
 }
 
 export const config = {
@@ -76,6 +112,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public (public files)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|public|uploads).*)",
   ],
 }

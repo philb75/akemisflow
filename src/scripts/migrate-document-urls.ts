@@ -1,15 +1,15 @@
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/db'
 import { DocumentType } from '@prisma/client'
 
 /**
- * Migrate existing document URLs from the Supplier model to the new Document model
+ * Migrate existing document URLs from the Contractor model to the new Document model
  */
 async function migrateDocumentUrls() {
   console.log('Starting document URL migration...')
 
   try {
-    // Find all suppliers with document URLs
-    const suppliers = await prisma.supplier.findMany({
+    // Find all contractors with document URLs
+    const contractors = await prisma.contractor.findMany({
       where: {
         OR: [
           { proofOfAddressUrl: { not: null } },
@@ -18,12 +18,12 @@ async function migrateDocumentUrls() {
       }
     })
 
-    console.log(`Found ${suppliers.length} suppliers with document URLs to migrate`)
+    console.log(`Found ${contractors.length} contractors with document URLs to migrate`)
 
     let migratedCount = 0
     let errorCount = 0
 
-    for (const supplier of suppliers) {
+    for (const contractor of contractors) {
       try {
         // Get the first admin user as the uploader (for migration purposes)
         const adminUser = await prisma.user.findFirst({
@@ -37,82 +37,82 @@ async function migrateDocumentUrls() {
         }
 
         // Migrate proof of address
-        if (supplier.proofOfAddressUrl) {
+        if (contractor.proofOfAddressUrl) {
           // Check if document already exists
           const existingProofOfAddress = await prisma.document.findFirst({
             where: {
-              supplierId: supplier.id,
+              contractorId: contractor.id,
               documentType: 'PROOF_OF_ADDRESS',
-              publicUrl: supplier.proofOfAddressUrl
+              publicUrl: contractor.proofOfAddressUrl
             }
           })
 
           if (!existingProofOfAddress) {
             await prisma.document.create({
               data: {
-                fileName: supplier.proofOfAddressName || 'proof_of_address.pdf',
-                originalName: supplier.proofOfAddressName || 'proof_of_address.pdf',
-                fileType: supplier.proofOfAddressType || 'pdf',
-                fileSize: supplier.proofOfAddressSize || 0,
-                mimeType: supplier.proofOfAddressType === 'pdf' ? 'application/pdf' : 'application/octet-stream',
+                fileName: contractor.proofOfAddressName || 'proof_of_address.pdf',
+                originalName: contractor.proofOfAddressName || 'proof_of_address.pdf',
+                fileType: contractor.proofOfAddressType || 'pdf',
+                fileSize: contractor.proofOfAddressSize || 0,
+                mimeType: contractor.proofOfAddressType === 'pdf' ? 'application/pdf' : 'application/octet-stream',
                 storageProvider: 'supabase', // Assuming existing URLs are from production
-                storagePath: supplier.proofOfAddressUrl,
-                publicUrl: supplier.proofOfAddressUrl,
+                storagePath: contractor.proofOfAddressUrl,
+                publicUrl: contractor.proofOfAddressUrl,
                 documentType: 'PROOF_OF_ADDRESS',
-                supplierId: supplier.id,
+                contractorId: contractor.id,
                 userId: adminUser.id,
-                description: 'Migrated from supplier record',
+                description: 'Migrated from contractor record',
                 isVerified: true, // Assume existing documents were verified
                 verifiedBy: adminUser.id,
                 verifiedAt: new Date()
               }
             })
-            console.log(`✓ Migrated proof of address for supplier ${supplier.email}`)
+            console.log(`✓ Migrated proof of address for contractor ${contractor.email}`)
             migratedCount++
           } else {
-            console.log(`- Proof of address already migrated for supplier ${supplier.email}`)
+            console.log(`- Proof of address already migrated for contractor ${contractor.email}`)
           }
         }
 
         // Migrate ID document
-        if (supplier.idDocumentUrl) {
+        if (contractor.idDocumentUrl) {
           // Check if document already exists
           const existingIdDocument = await prisma.document.findFirst({
             where: {
-              supplierId: supplier.id,
+              contractorId: contractor.id,
               documentType: 'ID_DOCUMENT',
-              publicUrl: supplier.idDocumentUrl
+              publicUrl: contractor.idDocumentUrl
             }
           })
 
           if (!existingIdDocument) {
             await prisma.document.create({
               data: {
-                fileName: supplier.idDocumentName || 'id_document.pdf',
-                originalName: supplier.idDocumentName || 'id_document.pdf',
-                fileType: supplier.idDocumentType || 'pdf',
-                fileSize: supplier.idDocumentSize || 0,
-                mimeType: supplier.idDocumentType === 'pdf' ? 'application/pdf' : 'application/octet-stream',
+                fileName: contractor.idDocumentName || 'id_document.pdf',
+                originalName: contractor.idDocumentName || 'id_document.pdf',
+                fileType: contractor.idDocumentType || 'pdf',
+                fileSize: contractor.idDocumentSize || 0,
+                mimeType: contractor.idDocumentType === 'pdf' ? 'application/pdf' : 'application/octet-stream',
                 storageProvider: 'supabase', // Assuming existing URLs are from production
-                storagePath: supplier.idDocumentUrl,
-                publicUrl: supplier.idDocumentUrl,
+                storagePath: contractor.idDocumentUrl,
+                publicUrl: contractor.idDocumentUrl,
                 documentType: 'ID_DOCUMENT',
-                supplierId: supplier.id,
+                contractorId: contractor.id,
                 userId: adminUser.id,
-                description: 'Migrated from supplier record',
+                description: 'Migrated from contractor record',
                 isVerified: true, // Assume existing documents were verified
                 verifiedBy: adminUser.id,
                 verifiedAt: new Date()
               }
             })
-            console.log(`✓ Migrated ID document for supplier ${supplier.email}`)
+            console.log(`✓ Migrated ID document for contractor ${contractor.email}`)
             migratedCount++
           } else {
-            console.log(`- ID document already migrated for supplier ${supplier.email}`)
+            console.log(`- ID document already migrated for contractor ${contractor.email}`)
           }
         }
       } catch (error) {
-        console.error(`✗ Error migrating documents for supplier ${supplier.email}:`, error)
+        console.error(`✗ Error migrating documents for contractor ${contractor.email}:`, error)
         errorCount++
       }
     }

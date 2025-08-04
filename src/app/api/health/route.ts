@@ -1,38 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import healthService from '@/lib/health'
+import { apiRoute } from '@/middleware/error-handler'
 
-export async function GET(request: NextRequest) {
-  try {
-    // For now, return a simple health check
-    // Database connection will be tested when we have proper dependencies
+export const GET = apiRoute(async (req: NextRequest) => {
+  const detailed = req.nextUrl.searchParams.get('detailed') === 'true'
+  
+  if (detailed) {
+    // Full system health check
+    const health = await healthService.getSystemHealth()
+    return NextResponse.json(health)
+  } else {
+    // Quick readiness check
+    const readiness = await healthService.isSystemReady()
     
-    return NextResponse.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      database: 'schema created',
-      environment: {
-        nodeEnv: process.env.NODE_ENV || 'development',
-        databaseUrl: process.env.DATABASE_URL ? 'configured' : 'missing',
-      },
-      features: {
-        dockerServices: 'running',
-        databaseSchema: 'created',
-        sampleData: 'inserted',
-        uiComponents: 'ready',
-      },
-      version: '0.1.0',
-      phase: 'Phase 1 - Core UI Complete',
-    });
-  } catch (error) {
-    console.error('Health check failed:', error);
-    
-    return NextResponse.json(
-      {
+    if (readiness.ready) {
+      return NextResponse.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        message: 'System is ready',
+        version: '0.1.0',
+        phase: 'Enhanced with logging and error handling'
+      })
+    } else {
+      return NextResponse.json({
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error',
-        version: '0.1.0',
-      },
-      { status: 503 }
-    );
+        message: 'System not ready',
+        issues: readiness.issues,
+        version: '0.1.0'
+      }, { status: 503 })
+    }
   }
-}
+})
+
+// HEAD request for simple up/down check
+export const HEAD = apiRoute(async () => {
+  const readiness = await healthService.isSystemReady()
+  
+  return new NextResponse(null, {
+    status: readiness.ready ? 200 : 503
+  })
+})

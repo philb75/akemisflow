@@ -1,0 +1,29 @@
+name: change-request
+description: Orchestrates AkemisFlow change requests with automated testing and retry logic
+type: general-purpose
+entry_point: orchestrator/change-request.js
+model: opus
+capabilities:
+  - Analyzes user change requests
+  - Generates requirements and test plans
+  - Coordinates developer and tester agents
+  - Implements retry logic with model switching
+  - Validates completion
+usage: |
+  This agent is triggered automatically when you request changes to AkemisFlow.
+  It orchestrates the entire development workflow including testing and validation.
+  
+  Example triggers:
+  - "Change the comment field width"
+  - "Fix the alignment of..."
+  - "Add a new field..."
+  - "Modify the layout..."
+keywords:
+  - change
+  - fix
+  - modify
+  - update
+  - add
+  - remove
+  - align
+  - adjust

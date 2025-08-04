@@ -1,0 +1,110 @@
+{
+  "testType": "ui-interactions",
+  "status": "passed",
+  "startTime": "2025-08-04T17:02:31.127Z",
+  "endTime": "2025-08-04T17:02:43.180Z",
+  "duration": 12053,
+  "screenshots": [],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T17:02:33.055Z"
+    }
+  ],
+  "serverLogExcerpts": [],
+  "performanceMetrics": {
+    "buttons": {
+      "total": 1,
+      "tested": 0,
+      "responsive": 0
+    },
+    "forms": {
+      "total": 1,
+      "formData": [
+        {
+          "index": 0,
+          "inputCount": 2,
+          "buttonCount": 1,
+          "inputs": [
+            {
+              "type": "email",
+              "name": "email",
+              "placeholder": "Enter your email",
+              "required": true
+            },
+            {
+              "type": "password",
+              "name": "password",
+              "placeholder": "Enter your password",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "modals": {
+      "triggers": 0,
+      "opened": 0
+    },
+    "dropdowns": {
+      "native": 0,
+      "custom": 0,
+      "tested": 0
+    },
+    "tables": {
+      "total": 0,
+      "totalRows": 0,
+      "totalCells": 0
+    },
+    "tooltipsAlerts": {
+      "tooltips": 0,
+      "alerts": 0
+    }
+  },
+  "stepResults": [
+    {
+      "name": "Test Buttons",
+      "success": true,
+      "duration": 2420,
+      "details": "Found 1 buttons, tested 0, 0 responded"
+    },
+    {
+      "name": "Test Forms",
+      "success": true,
+      "duration": 5223,
+      "details": "Found 1 forms"
+    },
+    {
+      "name": "Test Modals",
+      "success": true,
+      "duration": 102,
+      "details": "Tested 0 triggers, 0 modals opened"
+    },
+    {
+      "name": "Test Dropdowns",
+      "success": true,
+      "duration": 103,
+      "details": "Found 0 dropdowns, tested 0"
+    },
+    {
+      "name": "Test Tables",
+      "success": true,
+      "duration": 2262,
+      "details": "Found 0 tables"
+    },
+    {
+      "name": "Test Tooltips and Alerts",
+      "success": true,
+      "duration": 207,
+      "details": "Found 0 tooltips, 0 alerts"
+    }
+  ],
+  "summary": "UI interactions test completed successfully",
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T17:02:43.180Z",
+    "environment": "development"
+  }
+}

@@ -1,0 +1,13 @@
+name: validation-tester
+description: Tests changes made by developer agent using Puppeteer
+type: tester
+entry_point: tester/validation-tester.js
+model: sonnet
+capabilities:
+  - Layout validation with Puppeteer
+  - Database schema validation
+  - API endpoint testing
+  - Screenshot capture
+  - Test report generation
+internal: true
+called_by: change-request

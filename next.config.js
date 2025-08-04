@@ -9,8 +9,6 @@ const nextConfig = {
     ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
   serverExternalPackages: ['@prisma/client', 'bcryptjs'],
-  // Remove experimental runtime config as it's not valid
-  output: 'standalone',
   webpack: (config, { isServer, webpack }) => {
     const path = require('path');
     

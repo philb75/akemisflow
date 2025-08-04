@@ -1,0 +1,132 @@
+{
+  "testType": "navigation",
+  "status": "passed",
+  "startTime": "2025-08-04T16:39:46.514Z",
+  "endTime": "2025-08-04T16:39:52.477Z",
+  "duration": 5963,
+  "screenshots": [],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T16:39:48.818Z"
+    }
+  ],
+  "serverLogExcerpts": [
+    {
+      "content": " \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T16:39:49.303Z"
+    },
+    {
+      "content": " \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T16:39:50.300Z"
+    },
+    {
+      "content": " \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T16:39:51.301Z"
+    }
+  ],
+  "performanceMetrics": {
+    "directNavigation": {
+      "results": [
+        {
+          "page": "Home",
+          "path": "/",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Dashboard",
+          "path": "/dashboard",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Entities",
+          "path": "/entities",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Contractors",
+          "path": "/entities/contractors",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Clients",
+          "path": "/entities/clients",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Finance",
+          "path": "/finance",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Reporting",
+          "path": "/reporting",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        },
+        {
+          "page": "Admin",
+          "path": "/admin",
+          "status": "error",
+          "loadTime": 0,
+          "details": "this.page.waitForTimeout is not a function"
+        }
+      ],
+      "successRate": 0,
+      "averageLoadTime": 0
+    }
+  },
+  "stepResults": [
+    {
+      "name": "Test Main Navigation",
+      "success": true,
+      "duration": 1448,
+      "details": "Found 0 navigation links"
+    },
+    {
+      "name": "Test Breadcrumbs",
+      "success": false,
+      "duration": 154,
+      "error": "this.page.waitForTimeout is not a function"
+    },
+    {
+      "name": "Test Back Navigation",
+      "success": false,
+      "duration": 216,
+      "error": "this.page.waitForTimeout is not a function"
+    },
+    {
+      "name": "Test Direct Navigation",
+      "success": false,
+      "duration": 1858,
+      "details": "0/8 pages loaded successfully"
+    },
+    {
+      "name": "Test Responsive Navigation",
+      "success": false,
+      "duration": 233,
+      "error": "this.page.waitForTimeout is not a function"
+    }
+  ],
+  "summary": "Navigation test completed successfully",
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T16:39:52.477Z",
+    "environment": "development"
+  }
+}

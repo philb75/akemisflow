@@ -131,7 +131,7 @@ After deployment, create your first admin user:
 3. Test key features:
    - User management
    - Bank accounts
-   - Suppliers
+   - Contractors
    - File uploads
 
 ## Troubleshooting

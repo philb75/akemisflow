@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "project": "akemisflow",
+  "description": "Automated change request orchestration system for AkemisFlow",
+  "agents": {
+    "change-request": {
+      "name": "Change Request Orchestrator",
+      "description": "Main orchestrator for all AkemisFlow changes",
+      "type": "orchestrator",
+      "model": "opus",
+      "entry": "./orchestrator/change-request.js",
+      "triggers": ["change", "fix", "modify", "update", "add", "remove", "align"],
+      "auto_trigger": true
+    },
+    "code-developer": {
+      "name": "Code Developer",
+      "description": "Implements code changes",
+      "type": "developer",
+      "model": "sonnet",
+      "entry": "./developer/code-developer.js",
+      "internal": true
+    },
+    "validation-tester": {
+      "name": "Validation Tester",
+      "description": "Tests and validates changes",
+      "type": "tester",
+      "model": "sonnet",
+      "entry": "./tester/validation-tester.js",
+      "internal": true
+    }
+  },
+  "workflows": {
+    "change-request": {
+      "description": "Standard change request workflow",
+      "steps": [
+        {
+          "agent": "change-request",
+          "action": "analyze"
+        },
+        {
+          "agent": "code-developer",
+          "action": "implement",
+          "retry_with": "opus",
+          "max_attempts": 3
+        },
+        {
+          "agent": "validation-tester",
+          "action": "validate"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "auto_orchestration": true,
+    "require_tests": true,
+    "model_switching": true,
+    "max_retries": 3
+  }
+}

@@ -35,7 +35,7 @@ This will return detailed error information.
 ### 2. Check Vercel Function Logs
 1. Go to Vercel Dashboard
 2. Click on Functions tab
-3. Look for `/api/test-db` or `/api/suppliers/sync-airwallex`
+3. Look for `/api/test-db` or `/api/contractors/sync-airwallex`
 4. Check the logs for detailed error messages
 
 ### 3. Verify Connection String Format

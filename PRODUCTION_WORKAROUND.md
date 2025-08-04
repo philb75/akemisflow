@@ -11,7 +11,7 @@ Since the Supabase client works, I've created an alternative sync endpoint that 
 
 ### Use the Supabase-based Sync Endpoint
 ```
-POST https://akemisflow-philippe-barthelemys-projects.vercel.app/api/suppliers/sync-airwallex-supabase
+POST https://akemisflow-philippe-barthelemys-projects.vercel.app/api/contractors/sync-airwallex-supabase
 ```
 
 This endpoint:
@@ -65,7 +65,7 @@ The issue appears to be:
 
 ## Next Steps
 
-1. Use the `/api/suppliers/sync-airwallex-supabase` endpoint for now
+1. Use the `/api/contractors/sync-airwallex-supabase` endpoint for now
 2. Monitor the test endpoints to see if the issue resolves
 3. Contact Vercel support with the specific error details
 4. Consider migrating to Supabase client if issue persists

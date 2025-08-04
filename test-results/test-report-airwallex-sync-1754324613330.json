@@ -1,0 +1,46 @@
+{
+  "testType": "airwallex-sync",
+  "status": "failed",
+  "startTime": "2025-08-04T16:23:28.974Z",
+  "endTime": "2025-08-04T16:23:33.330Z",
+  "duration": 4356,
+  "screenshots": [
+    {
+      "name": "test-failure",
+      "filename": "test-failure-2025-08-04T16-23-32-900Z.png",
+      "filepath": "test-screenshots/test-failure-2025-08-04T16-23-32-900Z.png",
+      "timestamp": "2025-08-04T16:23:33.050Z"
+    }
+  ],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T16:23:31.841Z"
+    },
+    {
+      "message": "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Sign in with Google\"), button[data-provider=\"google\"], .google-signin-button' is not a valid selector.",
+      "stack": "DOMException: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Sign in with Google\"), button[data-provider=\"google\"], .google-signin-button' is not a valid selector.\n    at evaluateHandle (evaluateHandle at CSSQueryHandler.queryOne (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:137:73), <anonymous>:1:15)\n    at #evaluate (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:391:56)\n    at async ExecutionContext.evaluateHandle (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:329:16)\n    at async IsolatedWorld.evaluateHandle (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/IsolatedWorld.js:89:16)\n    at async CdpJSHandle.evaluateHandle (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/JSHandle.js:157:20)\n    at async CdpElementHandle.evaluateHandle (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:351:20)\n    at async CSSQueryHandler.queryOne (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/common/QueryHandler.js:137:59)\n    at async CdpElementHandle.$ (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:406:21)\n    at async CdpElementHandle.<anonymous> (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/ElementHandle.js:132:24)\n    at async CdpFrame.$ (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:402:20)",
+      "timestamp": "2025-08-04T16:23:32.900Z"
+    }
+  ],
+  "serverLogExcerpts": [
+    {
+      "content": "5-08-04T16:23:31.372Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T16:23:31.847Z"
+    },
+    {
+      "content": "5-08-04T16:23:31.372Z] INFO [STARTUP]: Application layout initialized\n  Metadata: {\n  \"environment\": {\n    \"mode\": \"local-prisma\",\n    \"runtime\": \"nodejs\",\n    \"database\": \"prisma\",\n    \"storage\": \"local\",\n    \"features\": {\n      \"fileLogging\": true,\n      \"healthChecks\": true,\n      \"dockerServices\": true,\n      \"middleware\": false,\n      \"prismaClient\": true,\n      \"supabaseClient\": false\n    },\n    \"env\": {\n      \"NODE_ENV\": \"development\",\n      \"VERCEL\": false,\n      \"DATABASE_URL\": true,\n      \"SUPABASE_URL\": false,\n      \"isEdgeRuntime\": false,\n      \"platform\": \"server\"\n    }\n  }\n}\n  Environment: local-prisma (nodejs)\n",
+      "timestamp": "2025-08-04T16:23:32.849Z"
+    }
+  ],
+  "performanceMetrics": {},
+  "stepResults": [],
+  "summary": null,
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T16:23:33.330Z",
+    "environment": "development"
+  }
+}

@@ -4,7 +4,7 @@ export default function EntitiesPage() {
   return (
     <PlaceholderPage 
       title="Entities"
-      description="Manage your business entities including clients, suppliers, and bank accounts"
+      description="Manage your business entities including clients, contractors, and bank accounts"
     />
   )
 }

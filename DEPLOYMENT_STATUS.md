@@ -28,7 +28,7 @@
 
 ### 💾 **Local Data Summary**
 - **Contacts**: 19 records
-- **Suppliers**: 29 records  
+- **Contractors**: 29 records  
 - **Bank Accounts**: 1 record
 - **Transactions**: 148 records
 - **Fresh Backup**: 215KB created at 08:15 UTC

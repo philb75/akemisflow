@@ -1,0 +1,21 @@
+{
+  "requestId": "90e0a42e8567580c",
+  "timestamp": "2025-08-04T17:57:46.507Z",
+  "error": "Unexpected token '\ud83d', \"\n🔨 Develop\"... is not valid JSON",
+  "stack": "SyntaxError: Unexpected token '\ud83d', \"\n🔨 Develop\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at ChangeRequestOrchestrator.triggerDeveloper (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/orchestrator/change-request-orchestrator.js:235:27)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async ChangeRequestOrchestrator.orchestrate (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/orchestrator/change-request-orchestrator.js:69:32)",
+  "context": {
+    "id": "90e0a42e8567580c",
+    "original": "Fix the comment field alignment in the contractor expanded view to properly align with the Account Name field boundaries",
+    "timestamp": "2025-08-04T17:57:46.473Z",
+    "analysis": {
+      "affectedAreas": [
+        "ui",
+        "database",
+        "contractor"
+      ],
+      "deploymentMode": "all",
+      "ambiguities": [],
+      "complexity": "complex"
+    }
+  }
+}

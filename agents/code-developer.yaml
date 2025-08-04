@@ -1,0 +1,13 @@
+name: code-developer
+description: Implements code changes based on requirements from change-request agent
+type: developer
+entry_point: developer/code-developer.js
+model: sonnet
+capabilities:
+  - Implements UI changes
+  - Updates database schemas
+  - Modifies API endpoints
+  - Applies fixes for failed tests
+  - Generates change manifests
+internal: true
+called_by: change-request

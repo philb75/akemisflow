@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate && next build",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
@@ -18,10 +18,10 @@
     "src/app/api/documents/upload/route.ts": {
       "maxDuration": 30
     },
-    "src/app/api/suppliers/route.ts": {
+    "src/app/api/contractors/route.ts": {
       "maxDuration": 30
     },
-    "src/app/api/suppliers/sync-airwallex/route.ts": {
+    "src/app/api/contractors/sync-airwallex/route.ts": {
       "maxDuration": 60
     }
   }

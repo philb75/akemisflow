@@ -14,7 +14,7 @@ Add these environment variables in Vercel Dashboard:
 STORAGE_PROVIDER=supabase
 SUPABASE_STORAGE_BUCKET=documents
 
-# Airwallex Integration (Required for supplier/client sync)
+# Airwallex Integration (Required for contractor/client sync)
 AIRWALLEX_CLIENT_ID=XAqyZmYLTSizOYHgBaPYlA
 AIRWALLEX_API_KEY=ccee18a2d6a11d284d182a5674c893d6f3c6fb3ee25d845af32fdb6bcf6a77cc1693aa8945ae6f14de09881575131845
 AIRWALLEX_BASE_URL=https://api.airwallex.com
@@ -90,7 +90,7 @@ auth.uid() IS NOT NULL
 
 ### 2. Test Document Functionality
 - [ ] Login to production app
-- [ ] Navigate to a supplier detail page
+- [ ] Navigate to a contractor detail page
 - [ ] Go to Documents tab
 - [ ] Test upload (try PDF and image)
 - [ ] Verify document appears in list

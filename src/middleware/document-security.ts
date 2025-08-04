@@ -13,7 +13,7 @@ export interface DocumentAccessContext {
     id: string
     userId: string
     contactId?: string | null
-    supplierId?: string | null
+    contractorId?: string | null
     invoiceId?: string | null
     isActive: boolean
     deletedAt?: Date | null
@@ -45,14 +45,14 @@ export async function checkDocumentAccess(
         id: true,
         userId: true,
         contactId: true,
-        supplierId: true,
+        contractorId: true,
         invoiceId: true,
         isActive: true,
         deletedAt: true,
         contact: {
           select: { id: true, name: true }
         },
-        supplier: {
+        contractor: {
           select: { id: true, firstName: true, lastName: true }
         },
         invoice: {
@@ -148,17 +148,17 @@ export async function checkUploadPermission(
 
       case 'contractor':
       case 'supplier':
-        const supplier = await prisma.supplier.findUnique({
+        const contractor = await prisma.contractor.findUnique({
           where: { id: entityId },
           select: { id: true, email: true }
         })
         
-        if (!supplier) {
-          return { allowed: false, reason: 'Supplier not found' }
+        if (!contractor) {
+          return { allowed: false, reason: 'Contractor not found' }
         }
 
-        // For now, only admins can upload for suppliers
-        // In the future, suppliers could have their own accounts
+        // For now, only admins can upload for contractors
+        // In the future, contractors could have their own accounts
         break
 
       case 'invoice':

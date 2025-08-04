@@ -13,7 +13,7 @@ The document management system has been successfully implemented with the follow
 - **File Validation**: Validates file types and sizes before upload
 - **Security**: Role-based access control with document permissions
 - **UI Components**: Complete set of UI components for document management
-- **Integration**: Seamlessly integrated into entity and supplier detail pages
+- **Integration**: Seamlessly integrated into entity and contractor detail pages
 
 ### Architecture
 
@@ -39,7 +39,7 @@ model Document {
   
   // Relations
   contactId       String?       
-  supplierId      String?       
+  contractorId    String?       
   invoiceId       String?       
   userId          String        
   
@@ -77,7 +77,7 @@ enum DocumentType {
 
 ### Integration Points
 Documents are integrated into:
-- **Supplier Details** (`/entities/suppliers/[id]`)
+- **Contractor Details** (`/entities/contractors/[id]`)
 - **Client Details** (`/entities/clients/[id]`)
 - Future: Invoice attachments
 
@@ -89,9 +89,9 @@ Documents are integrated into:
 
 ## Testing the Functionality
 
-1. **View Supplier with Documents**
-   - Navigate to: http://localhost:3000/entities/suppliers
-   - Click on any supplier to view details
+1. **View Contractor with Documents**
+   - Navigate to: http://localhost:3000/entities/contractors
+   - Click on any contractor to view details
    - Go to the "Documents" tab
 
 2. **Upload a Document**

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { formatSupplierNames } from '../src/lib/name-formatter'
+import { formatContractorNames } from '../src/lib/name-formatter'
 
 const prisma = new PrismaClient()
 
@@ -84,13 +84,13 @@ async function migrateAirwallexData() {
         console.log(`📦 Migrating supplier: ${firstName} ${lastName} (${supplier.email})`)
         
         // Apply name formatting
-        const formattedNames = formatSupplierNames({
+        const formattedNames = formatContractorNames({
           firstName: firstName,
           lastName: lastName
         })
         
         // Create AirwallexSupplier record
-        await prisma.airwallexSupplier.create({
+        await prisma.airwallexContractor.create({
           data: {
             beneficiaryId: beneficiaryId,
             entityType: supplier.airwallex_entity_type || supplier.airwallexEntityType || 'individual',

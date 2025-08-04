@@ -63,8 +63,8 @@ export async function GET() {
   try {
     // Test 1: Simple count query
     console.log('Attempting database connection...')
-    const supplierCount = await prisma.supplier.count()
-    console.log('Supplier count successful:', supplierCount)
+    const contractorCount = await prisma.contractor.count()
+    console.log('Contractor count successful:', contractorCount)
     
     // Test 2: Try to fetch Prisma version
     const prismaVersion = await prisma.$queryRaw`SELECT version()`
@@ -73,7 +73,7 @@ export async function GET() {
     return NextResponse.json({ 
       success: true, 
       tests: {
-        supplierCount,
+        contractorCount,
         databaseVersion: prismaVersion,
       },
       environment: envCheck,

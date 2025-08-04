@@ -15,7 +15,7 @@ The database schema is managed by Prisma ORM and is identical between local (Doc
 ### Financial Entities
 - **Contact** - Clients, consultants, partners (multi-purpose)
 - **BankAccount** - Company bank accounts with full details
-- **Supplier** - Supplier information with document uploads
+- **Contractor** - Contractor information with document uploads
 - **Invoice** - Client invoices with line items
 - **Transaction** - Financial transactions (debits/credits)
 - **ConsultantPayment** - Payments to consultants
@@ -27,9 +27,9 @@ The database schema is managed by Prisma ORM and is identical between local (Doc
 
 ## Recent Additions
 
-### Supplier Model (Added for supplier management)
+### Contractor Model (Added for contractor management)
 ```prisma
-model Supplier {
+model Contractor {
   id                 String         @id @default(uuid())
   firstName          String
   lastName           String
@@ -49,7 +49,7 @@ model Supplier {
   idDocumentName     String?
   idDocumentType     String?
   idDocumentSize     Int?
-  status             SupplierStatus @default(ACTIVE)
+  status             ContractorStatus @default(ACTIVE)
   isActive           Boolean        @default(true)
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
@@ -115,15 +115,15 @@ Both environments use the exact same Prisma schema file (`prisma/schema.prisma`)
 - SAVINGS
 - CHECKING
 
-### BankAccountStatus / SupplierStatus
+### BankAccountStatus / ContractorStatus
 - ACTIVE
 - INACTIVE
 - SUSPENDED
 
 ## File Storage
 
-Currently, uploaded files (supplier documents) are stored:
-- **Local**: `/public/uploads/suppliers/`
+Currently, uploaded files (contractor documents) are stored:
+- **Local**: `/public/uploads/contractors/`
 - **Production**: Consider migrating to Supabase Storage or S3
 
 ## Migration Notes

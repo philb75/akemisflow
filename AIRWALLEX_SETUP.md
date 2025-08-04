@@ -1,7 +1,7 @@
 # Airwallex Integration Setup
 
 ## Overview
-The AkemisFlow application integrates with Airwallex API to sync supplier/beneficiary data. This integration requires proper API credentials to be configured in the environment.
+The AkemisFlow application integrates with Airwallex API to sync contractor/beneficiary data. This integration requires proper API credentials to be configured in the environment.
 
 ## Required Environment Variables
 
@@ -45,17 +45,17 @@ Add to your `.env.local.docker` file or pass as environment variables in docker-
 
 With Airwallex configured, you can:
 
-1. **Sync Suppliers**: Import beneficiary data from Airwallex as suppliers
+1. **Sync Contractors**: Import beneficiary data from Airwallex as contractors
 2. **Sync Clients**: Import payer account data from Airwallex as clients
 3. **Track Sync Status**: Monitor which entities are synced with Airwallex
 4. **Manage Bank Details**: Automatically populate bank account information
 
 ## Testing the Integration
 
-1. Navigate to `/entities/suppliers`
+1. Navigate to `/entities/contractors`
 2. Click "Sync with Airwallex" button
 3. Check the sync results in the alert dialog
-4. Verify suppliers are imported with Airwallex data
+4. Verify contractors are imported with Airwallex data
 
 ## Troubleshooting
 

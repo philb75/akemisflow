@@ -1,0 +1,37 @@
+{
+  "testType": "ui-interactions",
+  "status": "failed",
+  "startTime": "2025-08-04T16:39:52.587Z",
+  "endTime": "2025-08-04T16:39:54.722Z",
+  "duration": 2135,
+  "screenshots": [
+    {
+      "name": "test-failure",
+      "filename": "test-failure-2025-08-04T16-39-54-213Z.png",
+      "filepath": "test-screenshots/test-failure-2025-08-04T16-39-54-213Z.png",
+      "timestamp": "2025-08-04T16:39:54.463Z"
+    }
+  ],
+  "errors": [
+    {
+      "message": "this.page.waitForTimeout is not a function",
+      "stack": "TypeError: this.page.waitForTimeout is not a function\n    at UIInteractionsTest.step1_TestButtons (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/ui-interactions.js:49:23)\n    at runNextTicks (node:internal/process/task_queues:65:5)\n    at listOnTimeout (node:internal/timers:555:9)\n    at process.processTimers (node:internal/timers:529:7)\n    at async UIInteractionsTest.execute (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/ui-interactions.js:22:7)\n    at async AkemisFlowTestAgent.runTest (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:102:27)\n    at async AkemisFlowTestAgent.main (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:377:24)",
+      "timestamp": "2025-08-04T16:39:54.213Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "timestamp": "2025-08-04T16:39:54.463Z"
+    }
+  ],
+  "serverLogExcerpts": [],
+  "performanceMetrics": {},
+  "stepResults": [],
+  "summary": null,
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T16:39:54.722Z",
+    "environment": "development"
+  }
+}

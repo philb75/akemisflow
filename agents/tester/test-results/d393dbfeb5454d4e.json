@@ -1,0 +1,48 @@
+{
+  "requestId": "d393dbfeb5454d4e",
+  "timestamp": "2025-08-04T18:28:27.585Z",
+  "summary": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "passRate": "50.0%"
+  },
+  "tests": [
+    {
+      "id": "T1",
+      "name": "UI Layout Test for R1",
+      "requirement": "R1",
+      "status": "fail",
+      "duration": 839,
+      "details": {
+        "reason": "Comment field not properly aligned",
+        "expected": "Comment field aligned with Account Name field",
+        "actual": "Elements not found",
+        "measurements": {
+          "found": false
+        }
+      }
+    },
+    {
+      "id": "T1",
+      "name": "Database Test for R2",
+      "requirement": "R2",
+      "status": "pass",
+      "duration": 398,
+      "details": {
+        "message": "Database schema correctly updated"
+      }
+    }
+  ],
+  "changeManifest": {
+    "requestId": "d393dbfeb5454d4e",
+    "timestamp": "2025-08-04T18:27:54.849Z",
+    "model": "sonnet",
+    "attempt": 1,
+    "changes": [],
+    "summary": {
+      "filesModified": 2,
+      "requirementsImplemented": 2
+    }
+  }
+}

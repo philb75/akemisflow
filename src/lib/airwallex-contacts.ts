@@ -152,6 +152,28 @@ export class AirwallexContactSync {
     return addressParts.join(', ')
   }
 
+  async deleteAllAirwallexContacts(): Promise<number> {
+    try {
+      console.log('🗑️ Deleting all Airwallex contacts...')
+      
+      // Delete all contacts that have Airwallex metadata
+      const deleteResult = await prisma.contact.deleteMany({
+        where: {
+          metadata: {
+            path: ['airwallex'],
+            not: null
+          }
+        }
+      })
+
+      console.log(`✅ Deleted ${deleteResult.count} Airwallex contacts`)
+      return deleteResult.count
+    } catch (error) {
+      console.error('❌ Error deleting Airwallex contacts:', error)
+      throw error
+    }
+  }
+
   async getContactsSummary(): Promise<{
     totalContacts: number
     airwallexContacts: number

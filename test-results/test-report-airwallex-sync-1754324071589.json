@@ -1,0 +1,38 @@
+{
+  "testType": "airwallex-sync",
+  "status": "failed",
+  "startTime": "2025-08-04T16:14:29.295Z",
+  "endTime": "2025-08-04T16:14:31.588Z",
+  "duration": 2293,
+  "screenshots": [
+    {
+      "name": "test-failure",
+      "filename": "test-failure-2025-08-04T16-14-31-210Z.png",
+      "filepath": "test-screenshots/test-failure-2025-08-04T16-14-31-210Z.png",
+      "timestamp": "2025-08-04T16:14:31.341Z"
+    }
+  ],
+  "errors": [
+    {
+      "type": "requestfailed",
+      "url": "http://localhost:3000/",
+      "failure": "net::ERR_CONNECTION_REFUSED",
+      "timestamp": "2025-08-04T16:14:31.207Z"
+    },
+    {
+      "message": "net::ERR_CONNECTION_REFUSED at http://localhost:3000",
+      "stack": "Error: net::ERR_CONNECTION_REFUSED at http://localhost:3000\n    at navigate (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Frame.js:184:27)\n    at async Deferred.race (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/util/Deferred.js:36:20)\n    at async CdpFrame.goto (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Frame.js:150:25)\n    at async CdpPage.goto (/Users/philippebarthelemy/dev/akemis/akemisflow/node_modules/.pnpm/puppeteer-core@24.15.0/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:574:20)\n    at async AirwallexSyncTest.step1_NavigateToApp (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/airwallex-sync.js:44:7)\n    at async AirwallexSyncTest.execute (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-modules/airwallex-sync.js:22:7)\n    at async AkemisFlowTestAgent.runTest (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:102:27)\n    at async AkemisFlowTestAgent.main (/Users/philippebarthelemy/dev/akemis/akemisflow/agents/test-agent.js:377:24)",
+      "timestamp": "2025-08-04T16:14:31.210Z"
+    }
+  ],
+  "serverLogExcerpts": [],
+  "performanceMetrics": {},
+  "stepResults": [],
+  "summary": null,
+  "metadata": {
+    "agentVersion": "1.0.0",
+    "nodeVersion": "v22.14.0",
+    "timestamp": "2025-08-04T16:14:31.589Z",
+    "environment": "development"
+  }
+}

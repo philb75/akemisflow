@@ -44,7 +44,7 @@
 1. Login: `philb75@gmail.com` / `Philb123$`
 2. ✅ Verify dashboard access
 3. ✅ Check Entities → Clients (19 records)
-4. ✅ Check Entities → Suppliers (29 records)  
+4. ✅ Check Entities → Contractors (29 records)  
 5. ✅ Check transactions (148 records)
 
 ## 🤖 **Post-Deployment Operations Ready**
@@ -68,13 +68,13 @@ node agents/sync-agent.js report
 ## 📊 **Expected Results**
 
 ### **Schema Deployment**
-- 7 core tables created (contacts, suppliers, bank_accounts, transactions, invoices, etc.)
+- 7 core tables created (contacts, contractors, bank_accounts, transactions, invoices, etc.)
 - 4 NextAuth tables created (users, accounts, sessions, verification_tokens)
 - Admin user created: philb75@gmail.com with ADMINISTRATOR role
 
 ### **Data Import**
 - 19 contacts imported
-- 29 suppliers imported  
+- 29 contractors imported  
 - 1 bank account imported
 - 148 transactions imported
 - 0 invoices (as expected from local data)

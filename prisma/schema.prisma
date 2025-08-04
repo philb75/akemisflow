@@ -59,6 +59,7 @@ model User {
   verifiedDocuments Document[] @relation("VerifiedDocuments")
   sessions          Session[]
   company           Contact?   @relation(fields: [companyId], references: [id])
+  configModifications SystemConfiguration[]
 
   @@map("users")
 }
@@ -302,7 +303,7 @@ model PartnerProfitShare {
   @@map("partner_profit_shares")
 }
 
-model Supplier {
+model Contractor {
   id                         String           @id @default(uuid()) @db.Uuid
   firstName                  String           @map("first_name") @db.VarChar(100)
   lastName                   String           @map("last_name") @db.VarChar(100)
@@ -345,8 +346,17 @@ model Supplier {
   // Airwallex integration
   airwallexContactId         String?          @map("airwallex_contact_id") @db.VarChar(255)
   
+  // Contract information
+  jobDescription             String?          @map("job_description")
+  rate                       Decimal?         @db.Decimal(10, 2)
+  rateCurrency               String?          @default("EUR") @map("rate_currency") @db.VarChar(3)
+  rateFrequency              RateFrequency?   @default(HOURLY) @map("rate_frequency")
+  
+  // General comments
+  comments                   String?          @map("comments")
+  
   // Status and metadata
-  status                     SupplierStatus   @default(ACTIVE)
+  status                     ContractorStatus @default(ACTIVE)
   isActive                   Boolean          @default(true) @map("is_active")
   preferredCurrency          String?          @default("EUR") @map("preferred_currency") @db.VarChar(3)
   createdAt                  DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -354,12 +364,12 @@ model Supplier {
   
   // Relationships
   documents                  Document[]
-  airwallexSuppliers         AirwallexSupplier[]
+  airwallexContractors       AirwallexContractor[]
 
-  @@map("suppliers")
+  @@map("contractors")
 }
 
-model AirwallexSupplier {
+model AirwallexContractor {
   id                    String    @id @default(uuid()) @db.Uuid
   beneficiaryId         String    @unique @map("beneficiary_id") @db.VarChar(255)
   entityType            String?   @map("entity_type") @db.VarChar(20)
@@ -426,11 +436,11 @@ model AirwallexSupplier {
   createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   syncError             String?   @map("sync_error")
   
-  // Relationship to AkemisFlow supplier
-  linkedSupplierId      String?   @map("linked_supplier_id") @db.Uuid
-  linkedSupplier        Supplier? @relation(fields: [linkedSupplierId], references: [id])
+  // Relationship to AkemisFlow contractor
+  linkedContractorId    String?   @map("linked_contractor_id") @db.Uuid
+  linkedContractor      Contractor? @relation(fields: [linkedContractorId], references: [id])
   
-  @@map("airwallex_suppliers")
+  @@map("airwallex_contractors")
 }
 
 model ExchangeRate {
@@ -465,7 +475,7 @@ model Document {
   bucketName        String?      @map("bucket_name") @db.VarChar(100)
   publicUrl         String?      @map("public_url") @db.VarChar(500)
   contactId         String?      @map("contact_id") @db.Uuid
-  supplierId        String?      @map("supplier_id") @db.Uuid
+  contractorId      String?      @map("contractor_id") @db.Uuid
   invoiceId         String?      @map("invoice_id") @db.Uuid
   userId            String       @map("user_id")
   documentType      DocumentType @map("document_type")
@@ -486,12 +496,12 @@ model Document {
   invoice           Invoice?     @relation(fields: [invoiceId], references: [id])
   previousVersion   Document?    @relation("DocumentVersions", fields: [previousVersionId], references: [id])
   nextVersions      Document[]   @relation("DocumentVersions")
-  supplier          Supplier?    @relation(fields: [supplierId], references: [id])
+  contractor        Contractor?  @relation(fields: [contractorId], references: [id])
   uploadedBy        User         @relation("UploadedDocuments", fields: [userId], references: [id])
   verifiedByUser    User?        @relation("VerifiedDocuments", fields: [verifiedBy], references: [id])
 
   @@index([contactId, documentType])
-  @@index([supplierId, documentType])
+  @@index([contractorId, documentType])
   @@index([invoiceId])
   @@index([expiryDate])
   @@index([isActive, documentType])
@@ -603,10 +613,15 @@ enum PartnerProfitShareStatus {
   PAID
 }
 
-enum SupplierStatus {
+enum ContractorStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
+}
+
+enum RateFrequency {
+  HOURLY
+  DAILY
 }
 
 enum ExchangeRateSource {
@@ -625,4 +640,51 @@ enum DocumentType {
   ID
   PROOF_OF_ADDRESS
   BANK
+}
+
+model SystemConfiguration {
+  id              String                    @id @default(uuid()) @db.Uuid
+  key             String                    @unique @db.VarChar(100)
+  value           String?                   @db.Text
+  category        SystemConfigCategory      
+  subcategory     String?                   @db.VarChar(50)
+  description     String?                   @db.Text
+  isSecret        Boolean                   @default(false) @map("is_secret")
+  isActive        Boolean                   @default(true) @map("is_active")
+  environment     SystemConfigEnvironment? @default(BOTH)
+  dataType        SystemConfigDataType      @default(STRING) @map("data_type")
+  defaultValue    String?                   @map("default_value") @db.Text
+  validationRule  String?                   @map("validation_rule") @db.Text
+  sortOrder       Int                       @default(0) @map("sort_order")
+  lastModifiedBy  String?                   @map("last_modified_by")
+  lastModifiedAt  DateTime                  @updatedAt @map("last_modified_at") @db.Timestamptz(6)
+  createdAt       DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relationship to user who last modified
+  modifiedByUser  User?                     @relation(fields: [lastModifiedBy], references: [id])
+
+  @@map("system_configurations")
+}
+
+enum SystemConfigCategory {
+  DATABASE
+  STORAGE
+  INTEGRATIONS
+  SECURITY
+  SYSTEM
+  NOTIFICATIONS
+}
+
+enum SystemConfigEnvironment {
+  LOCAL
+  PRODUCTION
+  BOTH
+}
+
+enum SystemConfigDataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+  ENCRYPTED
 }

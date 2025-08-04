@@ -46,31 +46,31 @@ export async function POST() {
       // Test simple query first
       try {
         const { count, error: countError } = await supabase
-          .from('suppliers')
+          .from('contractors')
           .select('*', { count: 'exact', head: true })
         
         if (countError) {
           logs.push(`❌ Count query error: ${countError.message}`)
         } else {
-          logs.push(`📊 Current suppliers in DB: ${count}`)
+          logs.push(`📊 Current contractors in DB: ${count}`)
         }
       } catch (err: any) {
         logs.push(`❌ Count query exception: ${err.message}`)
       }
       
       // Test insertion with minimal data (using snake_case for Supabase)
-      const minimalSupplier = {
+      const minimalContractor = {
         first_name: testBeneficiary.first_name || 'Test',
         last_name: testBeneficiary.last_name || 'User',
         email: `test-${Date.now()}@example.com`, // Unique email
         status: 'ACTIVE'
       }
       
-      logs.push(`📤 Attempting to insert test supplier...`)
+      logs.push(`📤 Attempting to insert test contractor...`)
       try {
         const { data, error } = await supabase
-          .from('suppliers')
-          .insert(minimalSupplier)
+          .from('contractors')
+          .insert(minimalContractor)
           .select()
           .single()
         
@@ -79,10 +79,10 @@ export async function POST() {
           logs.push(`❌ Error code: ${error.code}`)
           logs.push(`❌ Error details: ${JSON.stringify(error.details)}`)
         } else {
-          logs.push(`✅ Successfully inserted supplier: ${data.id}`)
+          logs.push(`✅ Successfully inserted contractor: ${data.id}`)
           
           // Clean up test data
-          await supabase.from('suppliers').delete().eq('id', data.id)
+          await supabase.from('contractors').delete().eq('id', data.id)
           logs.push(`🧹 Cleaned up test data`)
         }
       } catch (err: any) {
@@ -91,8 +91,8 @@ export async function POST() {
       
     } else {
       logs.push('🟡 Using Prisma database')
-      const count = await prisma.supplier.count()
-      logs.push(`📊 Current suppliers in DB: ${count}`)
+      const count = await prisma.contractor.count()
+      logs.push(`📊 Current contractors in DB: ${count}`)
     }
     
     return NextResponse.json({ 

@@ -1,5 +1,5 @@
 /**
- * Name formatting utilities for supplier names
+ * Name formatting utilities for contractor names
  * - Last names: UPPERCASE
  * - First/Middle names: Title case (first letter uppercase, rest lowercase)
  */
@@ -46,19 +46,19 @@ export function formatFullName(
 }
 
 /**
- * Format supplier name data for database storage
- * @param supplierData - Object containing name fields
+ * Format contractor name data for database storage
+ * @param contractorData - Object containing name fields
  * @returns Object with formatted name fields
  */
-export function formatSupplierNames<T extends { 
+export function formatContractorNames<T extends { 
   firstName?: string
   lastName?: string
   middleName?: string
   first_name?: string
   last_name?: string
   middle_name?: string
-}>(supplierData: T): T {
-  const formatted = { ...supplierData }
+}>(contractorData: T): T {
+  const formatted = { ...contractorData }
   
   // Handle camelCase fields (Prisma/Frontend)
   if (formatted.firstName) {
@@ -86,7 +86,7 @@ export function formatSupplierNames<T extends {
 }
 
 /**
- * Get display name for a supplier
+ * Get display name for a contractor
  * @param firstName - First name
  * @param lastName - Last name
  * @param middleName - Optional middle name

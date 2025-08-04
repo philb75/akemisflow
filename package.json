@@ -4,10 +4,12 @@
   "description": "Financial management system for Akemis operations",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
+    "dev:enhanced": "node scripts/dev-start.js",
+    "dev:check": "node scripts/startup-check.js",
     "build": "prisma generate && next build",
     "vercel-build": "node scripts/vercel-build.js",
-    "start": "next start",
+    "start": "next start -p 3000",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:migrate": "prisma migrate deploy",
@@ -33,7 +35,14 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:agent": "node agents/test-agent.js",
+    "test:runner": "node test-runner.js",
+    "test:quick": "node test-runner.js scenario quick",
+    "test:auth": "node test-runner.js scenario auth",
+    "test:airwallex": "node test-runner.js scenario airwallex",
+    "test:crud": "node test-runner.js scenario crud",
+    "test:full": "node test-runner.js scenario full"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
@@ -69,6 +78,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",
     "recharts": "^2.8.0",
+    "sonner": "^2.0.6",
     "tailwind-merge": "^2.2.0",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
@@ -91,6 +101,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.1.1",
     "prisma": "^5.7.0",
+    "puppeteer": "^24.15.0",
     "tsx": "^4.20.3"
   },
   "prisma": {

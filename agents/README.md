@@ -4,7 +4,39 @@ Comprehensive automation suite for AkemisFlow deployment, monitoring, and mainte
 
 ## 🤖 Available Agents
 
-### 1. **Sync Agent** (`sync-agent.js`)
+### 1. **Test Agent** (`test-agent.js`)
+Automated testing with Puppeteer for comprehensive application validation.
+
+```bash
+# Run specific test types
+node agents/test-agent.js run airwallex-sync
+node agents/test-agent.js run contractor-crud
+node agents/test-agent.js run auth-flow
+node agents/test-agent.js run navigation
+node agents/test-agent.js run ui-interactions
+
+# Test scenarios with runner
+node test-runner.js scenario quick    # Navigation + UI
+node test-runner.js scenario full     # All tests
+```
+
+**Features:**
+- Puppeteer-based browser automation
+- Screenshot capture at each step
+- Server log monitoring during tests
+- Comprehensive JSON reporting
+- Multiple test modules for different functionality
+- Performance metrics collection
+- Detailed error reporting and debugging
+
+**Use Cases:**
+- Post-deployment validation
+- Regression testing after code changes
+- Airwallex synchronization verification
+- Authentication flow testing
+- UI component interaction testing
+
+### 2. **Sync Agent** (`sync-agent.js`)
 Bidirectional synchronization between local and production environments.
 
 ```bash
