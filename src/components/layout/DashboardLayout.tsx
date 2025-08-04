@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -101,6 +101,37 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname()
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [environmentLabel, setEnvironmentLabel] = useState<string>("Loading...")
+  const [environmentColor, setEnvironmentColor] = useState<string>("text-gray-400")
+
+  useEffect(() => {
+    // Detect environment based on runtime conditions
+    const detectEnvironment = () => {
+      // Check if we're on Vercel
+      const isVercel = window.location.hostname.includes('vercel.app') || 
+                      window.location.hostname.includes('vercel.sh')
+      
+      // Check for localhost
+      const isLocal = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1'
+      
+      if (isVercel) {
+        setEnvironmentLabel("Vercel | Supabase")
+        setEnvironmentColor("text-green-600")
+      } else if (isLocal) {
+        // On local, check if using local DB or Supabase
+        // We can check this by looking at the database URL in env or just default to PostgreSQL for local
+        setEnvironmentLabel("Local Server | PostgreSQL")
+        setEnvironmentColor("text-red-600")
+      } else {
+        // Production or custom domain
+        setEnvironmentLabel("Production | Supabase")
+        setEnvironmentColor("text-blue-600")
+      }
+    }
+    
+    detectEnvironment()
+  }, [])
 
   const toggleMenu = (menuName: string, forceExpand = false) => {
     if (forceExpand) {
@@ -273,7 +304,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">AkemisFlow</h1>
-              <span className="text-sm text-red-600 font-medium">Local Server | PostgreSQL</span>
+              <span className={`text-sm font-medium ${environmentColor}`}>{environmentLabel}</span>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
