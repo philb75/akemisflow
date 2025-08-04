@@ -91,12 +91,17 @@ export async function POST(request: NextRequest) {
         })
         
         // Prepare Airwallex contractor data
+        // Generate fallback email if missing using beneficiary ID
+        const email = beneficiary.beneficiary?.additional_info?.personal_email || 
+                     beneficiary.email || 
+                     `${beneficiary.beneficiary_id}@airwallex.contact`
+        
         const airwallexContractorData = {
           beneficiaryId: beneficiary.beneficiary_id,
           entityType: beneficiary.beneficiary?.entity_type,
           firstName: formattedNames.firstName,
           lastName: formattedNames.lastName,
-          email: beneficiary.beneficiary?.additional_info?.personal_email,
+          email: email,
           phone: beneficiary.beneficiary?.phone_number,
           company: beneficiary.beneficiary?.company_name,
           
@@ -361,7 +366,7 @@ export async function POST(request: NextRequest) {
             const contractorData = {
               firstName: formattedNames.firstName,
               lastName: formattedNames.lastName,
-              email: beneficiary.beneficiary?.additional_info?.personal_email || `${beneficiaryId}@airwallex.com`,
+              email: email, // Use the same email we calculated above
               phone: beneficiary.beneficiary?.phone_number,
               company: beneficiary.beneficiary?.company_name,
               
