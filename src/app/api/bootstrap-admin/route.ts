@@ -53,10 +53,7 @@ export async function POST(request: NextRequest) {
             email: 'test@akemisflow.com',
             password: hashedPassword,
             role: 'ADMINISTRATOR',
-            is_active: true,
-            name: 'Test Admin',
-            first_name: 'Test',
-            last_name: 'Admin'
+            name: 'Test Admin'
           })
           .select()
           .single()
@@ -99,10 +96,7 @@ export async function POST(request: NextRequest) {
         email: 'admin@akemisflow.com',
         password: hashedPassword,
         role: 'ADMINISTRATOR',
-        is_active: true,
-        name: 'Production Admin',
-        first_name: 'Production',
-        last_name: 'Admin'
+        name: 'Production Admin'
       })
       .select()
       .single()
