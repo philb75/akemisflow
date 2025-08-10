@@ -56,8 +56,7 @@ export async function POST(request: NextRequest) {
             is_active: true,
             name: 'Test Admin',
             first_name: 'Test',
-            last_name: 'Admin',
-            email_verified: new Date().toISOString()
+            last_name: 'Admin'
           })
           .select()
           .single()
@@ -103,8 +102,7 @@ export async function POST(request: NextRequest) {
         is_active: true,
         name: 'Production Admin',
         first_name: 'Production',
-        last_name: 'Admin',
-        email_verified: new Date().toISOString()
+        last_name: 'Admin'
       })
       .select()
       .single()
