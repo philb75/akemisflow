@@ -6,6 +6,13 @@ import { createSupabaseClient } from '@/lib/supabase'
 // Environment-aware database client
 const useSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
 
+console.log('🔧 Environment detection:')
+console.log('- NEXT_PUBLIC_SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+console.log('- SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY) 
+console.log('- Using Supabase:', useSupabase)
+console.log('- NEXTAUTH_URL:', process.env.NEXTAUTH_URL)
+console.log('- VERCEL_URL:', process.env.VERCEL_URL)
+
 export async function DELETE(request: NextRequest) {
   try {
     // Check authentication
@@ -72,7 +79,10 @@ export async function POST(request: NextRequest) {
     console.log('🔄 Re-importing Airwallex contractors...')
     
     // Trigger the contractors sync endpoint
-    const syncResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/contractors/sync-airwallex`, {
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+    console.log(`🔗 Making internal sync request to: ${baseUrl}/api/contractors/sync-airwallex`)
+    
+    const syncResponse = await fetch(`${baseUrl}/api/contractors/sync-airwallex`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,8 +90,18 @@ export async function POST(request: NextRequest) {
     })
     
     if (!syncResponse.ok) {
-      const error = await syncResponse.json()
-      throw new Error(error.error || 'Sync failed')
+      const errorText = await syncResponse.text()
+      console.error(`❌ Sync request failed with status ${syncResponse.status}:`, errorText)
+      
+      let errorMessage = 'Sync failed'
+      try {
+        const error = JSON.parse(errorText)
+        errorMessage = error.error || error.message || errorMessage
+      } catch {
+        errorMessage = errorText || errorMessage
+      }
+      
+      throw new Error(errorMessage)
     }
     
     const syncResult = await syncResponse.json()
