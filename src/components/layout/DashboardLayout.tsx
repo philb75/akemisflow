@@ -103,9 +103,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [environmentLabel, setEnvironmentLabel] = useState<string>("Loading...")
   const [environmentColor, setEnvironmentColor] = useState<string>("text-gray-400")
+  const [branchInfo, setBranchInfo] = useState<string>("")
 
   useEffect(() => {
-    // Detect environment based on runtime conditions
+    // Detect environment and branch based on runtime conditions
     const detectEnvironment = () => {
       // Check if we're on Vercel
       const isVercel = window.location.hostname.includes('vercel.app') || 
@@ -115,13 +116,34 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       const isLocal = window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1'
       
+      // Detect branch from URL or hostname patterns
+      const detectBranch = () => {
+        const hostname = window.location.hostname
+        
+        // For Vercel preview deployments, check for branch patterns
+        if (hostname.includes('-git-dev-') || hostname.includes('akemisflow-git-dev')) {
+          return 'dev'
+        } else if (hostname.includes('-git-') && !hostname.includes('akemisflow.vercel.app')) {
+          // Extract branch from git- pattern
+          const match = hostname.match(/-git-([^-]+)-/)
+          return match ? match[1] : 'preview'
+        } else if (hostname === 'akemisflow.vercel.app') {
+          return 'master'
+        }
+        
+        return isLocal ? 'local' : 'main'
+      }
+      
+      const branch = detectBranch()
+      setBranchInfo(branch)
+      
       if (isVercel) {
-        setEnvironmentLabel("Vercel | Supabase")
-        setEnvironmentColor("text-green-600")
+        const branchLabel = branch === 'master' ? 'Production' : branch === 'dev' ? 'Development' : `Branch: ${branch}`
+        setEnvironmentLabel(`${branchLabel} | Vercel | Supabase`)
+        setEnvironmentColor(branch === 'master' ? "text-blue-600" : branch === 'dev' ? "text-orange-600" : "text-purple-600")
       } else if (isLocal) {
         // On local, check if using local DB or Supabase
-        // We can check this by looking at the database URL in env or just default to PostgreSQL for local
-        setEnvironmentLabel("Local Server | PostgreSQL")
+        setEnvironmentLabel("Local Development | PostgreSQL")
         setEnvironmentColor("text-red-600")
       } else {
         // Production or custom domain
@@ -170,6 +192,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 src={sidebarCollapsed ? "/images/mini-logo.png" : "/images/logo.png"}
                 alt="Akemis Logo" 
                 className={sidebarCollapsed ? "h-8 w-8 object-contain" : "h-10 w-auto object-contain"}
+                onError={(e) => {
+                  // Fallback to text logo if image fails to load
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                  const fallback = document.createElement('div')
+                  fallback.className = `flex items-center justify-center ${sidebarCollapsed ? 'h-8 w-8 text-xs' : 'h-10 text-lg'} font-bold text-blue-700 bg-blue-100 rounded`
+                  fallback.textContent = sidebarCollapsed ? 'A' : 'AKEMIS'
+                  target.parentNode?.appendChild(fallback)
+                }}
               />
             </div>
           </div>
@@ -304,7 +335,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">AkemisFlow</h1>
-              <span className={`text-sm font-medium ${environmentColor}`}>{environmentLabel}</span>
+              <div className="flex items-center space-x-2">
+                <span className={`text-sm font-medium ${environmentColor}`}>{environmentLabel}</span>
+                {branchInfo === 'dev' && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                    DEV
+                  </span>
+                )}
+                {environmentLabel === "Loading..." && (
+                  <div className="inline-flex items-center">
+                    <div className="animate-spin h-3 w-3 border-2 border-gray-300 border-t-blue-600 rounded-full mr-1"></div>
+                    <span className="text-xs text-gray-500">Connecting...</span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
