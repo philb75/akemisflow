@@ -116,22 +116,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       const isLocal = window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1'
       
-      // Detect branch from URL or hostname patterns
+      // Detect branch from URL or hostname patterns  
       const detectBranch = () => {
         const hostname = window.location.hostname
         
-        // For Vercel preview deployments, check for branch patterns
-        if (hostname.includes('-git-dev-') || hostname.includes('akemisflow-git-dev')) {
-          return 'dev'
-        } else if (hostname.includes('-git-') && !hostname.includes('akemisflow.vercel.app')) {
-          // Extract branch from git- pattern
-          const match = hostname.match(/-git-([^-]+)-/)
-          return match ? match[1] : 'preview'
-        } else if (hostname === 'akemisflow.vercel.app') {
+        // Check for production domain first
+        if (hostname === 'akemisflow.vercel.app') {
           return 'master'
         }
         
-        return isLocal ? 'local' : 'main'
+        // For Vercel preview deployments, check for branch patterns in URL
+        if (hostname.includes('-git-dev-') || hostname.includes('akemisflow-git-dev')) {
+          return 'dev'
+        } else if (hostname.includes('-git-')) {
+          // Extract branch from git- pattern  
+          const match = hostname.match(/-git-([^-]+)-/)
+          return match ? match[1] : 'preview'
+        }
+        
+        // For preview deployments without git- pattern, assume it's from dev branch
+        if (isVercel && hostname.includes('philippe-barthelemys-projects.vercel.app')) {
+          return 'dev'
+        }
+        
+        return isLocal ? 'local' : 'preview'
       }
       
       const branch = detectBranch()
