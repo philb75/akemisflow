@@ -1,0 +1,53 @@
+{
+  "name": "AkemisFlow Development",
+  "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/postgresql:1": {
+      "version": "15"
+    },
+    "ghcr.io/devcontainers-contrib/features/pnpm:2": {
+      "version": "latest"
+    }
+  },
+
+  "forwardPorts": [3000, 5432, 54321, 54322],
+  
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "GitHub.copilot"
+      ]
+    }
+  },
+  
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "NEXTAUTH_URL": "https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}",
+    "NEXTAUTH_SECRET": "dev-secret-key-for-codespaces-2024",
+    
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:54322/postgres",
+    "DIRECT_DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres",
+    
+    "NEXT_PUBLIC_SUPABASE_URL": "http://localhost:54321",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU",
+    
+    "AIRWALLEX_CLIENT_ID": "ooSEP1J_RVCyQJCXMZx42g",
+    "AIRWALLEX_API_KEY": "894d904d7c01237087c5b9b458003bfb8393e7b9638a1bf64c80bb6dc1b9df399d45c3a29e4eb6230592912c6bd489bb",
+    "AIRWALLEX_BASE_URL": "https://api-demo.airwallex.com",
+    
+    "NEXT_PUBLIC_UPLOAD_PATH": "/workspace/uploads",
+    "AKEMIS_ENV": "development",
+    "GIT_DEFAULT_BRANCH": "dev"
+  }
+}

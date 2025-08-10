@@ -1,52 +1,72 @@
-# AkemisFlow Deployment Guide
+# 🚀 AkemisFlow Deployment Guide
 
-## Development Workflow
+## Overview
 
-### 1. Local Development Setup
+AkemisFlow uses a **branch-based deployment strategy** with Vercel:
+- **Production**: `master` branch → Production environment (currently active)
+- **Development**: `dev` branch → Preview environment with test data
+- **Features**: `feature/*` branches → Automatic preview URLs
+
+## Quick Start
+
+### 1. Initial Setup
+
+```bash
+# Run the setup script
+./scripts/deploy-dev-branch.sh
+```
+
+This script will:
+- Create and push a `dev` branch
+- Configure Vercel environment variables for each environment
+- Set up automatic deployments
+- Deploy your first preview
+
+### 2. Environment Structure
+
+```
+┌─────────────────────────────────────────┐
+│           Vercel Project                 │
+│          "akemisflow"                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌──────────────┐  ┌─────────────┐    │
+│  │ Production   │  │ Development │    │
+│  │  (master)    │  │   (dev)     │    │
+│  └──────────────┘  └─────────────┘    │
+│         ↑                ↑             │
+│         │                │             │
+│  ┌──────────────┐  ┌─────────────┐    │
+│  │  Prod DB     │  │   Dev DB    │    │
+│  │  (Supabase)  │  │ (Supabase)  │    │
+│  └──────────────┘  └─────────────┘    │
+└─────────────────────────────────────────┘
+```
+
+## Local Development
+
 ```bash
 # Clone repository
 git clone https://github.com/philb75/akemisflow.git
 cd akemisflow
 
-# Install dependencies
-npm install
+# Install dependencies (use pnpm)
+pnpm install
 
 # Start Docker services
 docker-compose up -d
 
 # Set up local database
-npm run db:migrate
-npm run db:seed
+pnpm prisma db push
+pnpm prisma db seed
 
 # Start development server
-npm run dev
+pnpm dev
 ```
 
-### 2. Making Changes
+## Deployment Process
 
-#### Code Changes
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Make changes
-3. Test locally
-4. Commit with descriptive messages
-
-#### Database Changes
-1. Modify `prisma/schema.prisma`
-2. Create migration: `npm run db:migration:create descriptive_name`
-3. Apply locally: `npm run db:migrate`
-4. Test thoroughly
-
-### 3. Deployment Process
-
-#### Automatic Deployment (Code)
-```bash
-git push origin master
-```
-- GitHub webhook triggers Vercel
-- Vercel builds and deploys
-- New code is live in ~2-3 minutes
-
-#### Manual Deployment (Database)
+### Automatic Deployment
 ```bash
 # Option 1: Use migration script
 node scripts/deploy-migrations.js

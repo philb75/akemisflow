@@ -34,10 +34,10 @@ import {
   Database,
   ExternalLink,
   ArrowRight,
+  ArrowLeft,
   Check,
   Star,
   Search,
-  ArrowLeft,
   Loader2,
   Edit,
   Briefcase,
@@ -806,6 +806,62 @@ export default function ContractorsPage() {
     }
   }
 
+  // Handle deletion of AkemisFlow contractor
+  const handleDeleteAkemisContractor = async (contractorId: string) => {
+    if (!confirm('Are you sure you want to delete this contractor from AkemisFlow? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/contractors/${contractorId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete contractor')
+      }
+
+      // Refresh the contractor list
+      await fetchContractors()
+      await fetchCombinedData()
+      
+      alert('✅ Contractor deleted successfully')
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('❌ Delete failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
+  }
+
+  // Handle deletion of Airwallex contact
+  const handleDeleteAirwallexContact = async (airwallexId: string) => {
+    if (!confirm('⚠️ WARNING: This will delete the Airwallex contact from your local database.\n\nAre you sure you want to continue?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/airwallex-contractors/${airwallexId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to delete Airwallex contact')
+      }
+
+      // Refresh the lists
+      await fetchAirwallexContacts()
+      await fetchCombinedData()
+      
+      alert('✅ Airwallex contact deleted successfully')
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('❌ Delete failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
+  }
+
   // Toggle row expansion
   const toggleRowExpansion = (contactId: string) => {
     const newExpanded = new Set(expandedRows)
@@ -1260,15 +1316,15 @@ export default function ContractorsPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 w-6 p-0 hover:bg-blue-100"
+                  className="h-7 w-7 p-0 hover:bg-blue-100"
                   onClick={() => handleSyncAirwallexToAkemis(contact)}
                   disabled={isContactSyncing}
                   title={contact.hasContractor ? "Update AkemisFlow from Airwallex" : "Create AkemisFlow from Airwallex"}
                 >
                   {isContactSyncing ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <ArrowLeft className="w-3 h-3 text-blue-600" />
+                    <ArrowLeft className="w-4 h-4 text-blue-600" />
                   )}
                 </Button>
               )}
@@ -1278,15 +1334,15 @@ export default function ContractorsPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 w-6 p-0 hover:bg-orange-100"
+                  className="h-7 w-7 p-0 hover:bg-orange-100"
                   onClick={() => handleSyncAkemisToAirwallex(contact)}
                   disabled={isContactSyncing}
                   title={contact.hasAirwallex ? "Update Airwallex from AkemisFlow" : "Create Airwallex from AkemisFlow"}
                 >
                   {isContactSyncing ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <ArrowRight className="w-3 h-3 text-orange-600" />
+                    <ArrowRight className="w-4 h-4 text-orange-600" />
                   )}
                 </Button>
               )}
@@ -1306,11 +1362,37 @@ export default function ContractorsPage() {
             {/* View Details Button */}
             {contact.hasContractor && (
               <Link href={`/entities/contractors/${contact.contractor.id}`}>
-                <Button size="sm" variant="outline" className="h-6 px-2">
-                  <Eye className="w-3 h-3 mr-1" />
+                <Button size="sm" variant="outline" className="h-8 px-3">
+                  <Eye className="w-4 h-4 mr-1" />
                   View
                 </Button>
               </Link>
+            )}
+            
+            {/* Delete Akemis Contractor Button */}
+            {contact.hasContractor && (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-8 w-8 p-0 hover:bg-red-50"
+                onClick={() => handleDeleteAkemisContractor(contact.contractor.id)}
+                title="Delete from AkemisFlow"
+              >
+                <Trash2 className="w-4 h-4 text-red-600" />
+              </Button>
+            )}
+            
+            {/* Delete Airwallex Contact Button */}
+            {contact.hasAirwallex && (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-8 w-8 p-0 hover:bg-orange-50"
+                onClick={() => handleDeleteAirwallexContact(contact.airwallex.id)}
+                title="Delete from Airwallex"
+              >
+                <X className="w-4 h-4 text-orange-600" />
+              </Button>
             )}
           </div>
         )
@@ -2741,24 +2823,11 @@ export default function ContractorsPage() {
         </div>
         <div className="flex space-x-2 pr-2">
           <Button
-            onClick={handleSyncWithAirwallex}
-            disabled={syncing}
-            variant="outline"
-            className="text-orange-600 border-orange-300 hover:bg-orange-50"
-          >
-            {syncing ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4 mr-2" />
-            )}
-            {syncing ? 'Syncing...' : 'Sync with Airwallex'}
-          </Button>
-          <Button
             onClick={() => setShowFieldSelector(!showFieldSelector)}
             variant="outline"
           >
             <Eye className="w-4 h-4 mr-2" />
-            Fields
+            Customize Fields
           </Button>
         </div>
       </div>
@@ -2774,6 +2843,27 @@ export default function ContractorsPage() {
               </div>
               <Database className="w-8 h-8 text-blue-600" />
             </div>
+            <div className="mt-3 pt-3 border-t flex items-center space-x-2">
+              <Link href="/entities/contractors/new">
+                <Button size="sm" variant="default" className="h-7">
+                  <Plus className="w-3 h-3 mr-1" />
+                  Add New
+                </Button>
+              </Link>
+              {contractors.length > 0 && (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-7 text-red-600 hover:bg-red-50"
+                  onClick={() => {
+                    alert('Bulk delete functionality can be implemented here')
+                  }}
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Bulk Delete
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
         
@@ -2785,6 +2875,35 @@ export default function ContractorsPage() {
                 <p className="text-2xl font-bold">{airwallexContacts.length}</p>
               </div>
               <ExternalLink className="w-8 h-8 text-orange-600" />
+            </div>
+            <div className="mt-3 pt-3 border-t flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-orange-600 hover:bg-orange-50"
+                onClick={handleSyncWithAirwallex}
+                disabled={syncing}
+              >
+                {syncing ? (
+                  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                )}
+                Sync
+              </Button>
+              {airwallexContacts.length > 0 && (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="h-7 text-orange-600 hover:bg-orange-50"
+                  onClick={() => {
+                    alert('Bulk delete Airwallex contacts functionality can be implemented here')
+                  }}
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Clear All
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
