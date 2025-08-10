@@ -36,6 +36,44 @@ export async function POST(request: NextRequest) {
     }
 
     if (existingAdmins && existingAdmins.length > 0) {
+      // Check if test admin already exists
+      const testAdminExists = existingAdmins.some(u => u.email === 'test@akemisflow.com')
+      
+      if (!testAdminExists) {
+        // Create a test admin for sync testing
+        const hashedPassword = await bcrypt.hash('TestAdmin123!', 10)
+        
+        const { data: testUser, error: testInsertError } = await supabase
+          .from('users')
+          .insert({
+            email: 'test@akemisflow.com',
+            password: hashedPassword,
+            role: 'ADMINISTRATOR',
+            is_active: true,
+            name: 'Test Admin',
+            first_name: 'Test',
+            last_name: 'Admin',
+            email_verified: new Date().toISOString()
+          })
+          .select()
+          .single()
+
+        if (testInsertError) {
+          console.error('Error creating test admin user:', testInsertError)
+        } else {
+          return NextResponse.json({
+            success: true,
+            message: 'Test admin user created for sync testing',
+            user: {
+              email: testUser.email,
+              role: testUser.role,
+              name: testUser.name
+            },
+            existingAdmins: existingAdmins.map(u => u.email)
+          }, { status: 201 })
+        }
+      }
+      
       return NextResponse.json({ 
         success: false,
         message: 'Admin users already exist',
