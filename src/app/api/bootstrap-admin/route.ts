@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
       // Check if test admin already exists
       const testAdminExists = existingAdmins.some(u => u.email === 'test@akemisflow.com')
       console.log('Test admin exists?', testAdminExists)
+      console.log('Existing admins:', existingAdmins.map(u => u.email))
       
       if (!testAdminExists) {
         console.log('Creating test admin user...')
@@ -63,6 +64,12 @@ export async function POST(request: NextRequest) {
 
         if (testInsertError) {
           console.error('Error creating test admin user:', testInsertError)
+          return NextResponse.json({
+            success: false,
+            message: 'Failed to create test admin user',
+            error: testInsertError.message,
+            existingAdmins: existingAdmins.map(u => u.email)
+          }, { status: 500 })
         } else {
           return NextResponse.json({
             success: true,
@@ -75,13 +82,13 @@ export async function POST(request: NextRequest) {
             existingAdmins: existingAdmins.map(u => u.email)
           }, { status: 201 })
         }
+      } else {
+        return NextResponse.json({ 
+          success: false,
+          message: 'Test admin user already exists',
+          existingAdmins: existingAdmins.map(u => u.email)
+        }, { status: 200 })
       }
-      
-      return NextResponse.json({ 
-        success: false,
-        message: 'Admin users already exist',
-        existingAdmins: existingAdmins.map(u => u.email)
-      }, { status: 200 })
     }
 
     // Create admin user
