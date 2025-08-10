@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
       .from('users')
       .select('email, role')
       .eq('role', 'ADMINISTRATOR')
-      .limit(1)
     
     if (checkError) {
       console.error('Error checking existing admins:', checkError)
@@ -35,11 +34,15 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
+    console.log('Existing admins found:', existingAdmins)
+    
     if (existingAdmins && existingAdmins.length > 0) {
       // Check if test admin already exists
       const testAdminExists = existingAdmins.some(u => u.email === 'test@akemisflow.com')
+      console.log('Test admin exists?', testAdminExists)
       
       if (!testAdminExists) {
+        console.log('Creating test admin user...')
         // Create a test admin for sync testing
         const hashedPassword = await bcrypt.hash('TestAdmin123!', 10)
         
