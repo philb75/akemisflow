@@ -29,21 +29,34 @@ export async function DELETE(request: NextRequest) {
     
     if (useSupabase) {
       const supabase = createSupabaseClient()
-      const { error } = await supabase
-        .from('airwallex_contractors')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all (Supabase requires a condition)
       
-      if (error) {
-        throw new Error(error.message)
+      // First get all records to count them
+      const { data: allRecords, error: selectError } = await supabase
+        .from('airwallex_contractors')
+        .select('id')
+      
+      if (selectError) {
+        throw new Error(`Failed to fetch records for deletion: ${selectError.message}`)
       }
       
-      // Get count of remaining records to calculate deleted count
-      const { count } = await supabase
-        .from('airwallex_contractors')
-        .select('*', { count: 'exact', head: true })
+      const recordCount = allRecords?.length || 0
+      console.log(`📊 Found ${recordCount} records to delete`)
       
-      deleteResult.count = 'all' // We don't have the exact count but all were deleted
+      if (recordCount > 0) {
+        // Delete all records using a condition that matches all
+        const { error: deleteError } = await supabase
+          .from('airwallex_contractors')
+          .delete()
+          .not('id', 'is', null) // More reliable condition: delete where id is not null
+        
+        if (deleteError) {
+          throw new Error(`Delete operation failed: ${deleteError.message}`)
+        }
+        
+        deleteResult.count = recordCount
+      } else {
+        deleteResult.count = 0
+      }
     } else {
       deleteResult = await prisma.airwallexContractor.deleteMany({})
     }
